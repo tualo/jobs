@@ -536,12 +536,19 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
 
                 */
+
+        this.updatePreviewFrame();
+    },
+
+    onDataUpdate: function (store, record, op, modifiedFieldNames) {
         let model = this.getViewModel();
         store = model.getStore('data'),
             range = store.getRange();
 
-        for (let i = 0; i < range.length; i++) {
-            let record = range[i];
+        //for (let i = 0; i < range.length; i++) {
+        if (modifiedFieldNames.includes('use_real_amount')) {
+
+
             record.set('singleprice', record.get('epreis'));
             if (record.get('use_real_amount')) {
                 record.set('netto', record.get('epreis') * record.get('ist_anzahl'));
@@ -558,7 +565,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             record.set('steuer', record.get('taxvalue'));
             record.set('epreis', record.get('singleprice'));
         }
-        this.updatePreviewFrame();
+        // }
     },
 
 
