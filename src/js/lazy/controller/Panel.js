@@ -13,6 +13,25 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             store = model.getStore('data');
         store.load();
 
+        // spalten use_real_amount und ist_anzahl einblenden,
+        // wenn reportType 'rechnung' ist
+
+        if (model.get('reportType') === 'rechnung') {
+            let grid = this.getView().getComponent('westPanel').getComponent('calculationGrid');
+            grid.columns.forEach(column => {
+                if (column.dataIndex === 'use_real_amount' || column.dataIndex === 'ist_anzahl') {
+                    column.setVisible(true);
+                }
+            });
+        } else {
+            let grid = this.getView().getComponent('westPanel').getComponent('calculationGrid');
+            grid.columns.forEach(column => {
+                if (column.dataIndex === 'use_real_amount' || column.dataIndex === 'ist_anzahl') {
+                    column.setVisible(false);
+                }
+            });
+        }
+
     },
 
 
