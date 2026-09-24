@@ -2,7 +2,7 @@ Ext.define('Tualo.jobs.lazy.Panel', {
     /*** */
     extend: 'Ext.panel.Panel',
     alias: 'widget.tualo_jobs_panel',
-    title: 'Kalkulation zu Angebot',
+
     requires: [
         'Tualo.jobs.lazy.controller.Panel',
         'Tualo.jobs.lazy.models.Panel'
@@ -15,6 +15,9 @@ Ext.define('Tualo.jobs.lazy.Panel', {
     config: {
         jobid: null,
         reportType: null
+    },
+    bind: {
+        title: '{title}'
     },
     applyJobid: function (jobid) {
         this.getViewModel().set('jobid', jobid);

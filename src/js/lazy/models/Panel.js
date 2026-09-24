@@ -27,6 +27,11 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
             if (get('reportType') == 'rechnung') return "Rechnung";
             return '<unbekannt>';
         },
+        title: function (get) {
+            if (get('reportType') == 'angebot') return "Kalkulation zu Angebot";
+            if (get('reportType') == 'rechnung') return "Kalkulation zu Rechnung";
+            return '<unbekannt>';
+        },
         canEdit: function (get) {
             return get('hasRecord') !== false;
         },
