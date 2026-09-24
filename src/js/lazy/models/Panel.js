@@ -127,7 +127,8 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
             listeners: {
                 beforeload: 'onDataStoreBeforeLoad',
                 load: 'onDataStoreLoad',
-                datachanged: 'onDataDataChanged'
+                datachanged: 'onDataDataChanged',
+                update: 'onDataUpdate'
             }
         },
 
