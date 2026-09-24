@@ -539,7 +539,8 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
                 */
 
-        this.updatePreviewFrame();
+
+        // this.updatePreviewFrame();
     },
 
     onDataUpdate: function (store, record, op, modifiedFieldNames) {
