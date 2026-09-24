@@ -167,7 +167,7 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
             "payments": [],
             "reductions": [],
             "signum": [],
-            "texts": texts,
+            "texts": texts_array,
             "locks": [],
             "tax_registration": [],
             "seller_information": [],
