@@ -59,7 +59,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
         filters.push({
             property: 'id',
-            value: view.getConfig().jobid,
+            value: model.get('jobid'),
             operator: 'eq'
         });
 
@@ -108,7 +108,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
         filters.push({
             property: 'jobid',
-            value: view.getConfig().jobid,
+            value: model.get('jobid'),
             operator: 'eq'
         });
 
@@ -206,7 +206,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
         filters.push({
             property: 'jobid',
-            value: view.getConfig().jobid,
+            value: model.get('jobid'),
             operator: 'eq'
         });
 
@@ -231,7 +231,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
         filters.push({
             property: 'tualo_job_id',
-            value: view.getConfig().jobid,
+            value: model.get('jobid'),
             operator: 'eq'
         });
 
@@ -602,7 +602,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
         filters.push({
             property: 'id',
-            value: view.getConfig().jobid,
+            value: model.get('jobid'),
             operator: 'eq'
         });
 
@@ -742,7 +742,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
                 iconCls: 'fa fa-warning'
             });
         } else {
-            Ext.getApplication().redirectTo('ds/tualo_job/id/' + view.getConfig().jobid);
+            Ext.getApplication().redirectTo('ds/tualo_job/id/' + model.get('jobid'));
         }
     }
 

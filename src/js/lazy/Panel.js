@@ -272,9 +272,10 @@ Ext.define('Tualo.jobs.lazy.Panel', {
                             handler: 'onSave'
                         }, {
                             bind: {
-                                disabled: '{disableForm}'
+                                disabled: '{disableForm}',
+                                text: '{saveButtonText}'
                             },
-                            text: 'Angebot erstellen',
+                            // text: 'Angebot erstellen',
                             handler: 'saveOfferReport'
 
                         }

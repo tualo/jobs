@@ -104,7 +104,7 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
 
             "id": -1,
 
-            "jobid": view.getConfig().jobid,
+            "jobid": model.get('jobid'),
             "layout": {
                 "positions": [
                     {
