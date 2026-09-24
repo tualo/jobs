@@ -151,6 +151,8 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
         let model = this.getViewModel(),
             artikelgruppen = model.getStore('artikelgruppen');
         this.showRealAmountColumns();
+
+
         records.forEach((record) => {
             if (Ext.isEmpty(record.get('leistungsbeschreibung')) && (!Ext.isEmpty(record.get('langtext')))) {
                 record.set('leistungsbeschreibung', record.get('langtext'));
@@ -565,6 +567,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             record.set('steuer', record.get('taxvalue'));
             record.set('epreis', record.get('singleprice'));
         }
+        me.gruppenPreise();
         // }
     },
 
