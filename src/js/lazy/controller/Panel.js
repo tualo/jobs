@@ -13,9 +13,12 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             store = model.getStore('data');
         store.load();
 
-        // spalten use_real_amount und ist_anzahl einblenden,
-        // wenn reportType 'rechnung' ist
 
+
+    },
+
+    showRealAmountColumns: function () {
+        let model = this.getViewModel();
         if (model.get('reportType') === 'rechnung') {
             let grid = this.getView().getComponent('westPanel').getComponent('calculationGrid');
             grid.columns.forEach(column => {
@@ -31,9 +34,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
                 }
             });
         }
-
     },
-
 
     onDropGrid: function () {
         this.numberRows();
@@ -149,6 +150,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
     onDataStoreLoad: function (store, records, successful, operation, eOpts) {
         let model = this.getViewModel(),
             artikelgruppen = model.getStore('artikelgruppen');
+        this.showRealAmountColumns();
         records.forEach((record) => {
             if (Ext.isEmpty(record.get('leistungsbeschreibung')) && (!Ext.isEmpty(record.get('langtext')))) {
                 record.set('leistungsbeschreibung', record.get('langtext'));
