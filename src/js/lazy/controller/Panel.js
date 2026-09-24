@@ -527,6 +527,37 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
     },
 
     onDataDataChanged: function () {
+        /*
+        localRecord.singleprice = localRecord.epreis;
+                localRecord.net = localRecord.epreis * localRecord.amount;
+                localRecord.tax = localRecord.steuersatz;
+                localRecord.taxvalue = localRecord.steuersatz / 100 * localRecord.net;
+                localRecord.gross = localRecord.net + localRecord.taxvalue;
+
+
+                */
+        let model = this.getViewModel();
+        store = model.getStore('data'),
+            range = store.getRange();
+
+        for (let i = 0; i < range.length; i++) {
+            let record = range[i];
+            record.set('singleprice', record.get('epreis'));
+            if (record.get('use_real_amount')) {
+                record.set('netto', record.get('epreis') * record.get('ist_anzahl'));
+            } else {
+                record.set('netto', record.get('epreis') * record.get('anzahl'));
+            }
+            record.set('net', record.get('epreis') * record.get('amount'));
+            record.set('tax', record.get('steuersatz'));
+            record.set('taxvalue', record.get('steuersatz') / 100 * record.get('net'));
+            record.set('gross', record.get('net') + record.get('taxvalue'));
+
+            record.set('brutto', record.get('gross'));
+            record.set('steuersatz', record.get('tax'));
+            record.set('steuer', record.get('taxvalue'));
+            record.set('epreis', record.get('singleprice'));
+        }
         this.updatePreviewFrame();
     },
 
