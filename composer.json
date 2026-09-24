@@ -1,0 +1,17 @@
+{
+  "name": "tualo/jobs",
+  "description": "jobs package for Tualo Office",
+  "type": "library",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Tualo\\Office\\Jobs\\": "src/"
+    },
+    "files": [
+      "src/functions.php"
+    ]
+  },
+  "minimum-stability": "dev",
+  "require": {},
+  "version": "1.0.5"
+}
