@@ -150,7 +150,7 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
             "sperre": 0,
             "steuer": 0,
             "taxid": null,
-            "reporttype": "calculation",
+            "reporttype": model.get('reporttype'),
             "vertriebsweg": null,
             "warehouse": 0,
             "paytype": "bar",
