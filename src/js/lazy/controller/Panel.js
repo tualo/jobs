@@ -567,6 +567,8 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             record.set('steuersatz', record.get('tax'));
             record.set('steuer', record.get('taxvalue'));
             record.set('epreis', record.get('singleprice'));
+            record.set('gruppenpreis_netto', record.get('netto'));
+            record.set('gruppenpreis_brutto', record.get('brutto'));
         }
         /*
         var me = this;
