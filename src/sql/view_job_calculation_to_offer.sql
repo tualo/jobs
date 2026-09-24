@@ -3,6 +3,9 @@ DELIMITER;
 CREATE OR REPLACE VIEW `view_job_calculation_to_report` AS
 select
     `p`.`use_in_offer` AS `use_row`,
+    
+    `p`.`use_real_amount` AS `use_real_amount`,
+
     `h`.`approved` AS `approved`,
     `j`.`id` AS `jobid`,
     `g`.`langtext` AS `langtext`,
