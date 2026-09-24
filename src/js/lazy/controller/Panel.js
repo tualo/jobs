@@ -620,8 +620,12 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
     prepareTexts: async function (store, records) {
         let i = 0,
-            l = records.length,
-            templateData = await this.createTemplateData(),
+            l = records.length;
+        let me = this,
+            view = this.getView(),
+            model = view.getViewModel();
+        if (Ext.isEmpty(model.get('jobid'))) return;
+        let templateData = await this.createTemplateData(),
             syncNeeded = false;
 
         // console.log('onTextStoreLoad',store,records);
