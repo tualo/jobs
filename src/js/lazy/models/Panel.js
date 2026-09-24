@@ -1,6 +1,6 @@
 Ext.define('Tualo.jobs.lazy.models.Panel', {
     extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.j2o_panel',
+    alias: 'viewmodel.tualo_jobs_panel',
     data: {
         jobid: null,
         reportType: null,
