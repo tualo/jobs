@@ -13,13 +13,20 @@ Ext.define('Tualo.jobs.lazy.Panel', {
     },
 
     config: {
-        jobid: null
+        jobid: null,
+        reportType: null
+    },
+    applyJobid: function (jobid) {
+        this.getViewModel().set('jobid', jobid);
+    },
+    applyReportType: function (reportType) {
+        this.getViewModel().set('reportType', reportType);
     },
     controller: 'tualo_jobs_panel',
     viewModel: {
         type: 'tualo_jobs_panel'
     },
-    getWindowTitle: function () { return "Kalkulation zu Angebot" },
+    getWindowTitle: function () { return "Kalkulation konvertieren" },
     tools: [
     ],
 

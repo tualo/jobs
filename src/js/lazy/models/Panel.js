@@ -3,6 +3,7 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
     alias: 'viewmodel.j2o_panel',
     data: {
         jobid: null,
+        reportType: null,
         url: 'about:blank',
         record: null,
         total_net: 0,
@@ -21,6 +22,11 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
         address: ''
     },
     formulas: {
+        name: function (get) {
+            if (get('reportType') == 'angebot') return "Angebot";
+            if (get('reportType') == 'rechnung') return "Rechnung";
+            return '<unbekannt>';
+        },
         canEdit: function (get) {
             return get('hasRecord') !== false;
         },
@@ -36,6 +42,9 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
         },
         disableForm: function (get) {
             return get('selectedRows') == 0;
+        },
+        saveButtonText: function (get) {
+            return get('reportType') == 'angebot' ? 'Angebot erstellen' : 'Rechnung erstellen';
         }
     },
     stores: {

@@ -10,7 +10,7 @@ select
     pos,
     text,
     used_template_id
-from view_job_texts
+from tualo_job_offer_text
 
 union all
 

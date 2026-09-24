@@ -8,7 +8,7 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
             epreis = 0,
             store = model.getStore('data'),
             artikelgruppen = model.getStore('artikelgruppen'),
-            tualo_job_offer_text = model.getStore('tualo_job_offer_text'),
+            texts = model.getStore('texts'),
 
             range = store.getRange(),
             positions = [],
@@ -71,47 +71,17 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
             rowNumber++;
         });
 
-        let texts = [];
+        let texts_array = [];
 
 
-        tualo_job_offer_text.getRange().forEach((tualo_job_offer_text_record) => {
-            texts.push({
-                text: tualo_job_offer_text_record.get('text'),
-                typ: tualo_job_offer_text_record.get('placement')
-            })
-        })
-        /*
-        let elm = iframeDocument.getElementById(tualo_job_offer_text_record.id);
-        if (elm) {
-            console.log('elm', elm.innerHTML);
-            let fn = async function () {
-                let response = await fetch('./ds/tualo_job_offer_text/update', {
-                    method: 'POST',
-                    headers: {
-                        "Accept": "application/json",
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        __table_name: 'tualo_job_offer_text',
-                        __id: tualo_job_offer_text_record.id,
-                        id: tualo_job_offer_text_record.id,
-                        text: elm.innerHTML
-                    })
-                });
-                let jsonData = await response.json();
-                if (jsonData.success !== true) {
-                    Ext.toast({
-                        html: jsonData.msg,
-                        title: 'Fehler',
-                        width: 400,
-                        align: 't'
-                    });
-                }
+        texts.getRange().forEach((texts_record) => {
+            if (model.get('reporttype') === texts_record.get('reporttype')) {
+                texts_array.push({
+                    text: texts_record.get('text'),
+                    typ: texts_record.get('placement')
+                })
             }
-            fn();
-        }
-    })
-        */
+        });
 
         let taxes = [];
         for (let key in taxes_Hash) {
