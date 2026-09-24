@@ -1,11 +1,11 @@
-Ext.define('Tualo.js.tasks.JobToOffer', {
+Ext.define('Tualo.jobs.lazy.Panel', {
     /*** */
     extend: 'Ext.panel.Panel',
-    alias: 'widget.j2o_panel',
+    alias: 'widget.tualo_jobs_panel',
     title: 'Kalkulation zu Angebot',
     requires: [
-        'Tualo.js.tasks.controller.JobToOffer',
-        'Tualo.js.tasks.models.JobToOffer'
+        'Tualo.jobs.lazy.controller.Panel',
+        'Tualo.jobs.lazy.models.Panel'
     ],
     layout: {
         type: 'border',
@@ -15,9 +15,9 @@ Ext.define('Tualo.js.tasks.JobToOffer', {
     config: {
         jobid: null
     },
-    controller: 'j2o_panel',
+    controller: 'tualo_jobs_panel',
     viewModel: {
-        type: 'j2o_panel'
+        type: 'tualo_jobs_panel'
     },
     getWindowTitle: function () { return "Kalkulation zu Angebot" },
     tools: [
