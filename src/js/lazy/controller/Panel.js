@@ -400,6 +400,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
                 usedRecords++;
             }
         });
+        window.r = this.getReport();
         if (usedRecords > 0) {
             if ('about:blank' == previewFrame.src) {
                 console.log('previewFrame', previewFrame.src);
