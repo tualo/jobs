@@ -20,20 +20,22 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
             let localRecord = { ...record.data };
             if (record.get('use_in_offer') == 0) return;
 
+            localRecord.amount = localRecord.anzahl;
+            if (localRecord.use_real_amount) {
+                localRecord.amount = localRecord.ist_anzahl;
+            }
+
+
+            localRecord.singleprice = localRecord.epreis;
+            localRecord.net = localRecord.epreis * localRecord.amount;
+            localRecord.tax = localRecord.steuersatz;
+            localRecord.taxvalue = localRecord.steuersatz / 100 * localRecord.net;
+            localRecord.gross = localRecord.net + localRecord.taxvalue;
+
             if (forSaving == true) {
                 localRecord.article = localRecord.artikel;
 
-                localRecord.amount = localRecord.anzahl;
-                if (localRecord.use_real_amount) {
-                    localRecord.amount = localRecord.ist_anzahl;
-                }
 
-
-                localRecord.singleprice = localRecord.epreis;
-                localRecord.net = localRecord.epreis * localRecord.amount;
-                localRecord.tax = localRecord.steuersatz;
-                localRecord.taxvalue = localRecord.steuersatz / 100 * localRecord.net;
-                localRecord.gross = localRecord.net + localRecord.taxvalue;
 
                 localRecord.vid = localRecord.id;
 
