@@ -83,7 +83,7 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
 
 
         texts.getRange().forEach((texts_record) => {
-            if (model.get('reporttype') === texts_record.get('reporttype')) {
+            if (model.get('reportType') === texts_record.get('reporttype')) {
                 texts_array.push({
                     text: texts_record.get('text'),
                     typ: texts_record.get('placement')
@@ -158,7 +158,7 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
             "sperre": 0,
             "steuer": 0,
             "taxid": null,
-            "reporttype": model.get('reporttype'),
+            "reporttype": model.get('reportType'),
             "vertriebsweg": null,
             "warehouse": 0,
             "paytype": "bar",

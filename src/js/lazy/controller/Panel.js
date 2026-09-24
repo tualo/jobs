@@ -799,7 +799,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
     saveOfferReport: async function () {
         let model = this.getViewModel(),
             view = this.getView(),
-            reporttype = model.get('reporttype'),
+            reporttype = model.get('reportType'),
             res = await fetch('./report/' + reporttype + '/-1', {
                 method: 'PUT',
                 body: JSON.stringify(this.getReport(true))
