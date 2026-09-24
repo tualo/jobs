@@ -23,6 +23,8 @@ Ext.define('Tualo.routes.jobs.Panel', {
     }
 });
 
+console.log('Tualo.routes.jobs.Panel loaded');
+
 Ext.define('Tualo.routes.jobs.Panel', {
     statics: {
         load: async function () {
