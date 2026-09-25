@@ -3,12 +3,14 @@ Ext.define('Tualo.jobs.data.field.NettoFormel', {
     alias: [
         'data.field.tualo_jobs_net_formula'
     ],
-    depends: [
+    /*    depends: [
         'anzahl',
         'ist_anzahl',
         'reporttype',
         'use_real_amount'
+        
     ],
+    */
     critical: true,
     persist: true,
     queriedList: {},

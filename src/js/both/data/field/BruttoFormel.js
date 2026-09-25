@@ -3,9 +3,10 @@ Ext.define('Tualo.jobs.data.field.BruttoFormel', {
     alias: [
         'data.field.tualo_jobs_brutto_formula'
     ],
+    /*
     depends: [
         'ist_netto'
-    ],
+    ],*/
     critical: true,
     persist: true,
     queriedList: {},
