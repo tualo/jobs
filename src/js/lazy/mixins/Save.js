@@ -14,8 +14,25 @@ Ext.define('Tualo.jobs.lazy.mixins.Save', {
         report = this.getReport();
 
 
+        let calcStore = grid.getStore(),
+            updatedRecords = calcStore.getUpdatedRecords(),
+            changedFields = new Set();
 
-        grid.getStore().sync();
+        // union of all changed field names across dirty records
+        updatedRecords.forEach((rec) => {
+            Object.keys(rec.modified || {}).forEach((field) => changedFields.add(field));
+        });
+
+        // force every dirty record to report the same set of changed columns
+        updatedRecords.forEach((rec) => {
+            changedFields.forEach((field) => {
+                if (!(field in rec.modified)) {
+                    rec.modified[field] = rec.get(field);
+                }
+            });
+        });
+
+        calcStore.sync();
 
 
         texts.getRange().forEach((texts_record) => {
