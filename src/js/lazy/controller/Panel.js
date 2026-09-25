@@ -180,17 +180,18 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
                 record.set('gruppierung', (new Date()).getTime() + Math.floor(Math.random() * 1000));
             }
 
+            /*
 
-            if (Ext.isEmpty(record.get('gruppenpreis_netto'))) {
-                record.set('gruppenpreis_netto', record.get('ist_netto'));
-            }
-            if (Ext.isEmpty(record.get('gruppenpreis_brutto'))) {
-                record.set('gruppenpreis_brutto', record.get('brutto'));
-            }
+        if (Ext.isEmpty(record.get('gruppenpreis_netto'))) {
+            record.set('gruppenpreis_netto', record.get('ist_netto'));
+        }
+        if (Ext.isEmpty(record.get('gruppenpreis_brutto'))) {
+            record.set('gruppenpreis_brutto', record.get('brutto'));
+        }
 
-            // bitte später entfernen, wenn nicht mehr benötigt
-            record.set('netto', Math.round(record.get('epreis') * record.get('anzahl') * 100) / 100);
-
+        // bitte später entfernen, wenn nicht mehr benötigt
+        record.set('netto', Math.round(record.get('epreis') * record.get('anzahl') * 100) / 100);
+        */
 
         });
         this.gruppenPreise();
@@ -412,7 +413,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             store = model.getStore('data'),
             usedRecords = 0,
             previewFrame = view.getComponent('previewOuterFrame').getComponent('previewFrame');
-
+        this.gruppenPreise()
         if (this.lastFrameUpdate + 1000 > (new Date()).getTime()) {
             return;
         }
@@ -469,7 +470,6 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
         }
 
-        console.log('updatePreviewFrame', 'stop');
     },
 
 
