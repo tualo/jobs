@@ -156,7 +156,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
     onDataStoreLoad: function (store, records, successful, operation, eOpts) {
         let model = this.getViewModel(),
             artikelgruppen = model.getStore('artikelgruppen');
-        // this.showRealAmountColumns();
+        this.showRealAmountColumns();
 
 
         records.forEach((record) => {

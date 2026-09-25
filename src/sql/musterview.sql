@@ -1,5 +1,36 @@
 
 CREATE OR REPLACE VIEW `view_job_calculation_to_report` AS
+
+ 
+with t as (
+    
+        select 'angebot' reporttype
+        union 
+        select 'rechnung' reporttype
+    
+),
+
+ pos as (
+
+    select
+        p.*,
+        t.reporttype
+    from 
+    t
+    join `blg_pos_calculation` `p` on (
+
+        (
+            `p`.`zid` is null
+            or `p`.`zid` = 0
+        )
+        and (
+            `p`.`oid` is null
+            or `p`.`oid` = 0
+        )
+    )
+
+
+), a as (
 select
     `p`.`use_in_offer` AS `use_row`,
     
@@ -22,13 +53,13 @@ select
     `p`.`vdatum` AS `vdatum`,
     `p`.`netto` AS `netto`,
 
-    if( `p`.`use_real_amount`=1,
+    if( `p`.`use_real_amount`=1 and p.reporttype='rechnung',
         `p`.`epreis` * `p`.`ist_anzahl`,
         `p`.`epreis` * `p`.`anzahl`
 
     ) AS `ist_netto`,
-     t.reporttype,
-    if( `p`.`use_real_amount`=1 and t.reporttype='rechnung',
+     p.reporttype,
+    if( `p`.`use_real_amount`=1 and p.reporttype='rechnung',
         `p`.`epreis` * `p`.`ist_anzahl` * (1+`p`.`steuer`/100),
         `p`.`epreis` * `p`.`anzahl` * (1+`p`.`steuer`/100)
 
@@ -43,25 +74,7 @@ select
     `p`.`id` AS `id`,
     `p`.`leistungsbeschreibung` AS `leistungsbeschreibung`,
     `p`.`pos_text` AS `pos_text`,
-    if(`p`.`gruppierung` is null,
-        `p`.`netto`,
-        sum(if( `p`.`use_real_amount`=1,
-        `p`.`epreis` * `p`.`ist_anzahl`,
-        `p`.`epreis` * `p`.`anzahl`
-
-    )) over (partition by `p`.`beleg`, `p`.`gruppierung`)
-    ) AS `gruppenpreis_netto`,
-    if(`p`.`gruppierung` is null,
-        `p`.`brutto`,
-        sum(
-            
-            if( `p`.`use_real_amount`=1 and t.reporttype='rechnung',
-        `p`.`epreis` * `p`.`ist_anzahl` * (1+`p`.`steuer`/100),
-        `p`.`epreis` * `p`.`anzahl` * (1+`p`.`steuer`/100)
-
-    )
-        ) over (partition by `p`.`beleg`, `p`.`gruppierung`)
-    ) AS `gruppenpreis_brutto`,
+    
     `p`.`gruppenmenge` AS `gruppenmenge`,
     `p`.`teilueberschrift` AS `teilueberschrift`
 from
@@ -77,23 +90,8 @@ from
                                 and `j`.`id` = `h`.`jobid`
                             )
                         )
-                        join (
-                            select 'angebot' reporttype
-                            union 
-                            select 'rechnung' reporttype
-                        ) t
-                        join `blg_pos_calculation` `p` on (
-
-                            `p`.`beleg` = `h`.`id`
-                            and (
-                                `p`.`zid` is null
-                                or `p`.`zid` = 0
-                            )
-                            and (
-                                `p`.`oid` is null
-                                or `p`.`oid` = 0
-                            )
-                        )
+                        join pos p
+                            on(`p`.`beleg` = `h`.`id`)
                     )
                     join `artikelgruppen` `g` on(`g`.`gruppen_id` = `p`.`artikel`)
                 )
@@ -102,4 +100,15 @@ from
             left join `type_of_service_reporting_service_type` `s` on(`s`.`type_of_service_link` = `g`.`gruppen_id`)
         )
         left join `reporting_service_type` `r` on(`r`.`id` = `s`.`reporting_service_type`)
-    );
+    )
+)
+select a.* ,
+if(a.`gruppierung` is null,
+        a.`ist_netto`,
+        sum(a.`ist_netto`) over (partition by a.`beleg`, a.`gruppierung`)
+    ) AS `gruppenpreis_netto`,
+    if(a.`gruppierung` is null,
+        a.`ist_brutto`,
+        sum(a.`ist_brutto`) over (partition by a.`beleg`, a.`gruppierung`)
+    ) AS `gruppenpreis_brutto`
+from a;
