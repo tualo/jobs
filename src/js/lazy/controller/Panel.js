@@ -176,13 +176,13 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
 
             if (Ext.isEmpty(record.get('gruppenpreis_netto'))) {
-                record.set('gruppenpreis_netto', record.get('netto'));
+                record.set('gruppenpreis_netto', record.get('ist_netto'));
             }
             if (Ext.isEmpty(record.get('gruppenpreis_brutto'))) {
                 record.set('gruppenpreis_brutto', record.get('brutto'));
             }
 
-
+            // bitte später entfernen, wenn nicht mehr benötigt
             record.set('netto', Math.round(record.get('epreis') * record.get('anzahl') * 100) / 100);
 
 
@@ -203,8 +203,8 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
                         brutto: 0
                     };
                 }
-                gruppierungen[record.get('gruppierung')].netto += record.get('netto');
-                gruppierungen[record.get('gruppierung')].brutto += record.get('brutto');
+                gruppierungen[record.get('gruppierung')].netto += record.get('ist_netto');
+                gruppierungen[record.get('gruppierung')].brutto += record.get('ist_brutto');
             }
         });
 
@@ -299,13 +299,13 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
             store.each((record) => {
                 if (record.get('use_in_offer') == 1) {
-                    sumUse += record.get('netto');
+                    sumUse += record.get('ist_netto');
                     epreis = record.get('epreis');
                     total_amount += record.get('anzahl');
                 }
             });
             records.forEach((record) => {
-                selectedSum += record.get('netto');
+                selectedSum += record.get('ist_netto');
             });
 
             model.set('total_net', sumUse);
@@ -543,6 +543,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
         this.updatePreviewFrame();
     },
 
+    /*
     onDataUpdate: function (store, record, op, modifiedFieldNames) {
         let model = this.getViewModel();
         store = model.getStore('data'),
@@ -553,12 +554,14 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
 
             record.set('singleprice', record.get('epreis'));
+            / *
             if (record.get('use_real_amount')) {
                 record.set('netto', record.get('epreis') * record.get('ist_anzahl'));
             } else {
                 record.set('netto', record.get('epreis') * record.get('anzahl'));
             }
-            record.set('net', record.get('epreis') * record.get('amount'));
+            * /
+            record.set('net', record.get('ist_netto'));
             record.set('tax', record.get('steuersatz'));
             record.set('taxvalue', record.get('steuersatz') / 100 * record.get('net'));
             record.set('gross', record.get('net') + record.get('taxvalue'));
@@ -567,15 +570,16 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             record.set('steuersatz', record.get('tax'));
             record.set('steuer', record.get('taxvalue'));
             record.set('epreis', record.get('singleprice'));
-            record.set('gruppenpreis_netto', record.get('netto'));
+            record.set('gruppenpreis_netto', record.get('ist_netto'));
             record.set('gruppenpreis_brutto', record.get('brutto'));
         }
-        /*
+        / *
         var me = this;
         me.gruppenPreise();
-        */
+        * /
         // }
     },
+    */
 
 
 

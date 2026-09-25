@@ -49,7 +49,7 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
 
 
 
-            localRecord.net = localRecord.netto;
+            localRecord.net = localRecord.ist_netto;
             localRecord.amount = localRecord.amount;
             localRecord.gross = localRecord.brutto;
 
@@ -70,7 +70,7 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
                 };
             }
 
-            taxes_Hash["" + localRecord.steuersatz].net += localRecord.netto;
+            taxes_Hash["" + localRecord.steuersatz].net += localRecord.ist_netto;
             taxes_Hash["" + localRecord.steuersatz].gross += localRecord.brutto;
             taxes_Hash["" + localRecord.steuersatz].tax += localRecord.steuer;
 
