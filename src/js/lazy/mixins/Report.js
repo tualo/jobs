@@ -13,8 +13,8 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
             range = store.getRange(),
             positions = [],
             sumUse = 0,
-            rowNumber = 1;
-        taxes_Hash = {};
+            rowNumber = 1,
+            taxes_Hash = {};
 
         range.forEach((record) => {
             let localRecord = { ...record.data };
@@ -58,25 +58,31 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
                 localRecord.pos_text = rowNumber;
             }
 
+            positions.push(localRecord);
+            rowNumber++;
+        });
+
+
+        positions.forEach((localRecord) => {
+
             if (typeof taxes_Hash["" + localRecord.steuersatz] === 'undefined') {
-                taxes_Hash["" + localRecord.steuersatz] =
+                taxes_Hash["" + localRecord.tax] =
                 {
                     "category": "S",
                     "type": "VAT",
-                    "rate": localRecord.steuersatz,
+                    "rate": localRecord.tax,
                     "net": 0,
                     "gross": 0,
                     "tax": 0
                 };
             }
 
-            taxes_Hash["" + localRecord.steuersatz].net += localRecord.ist_netto;
-            taxes_Hash["" + localRecord.steuersatz].gross += localRecord.ist_brutto;
-            taxes_Hash["" + localRecord.steuersatz].tax += localRecord.ist_brutto - localRecord.ist_netto;
+            taxes_Hash["" + localRecord.tax].net += localRecord.net;
+            taxes_Hash["" + localRecord.tax].gross += localRecord.gross;
+            taxes_Hash["" + localRecord.tax].tax += localRecord.taxvalue;
 
 
-            positions.push(localRecord);
-            rowNumber++;
+
         });
 
         let texts_array = [];
