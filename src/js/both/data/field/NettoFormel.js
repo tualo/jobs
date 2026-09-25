@@ -27,3 +27,30 @@ Ext.define('Tualo.jobs.data.field.NettoFormel', {
         }
     }
 });
+
+/*
+
+
+
+INSERT IGNORE INTO `custom_types`  
+(
+        id,
+        xtype_long_classic,
+        xtype_long_modern,
+        extendsxtype_classic,
+        extendsxtype_modern,
+        name,
+        vendor,
+        description
+) VALUES
+(
+    'Tualo.jobs.data.field.NettoFormel',
+    'data.field.tualo_jobs_net_formula',
+    'data.field.tualo_jobs_net_formula',
+    'Ext.data.field.Number',
+    'Ext.data.field.Number',
+    'Tualo.jobs.data.field.NettoFormel',
+    'Tualo',
+    ''
+);
+*/
