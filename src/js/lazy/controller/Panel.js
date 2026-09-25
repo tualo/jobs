@@ -133,6 +133,12 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
         });
 
 
+        filters.push({
+            property: 'reporttype',
+            value: model.get('reportType'),
+            operator: 'eq'
+        });
+
         extraParams.filter = Ext.JSON.encode(filters);
         extraParams.sort = Ext.JSON.encode(sorters);
         store.getProxy().setExtraParams(extraParams);
@@ -679,11 +685,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             operator: 'eq'
         });
 
-        filters.push({
-            property: 'reporttype',
-            value: model.get('reportType'),
-            operator: 'eq'
-        });
+
         console.log('Filters applied:', filters);
 
         extraParams.filter = Ext.JSON.encode(filters);
