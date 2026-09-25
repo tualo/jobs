@@ -3,19 +3,15 @@ Ext.define('Tualo.jobs.data.field.BruttoFormel', {
     alias: [
         'data.field.tualo_jobs_brutto_formula'
     ],
-    /*
+
     depends: [
         'ist_netto'
-    ],*/
+    ],
     critical: true,
     persist: true,
     queriedList: {},
 
-    // formel: 'if((use_real_amount==1), ist_anzahl*epreis, anzahl*epreis)',
-    calculate: function (data) {
-        return data.netto * (1 + data.steuersatz);
-    },
-    /*
+
     convert: function (currentValue, record) {
         let me = this;
 
@@ -25,12 +21,12 @@ Ext.define('Tualo.jobs.data.field.BruttoFormel', {
         me._math.addRecord(record);
         try {
             if (typeof record.isNonData === 'boolean' && record.isNonData === true) return currentValue;
-            return me._math.parse(me.formel);
+            return (record.get('use_real_amount') == 1) ? record.get('ist_anzahl') * record.get('epreis') : record.get('anzahl') * record.get('epreis');
         } catch (e) {
             console.error(e);
             return currentValue;
         }
-    }*/
+    }
 });
 
 /*

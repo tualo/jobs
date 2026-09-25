@@ -3,23 +3,15 @@ Ext.define('Tualo.jobs.data.field.NettoFormel', {
     alias: [
         'data.field.tualo_jobs_net_formula'
     ],
-    /*    depends: [
-        'anzahl',
-        'ist_anzahl',
-        'reporttype',
+    depends: [
         'use_real_amount'
-        
+
     ],
-    */
     critical: true,
     persist: true,
     queriedList: {},
 
-    // formel: 'if((use_real_amount==1), ist_anzahl*epreis, anzahl*epreis)',
-    calculate: function (data) {
-        return (data.use_real_amount == 1 && data.reporttype == 'rechnung') ? data.ist_anzahl * data.epreis : data.anzahl * data.epreis;
-    },
-    /*
+
     convert: function (currentValue, record) {
         let me = this;
 
@@ -29,12 +21,12 @@ Ext.define('Tualo.jobs.data.field.NettoFormel', {
         me._math.addRecord(record);
         try {
             if (typeof record.isNonData === 'boolean' && record.isNonData === true) return currentValue;
-            return me._math.parse(me.formel);
+            return (record.get('use_real_amount') == 1 && record.get('reporttype') == 'rechnung') ? record.get('ist_anzahl') * record.get('epreis') : record.get('anzahl') * record.get('epreis');
         } catch (e) {
             console.error(e);
             return currentValue;
         }
-    }*/
+    }
 });
 
 /*
