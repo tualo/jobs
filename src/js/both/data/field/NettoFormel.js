@@ -10,7 +10,7 @@ Ext.define('Tualo.jobs.data.field.NettoFormel', {
     persist: true,
     queriedList: {},
 
-    formel: 'if(use_real_amount=1, ist_anzahl*epreis, anzahl*epreis)',
+    formel: 'if((use_real_amount==1), ist_anzahl*epreis, anzahl*epreis)',
     convert: function (currentValue, record) {
         let me = this;
 
