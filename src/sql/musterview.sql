@@ -27,7 +27,7 @@ select
         `p`.`epreis` * `p`.`anzahl`
 
     ) AS `ist_netto`,
- t.reporttype,
+     t.reporttype,
     if( `p`.`use_real_amount`=1 and t.reporttype='rechnung',
         `p`.`epreis` * `p`.`ist_anzahl` * (1+`p`.`steuer`/100),
         `p`.`epreis` * `p`.`anzahl` * (1+`p`.`steuer`/100)
@@ -45,11 +45,22 @@ select
     `p`.`pos_text` AS `pos_text`,
     if(`p`.`gruppierung` is null,
         `p`.`netto`,
-        sum(`p`.`netto`) over (partition by `p`.`beleg`, `p`.`gruppierung`)
+        sum(if( `p`.`use_real_amount`=1,
+        `p`.`epreis` * `p`.`ist_anzahl`,
+        `p`.`epreis` * `p`.`anzahl`
+
+    )) over (partition by `p`.`beleg`, `p`.`gruppierung`)
     ) AS `gruppenpreis_netto`,
     if(`p`.`gruppierung` is null,
         `p`.`brutto`,
-        sum(`p`.`brutto`) over (partition by `p`.`beleg`, `p`.`gruppierung`)
+        sum(
+            
+            if( `p`.`use_real_amount`=1 and t.reporttype='rechnung',
+        `p`.`epreis` * `p`.`ist_anzahl` * (1+`p`.`steuer`/100),
+        `p`.`epreis` * `p`.`anzahl` * (1+`p`.`steuer`/100)
+
+    )
+        ) over (partition by `p`.`beleg`, `p`.`gruppierung`)
     ) AS `gruppenpreis_brutto`,
     `p`.`gruppenmenge` AS `gruppenmenge`,
     `p`.`teilueberschrift` AS `teilueberschrift`
