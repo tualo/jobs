@@ -69,6 +69,7 @@ select
     `p`.`steuer` AS `steuer`,
     `p`.`brutto` AS `brutto`,
     `p`.`bemerkung` AS `bemerkung`,
+    `p`.`pos` AS `pos`,
     `p`.`pos` AS `position`,
     `p`.`steuersatz` AS `steuersatz`,
     `p`.`id` AS `id`,
