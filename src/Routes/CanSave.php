@@ -18,10 +18,11 @@ class CanSave extends \Tualo\Office\Basic\RouteWrapper
         BasicRoute::add('/jobs/cansave/(?P<type>\w+)', function ($matches) {
             App::contenttype('application/json');
             $db = App::get('session')->getDB();
-            $type = $matches['type'];
+            $type = preg_replace('/[^a-zA-Z0-9_\-]/', '', $matches['type']);
+
             App::result('success', false);
             try {
-                $value = $db->singleValue('select `group` from view_session_allowed_groups where `group` like "job_save_' . $type . '"', [], 'group');
+                $value = $db->singleValue('select `group` from view_session_allowed_groups where `group` = "job_save_' . $type . '"', [], 'group');
                 if ($value) App::result('success', true);
             } catch (\Exception $e) {
                 App::result('msg', $e->getMessage());
