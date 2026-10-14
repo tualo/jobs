@@ -54,6 +54,7 @@ Ext.define('Tualo.jobs.lazy.Panel', {
             flex: 2,
             split: true,
             collapsible: true,
+            title: 'Kalkulationen',
             region: 'west',
             layout: {
                 type: 'vbox',
@@ -61,9 +62,26 @@ Ext.define('Tualo.jobs.lazy.Panel', {
             },
             items: [
                 {
+                    xtype: 'form',
+                    title: null,
+                    items: [
+                        {
+                            xtype: 'textfield',
+                            fieldLabel: 'Bezeichnung',
+                            name: 'bezeichnung',
+                            bind: {
+                                value: '{document_name}'
+                            },
+                            listeners: {
+                                change: 'onChangeDocumentName'
+                            }
+                        }
+                    ]
+                },
+                {
                     flex: 1,
                     itemId: 'calculationGrid',
-                    title: 'Kalkulationen',
+                    title: null,
                     scrollable: true,
                     xtype: 'dslist_view_job_calculation_to_report',
                     selModel: {

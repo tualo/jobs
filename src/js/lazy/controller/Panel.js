@@ -419,6 +419,22 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
         }
     },
 
+    onChangeDocumentName: function (field, newValue, oldValue) {
+        let me = this,
+            model = me.getViewModel(),
+            store = model.getStore('data'),
+            range = store.getRange();
+
+        range.forEach((record) => {
+            if (record.get('use_in_offer') == 1) {
+                record.set('document_name', newValue);
+            }
+        });
+
+        // model.set('document_name', newValue);
+
+    },
+
     canSaveReport: async function () {
         let model = this.getViewModel();
         let response = await fetch('./jobs/cansave/' + model.get('reportType'));
