@@ -115,6 +115,8 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
 
             "date": Ext.util.Format.date(new Date(), "Y-m-d"),
 
+            "document_name": model.get('document_name'),
+
 
             "id": -1,
 

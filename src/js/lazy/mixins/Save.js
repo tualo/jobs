@@ -3,15 +3,37 @@ Ext.define('Tualo.jobs.lazy.mixins.Save', {
         let model = this.getViewModel(),
             view = this.getView(),
             previewFrame = view.getComponent('previewOuterFrame').getComponent('previewFrame');
-        grid = view.getComponent('westPanel').getComponent('calculationGrid'),
+        let grid = view.getComponent('westPanel').getComponent('calculationGrid'),
             selection = grid.getSelectionModel().getSelection(),
             iframe = previewFrame.getEl().dom.firstChild,
             iframeDocument = iframe.contentWindow.document,
             texts = model.getStore('texts'),
             data = model.getStore('data'),
+            reporttype = model.get('reportType'),
             blg_pos_calculation = model.getStore('blg_pos_calculation'),
             calcPositions = grid.getStore().getRange();
-        report = this.getReport();
+
+        let report = this.getReport();
+
+
+        if (model.get('document_name') == '') {
+            Ext.MessageBox.prompt(
+                'Dokument-Name',
+                'Bitte geben Sie einen Dokumentnamen ein:',
+                function (btn, txt) {
+                    if (btn == 'ok') {
+                        model.set('document_name');
+                        calcPositions.forEach((rec) => {
+                            if (rec.get('use_in_offer') == 1) {
+                                rec.set(reporttype + '_title', txt);
+                            }
+                        })
+                    }
+                },
+                false,
+                ''
+            );
+        }
 
 
         let calcStore = grid.getStore(),

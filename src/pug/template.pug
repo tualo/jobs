@@ -1,0 +1,143 @@
+//- Erwartete Eingaben: data.processor, controller, assignment, assignmentReference, transferMethods,
+//- transferNote, deletedOn, deletionTime, responsible, department, procedure, toolReportAttached,
+//- externalServiceProtocolAttached, subcontractorProtocolAttached, signCity und signDate.
+- var form = typeof data === 'undefined' || data === null ? {} : data
+- var transferMethods = form.transferMethods || []
+- var hasTransferMethod = function (method) { return transferMethods.indexOf(method) !== -1 }
+
+doctype html
+html(lang='de')
+	head
+		meta(charset='utf-8')
+		meta(name='viewport', content='width=device-width, initial-scale=1')
+		title Protokoll Datenlöschung
+		style.
+			@page {
+				size: A4 portrait;
+				margin: 16mm 18mm 18mm;
+			}
+			* { box-sizing: border-box; }
+			body {
+				margin: 0;
+				color: #202a31;
+				font-family: Arial, Helvetica, sans-serif;
+				font-size: 10pt;
+				line-height: 1.42;
+			}
+			main { max-width: 174mm; margin: 0 auto; }
+			header { border-bottom: 2px solid #176b67; margin-bottom: 8mm; padding-bottom: 4mm; }
+			h1 { color: #173b42; font-size: 21pt; line-height: 1.15; margin: 0; }
+			.eyebrow { color: #176b67; font-size: 8pt; font-weight: bold; margin: 0 0 2mm; text-transform: uppercase; }
+			.parties { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; margin: 0 0 6mm; }
+			.party { border-left: 2px solid #cbd8d6; padding-left: 3mm; }
+			.label { color: #52636a; display: block; font-size: 8pt; margin-bottom: 1mm; }
+			.value { font-weight: bold; }
+			p { margin: 0 0 3.5mm; }
+			.assignment { border: 1px solid #cad4d4; margin: 4mm 0; padding: 3mm; }
+			.assignment-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm 8mm; }
+			.section-title { color: #173b42; font-size: 11pt; margin: 6mm 0 2mm; }
+			.options { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm 5mm; margin: 2mm 0 3mm; }
+			.option { align-items: baseline; display: flex; gap: 2mm; }
+			.checkbox { border: 1px solid #5e6b70; display: inline-block; flex: 0 0 3.5mm; height: 3.5mm; position: relative; top: .5mm; }
+			.checkbox.checked::after { content: 'x'; font-size: 9pt; font-weight: bold; left: .45mm; line-height: 3mm; position: absolute; top: -.2mm; }
+			.note { border-bottom: 1px solid #aebabc; min-height: 7mm; padding: 1mm 0; }
+			.signature { margin-top: 9mm; page-break-inside: avoid; }
+			.signature-place { margin-bottom: 12mm; }
+			.signature-line { border-top: 1px solid #59666a; padding-top: 1.5mm; }
+			.muted { color: #52636a; font-size: 8pt; }
+			@media screen {
+				body { background: #eef1ef; padding: 12mm; }
+				main { background: #fff; box-shadow: 0 2mm 8mm rgba(20, 40, 42, .12); min-height: 260mm; padding: 16mm 18mm; }
+			}
+			@media print {
+				main { max-width: none; }
+				.assignment, .party { page-break-inside: avoid; }
+			}
+	body
+		main
+			header
+				p.eyebrow Datenschutz / Löschbestätigung
+				h1 Protokoll Datenlöschung
+
+			section.parties
+				.party
+					span.label Auftragnehmer
+					span.value= form.processor || 'WVD Dialog Marketing GmbH'
+				.party
+					span.label Auftraggeber
+					span.value= form.controller || 'xyz'
+
+			p Hiermit bestätigt der Auftragnehmer die datenschutzkonforme Löschung der durch den Auftraggeber übergebenen personenbezogenen Daten, welche im Rahmen der nachfolgend bezeichneten Beauftragung verwendet wurden.
+
+			section.assignment
+				.assignment-grid
+					div
+						span.label Beauftragung / Aktion
+						span.value= form.assignment || '____________________________'
+					div
+						span.label Eindeutige Referenz (z. B. Belegnummer oder Vertrag)
+						span.value= form.assignmentReference || '____________________________'
+
+			h2.section-title Übergabe der Daten
+			p Die Übergabe der Daten an den Auftragnehmer erfolgte sicher über:
+			.options
+				label.option
+					span.checkbox(class=hasTransferMethod('sftp') ? 'checked' : '')
+					span S/FTP
+				label.option
+					span.checkbox(class=hasTransferMethod('smime') ? 'checked' : '')
+					span S/MIME
+				label.option
+					span.checkbox(class=hasTransferMethod('media') ? 'checked' : '')
+					span Mobiler Datenträger
+				label.option
+					span.checkbox(class=hasTransferMethod('other') ? 'checked' : '')
+					span Sonstiges Verfahren (z. B. Papierdokumente)
+			p.note= form.transferNote || ''
+			p.muted Bemerkung zum Übermittlungsweg
+
+			h2.section-title Erklärung zur Löschung
+			p Eine Prüfung zur Löschung nach Artikel 17 der EU-Datenschutz-Grundverordnung (DSGVO) wurde durchgeführt. Etwaige gesetzliche, vertragliche oder sonstige Aufbewahrungsfristen, die einer Löschung entgegenstehen, liegen nicht vor. Inhalt und Umfang des Löschungsanspruchs ergeben sich aus Artikel 17 Absatz 1 Buchstabe a DSGVO.
+			p Ferner wird bestätigt, dass alle aus den vorbenannten Daten im Rahmen der vereinbarten Auftragsdatenverarbeitung eventuell erzeugten oder vorhandenen analogen und digitalen Kopien, Zwischendateien, Archivablagen, Ausdrucke, Backups sowie sonstigen Ablagen gelöscht wurden. Dies gilt auch für Ablagen bei Unterauftragnehmern, die im Rahmen der Auftragsdatenverarbeitung eingebunden waren.
+			p Als datenschutzkonform gelten die im Rahmen der vereinbarten Auftragsverarbeitung definierten technisch-organisatorischen Maßnahmen. Im Rahmen des vereinbarten Löschkonzeptes sind sichere Lösch- beziehungsweise Vernichtungsverfahren nach dem Stand der Technik einzusetzen. Die DIN 66398 definiert Löschung als einen Prozess, durch den personenbezogene Daten irreversibel verändert werden, sodass sie nicht mehr vorhanden oder unkenntlich sind und nicht mehr verwendet oder rekonstruiert werden können. Eine Anonymisierung ist möglich, sofern sie datenschutzrechtlich zulässig ist.
+
+			h2.section-title Durchführung der Löschung
+			p Die bereitgestellten personenbezogenen Daten wurden zu folgendem Zeitpunkt und durch die folgende beauftragte Person gelöscht:
+			section.assignment
+				.assignment-grid
+					div
+						span.label Datum
+						span.value= form.deletedOn || '____________________________'
+					div
+						span.label Uhrzeit
+						span.value= form.deletionTime || '____________________________'
+					div
+						span.label Zur Löschung beauftragte Person
+						span.value= form.responsible || '____________________________'
+					div
+						span.label Abteilung
+						span.value= form.department || '____________________________'
+					div
+						span.label Lösch-/Vernichtungsverfahren
+						span.value= form.procedure || '____________________________'
+
+			h2.section-title Nachweise
+			p Falls ein Löschtool zum Einsatz kam oder externe Dienstleister beziehungsweise Unterauftragnehmer eingebunden waren, sind die entsprechenden Protokolle beizufügen:
+			.options
+				label.option
+					span.checkbox(class=form.toolReportAttached ? 'checked' : '')
+					span Löschprotokoll des eingesetzten Löschtools beigefügt
+				label.option
+					span.checkbox(class=form.externalServiceProtocolAttached ? 'checked' : '')
+					span Vernichtungsprotokoll des externen Dienstleisters beigefügt
+				label.option
+					span.checkbox(class=form.subcontractorProtocolAttached ? 'checked' : '')
+					span Lösch-/Vernichtungsprotokoll des Subauftragnehmers beigefügt
+
+			section.signature
+				p.signature-place
+					span.value= form.signCity || '____________________________'
+					| , 
+					span.value= form.signDate || '____________________________'
+				div.signature-line
+					span.label Ort, Datum, Firmenstempel und rechtsverbindliche Unterschrift

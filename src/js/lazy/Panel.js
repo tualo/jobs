@@ -33,6 +33,10 @@ Ext.define('Tualo.jobs.lazy.Panel', {
     tools: [
     ],
 
+    listeners: {
+        boxready: 'onBoxReady'
+    },
+
     bbar: [
         '->',
         {
@@ -275,7 +279,7 @@ Ext.define('Tualo.jobs.lazy.Panel', {
                             handler: 'onSave'
                         }, {
                             bind: {
-                                disabled: '{disableForm}',
+                                disabled: '{disableSaveOfferReport}',
                                 text: '{saveButtonText}'
                             },
                             // text: 'Angebot erstellen',

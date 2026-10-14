@@ -12,8 +12,10 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
         selectedRows: 0,
         selectedLeistungsbeschreibung: '',
         selectedTemplate: 'default',
+        canSaveReport: false,
         renderedTemplate: '',
         selectedAggregation: 'sum',
+        document_name: '',
         selectedSum: 0,
         selectedMenge: 1,
         show_nettotal: 1,
@@ -24,7 +26,7 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
     formulas: {
         name: function (get) {
             if (get('reportType') == 'angebot') return "Angebot";
-            if (get('reportType') == 'rechnung') return "Rechnung";
+            if (get('reportType') == 'rechnung') return "Rechnung*";
             return '<unbekannt>';
         },
         title: function (get) {
@@ -47,6 +49,9 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
         },
         disableForm: function (get) {
             return get('selectedRows') == 0;
+        },
+        disableSaveOfferReport: function (get) {
+            return get('canSaveReport') === false;
         },
         saveButtonText: function (get) {
             return get('reportType') == 'angebot' ? 'Angebot erstellen' : 'Rechnung erstellen';

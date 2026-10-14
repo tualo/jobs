@@ -7,6 +7,10 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
         'Tualo.jobs.lazy.mixins.Save'
 
     ],
+    onBoxReady: function () {
+        console.log('onBoxReady');
+        this.canSaveReport();
+    },
 
     onReload: function () {
         let model = this.getViewModel(),
@@ -155,6 +159,8 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
     onDataStoreLoad: function (store, records, successful, operation, eOpts) {
         let model = this.getViewModel(),
+            reporttype = model.get('reportType'),
+
             artikelgruppen = model.getStore('artikelgruppen');
         this.showRealAmountColumns();
 
@@ -178,6 +184,10 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
             if (Ext.isEmpty(record.get('gruppierung'))) {
                 record.set('gruppierung', (new Date()).getTime() + Math.floor(Math.random() * 1000));
+            }
+
+            if (record.get('use_in_offer') == 1) {
+                model.set('document_name', record.get(reporttype + '_title'))
             }
 
             /*
@@ -296,6 +306,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
                 view = this.getView(),
                 store = model.getStore('data'),
                 initialValue = 0,
+                reporttype = model.get('reportType'),
                 aggregation = model.get('selectedAggregation'),
                 grid = view.getComponent('westPanel').getComponent('calculationGrid'),
                 records = grid.getSelectionModel().getSelection(),
@@ -309,6 +320,8 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
                     sumUse += record.get('ist_netto');
                     epreis = record.get('epreis');
                     total_amount += record.get('anzahl');
+
+                    model.set('document_name', record.get(reporttype + '_title'));
                 }
             });
             records.forEach((record) => {
@@ -404,6 +417,14 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
                 }
             });
         }
+    },
+
+    canSaveReport: async function () {
+        let model = this.getViewModel();
+        let response = await fetch('./jobs/cansave/' + model.get('reportType'));
+        let result = await response.json();
+        model.set('canSaveReport', result.success);
+        return result.success;
     },
     hasInitializedFrameEventLoaded: false,
     lastFrameUpdate: 0,
@@ -548,44 +569,6 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
         this.updatePreviewFrame();
     },
-
-    /*
-    onDataUpdate: function (store, record, op, modifiedFieldNames) {
-        let model = this.getViewModel();
-        store = model.getStore('data'),
-            range = store.getRange();
-
-        //for (let i = 0; i < range.length; i++) {
-        if (modifiedFieldNames.includes('use_real_amount')) {
-
-
-            record.set('singleprice', record.get('epreis'));
-            / *
-            if (record.get('use_real_amount')) {
-                record.set('netto', record.get('epreis') * record.get('ist_anzahl'));
-            } else {
-                record.set('netto', record.get('epreis') * record.get('anzahl'));
-            }
-            * /
-            record.set('net', record.get('ist_netto'));
-            record.set('tax', record.get('steuersatz'));
-            record.set('taxvalue', record.get('steuersatz') / 100 * record.get('net'));
-            record.set('gross', record.get('net') + record.get('taxvalue'));
-
-            record.set('brutto', record.get('gross'));
-            record.set('steuersatz', record.get('tax'));
-            record.set('steuer', record.get('taxvalue'));
-            record.set('epreis', record.get('singleprice'));
-            record.set('gruppenpreis_netto', record.get('ist_netto'));
-            record.set('gruppenpreis_brutto', record.get('brutto'));
-        }
-        / *
-        var me = this;
-        me.gruppenPreise();
-        * /
-        // }
-    },
-    */
 
 
 
@@ -811,11 +794,12 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
     saveOfferReport: async function () {
         let model = this.getViewModel(),
             view = this.getView(),
-            reporttype = model.get('reportType'),
-            res = await fetch('./report/' + reporttype + '/-1', {
-                method: 'PUT',
-                body: JSON.stringify(this.getReport(true))
-            });
+            reporttype = model.get('reportType');
+
+        let res = await fetch('./report/' + reporttype + '/-1', {
+            method: 'PUT',
+            body: JSON.stringify(this.getReport(true))
+        });
 
         res = await res.json();
 
