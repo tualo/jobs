@@ -15,6 +15,7 @@ Ext.define('Tualo.jobs.lazy.mixins.Save', {
 
         let report = this.getReport();
 
+        console.log('report', 'document_name', model.get('document_name'));
 
         if (model.get('document_name') == '') {
             Ext.MessageBox.prompt(
@@ -22,8 +23,9 @@ Ext.define('Tualo.jobs.lazy.mixins.Save', {
                 'Bitte geben Sie einen Dokumentnamen ein:',
                 function (btn, txt) {
                     if (btn == 'ok') {
-                        model.set('document_name');
+                        model.set('document_name', txt);
                         calcPositions.forEach((rec) => {
+                            console.log('Setting title for record', rec.get('id'), 'to', txt, rec.get('use_in_offer'));
                             if (rec.get('use_in_offer') == 1) {
                                 rec.set(reporttype + '_title', txt);
                             }
