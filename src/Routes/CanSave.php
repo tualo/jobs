@@ -22,7 +22,7 @@ class CanSave extends \Tualo\Office\Basic\RouteWrapper
 
             App::result('success', false);
             try {
-                $value = $db->singleValue('select `group` from view_session_allowed_groups where `group` = "job_save_' . $type . '"', [], 'group');
+                $value = $db->singleValue('select `group` from view_job_groups where `group` = "job_save_' . $type . '"', [], 'group');
                 if ($value) App::result('success', true);
             } catch (\Exception $e) {
                 App::result('msg', $e->getMessage());
