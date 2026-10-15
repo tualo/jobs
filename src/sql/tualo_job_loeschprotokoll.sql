@@ -31,3 +31,35 @@ CREATE TABLE IF NOT EXISTS `tualo_job_loeschprotokoll` (
     FOREIGN KEY (`job_id`) REFERENCES `tualo_job` (`id`)
     ON DELETE RESTRICT ON UPDATE CASCADE
 ) ;
+
+create or replace view view_readtable_tualo_job_loeschprotokoll as
+select
+  `tualo_job_loeschprotokoll`.`id`,
+  `tualo_job_loeschprotokoll`.`job_id`,
+  `tualo_job_loeschprotokoll`.`processor_name`,
+  `view_editor_relation_rechnung`.`address` `controller_name`,
+  `tualo_job_loeschprotokoll`.`assignment`,
+  `tualo_job_loeschprotokoll`.`assignment_reference`,
+  `tualo_job_loeschprotokoll`.`transfer_sftp`,
+  `tualo_job_loeschprotokoll`.`transfer_smime`,
+  `tualo_job_loeschprotokoll`.`transfer_mobile_media`,
+  `tualo_job_loeschprotokoll`.`transfer_other`,
+  `tualo_job_loeschprotokoll`.`transfer_note`,
+  `tualo_job_loeschprotokoll`.`deleted_on`,
+  `tualo_job_loeschprotokoll`.`deletion_time`,
+  `tualo_job_loeschprotokoll`.`responsible`,
+  `tualo_job_loeschprotokoll`.`department`,
+  `tualo_job_loeschprotokoll`.`procedure`,
+  `tualo_job_loeschprotokoll`.`tool_report_attached`,
+  `tualo_job_loeschprotokoll`.`external_service_protocol_attached`,
+  `tualo_job_loeschprotokoll`.`subcontractor_protocol_attached`,
+  `tualo_job_loeschprotokoll`.`sign_city`,
+  `tualo_job_loeschprotokoll`.`sign_date`,
+  `tualo_job_loeschprotokoll`.`create_date`,
+  `tualo_job_loeschprotokoll`.`update_date`
+from
+  `tualo_job_loeschprotokoll`
+  join `tualo_job` on `tualo_job_loeschprotokoll`.`job_id` = `tualo_job`.`id`
+  join adressen on (`tualo_job`.`kundennummer`,`tualo_job`.`kostenstelle`) = (`adressen`.`kundennummer`,`adressen`.`kostenstelle`)
+  join view_editor_relation_rechnung on (`tualo_job`.`kundennummer`,`tualo_job`.`kostenstelle`) = (`view_editor_relation_rechnung`.`kundennummer`,`view_editor_relation_rechnung`.`kostenstelle`)
+  ;
