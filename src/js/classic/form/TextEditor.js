@@ -1,5 +1,5 @@
 Ext.define('Tualo.job.form.field.TextEditor', {
-    extend: 'Ext.form.field.TextArea',
+    extend: 'Ext.form.field.HtmlEditor',
     alias: ['widget.tualo_job_text_editor'],
     config: {
         record: null
@@ -23,6 +23,7 @@ Ext.define('Tualo.job.form.field.TextEditor', {
         console.log('Tualo.job.form.field.TextEditor', 'setRecord called', record)
         var me = this;
         me.record = record;
+        me.createAndStoreTemplateData();
         return record;
     },
 
@@ -75,10 +76,25 @@ Ext.define('Tualo.job.form.field.TextEditor', {
 
     },
 
-    templateText: async function (currentText) {
+    _unclean: false,
+    _uncleanData: null,
+
+    createAndStoreTemplateData: async function () {
+        this._unclean = true;
         let templateData = await this.createTemplateData();
+        this.templateData = templateData;
+        this._unclean = false;
+        if (this._uncleanData) {
+            this.setValue(this._uncleanData);
+            this._uncleanData = null;
+        }
+        return templateData;
+    },
+
+    templateText: function (currentText) {
+        var me = this;
         let tpl = new Ext.XTemplate(currentText);
-        let newText = tpl.apply(templateData);
+        let newText = tpl.apply(me.templateData || {});
         return newText;
     },
 
@@ -106,23 +122,15 @@ Ext.define('Tualo.job.form.field.TextEditor', {
 
 
     setValue: function (v) {
-        var me = this,
-            t = (new Date()).getTime(),
-
-            cp = me.callParent.bind(me);
-
+        var me = this;
+        if (!me._unclean) {
+            v = this.templateText(v);
+        } else {
+            me._uncleanData = v;
+        }
         me.callParent([v]);
 
-        window.editor = me;
-        window.currentText = v;
 
-        let fn = async function (currentText) {
-            currentText = await this.templateText(currentText)
-            window.currentText = currentText;
-            console.log('newText:', currentText);
-
-        }.bind(me);
-        fn(v);
     },
 
 
