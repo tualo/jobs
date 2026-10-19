@@ -3,6 +3,7 @@ Ext.define('Tualo.jobs.lazy.models.Copy', {
     alias: 'viewmodel.tualo_jobs_copy',
     data: {
         jobid: null,
+        jobnumber: null,
 
         targetJobId: null,
 

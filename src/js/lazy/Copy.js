@@ -21,10 +21,13 @@ Ext.define('Tualo.jobs.lazy.Copy', {
     viewModel: {
         type: 'tualo_jobs_copy'
     },
+    listeners: {
+        boxready: 'onBoxReady'
+    },
 
-    applyJobid: function (jobid) {
-        console.log('applyJobid called with:', jobid);
-        return jobid;
+    setJobNumber: function (val) {
+        this.getController().setJobNumber(val);
+        return val;
     },
 
     bbar: [{
@@ -72,6 +75,7 @@ Ext.define('Tualo.jobs.lazy.Copy', {
                     xtype: 'combobox_tualo_job_id',
                     placeHolder: 'Wählen Sie einen Quell-Job aus',
                     minWidth: 300,
+                    itemId: 'combobox_jobid',
                     bind: {
                         value: '{jobid}'
                     }

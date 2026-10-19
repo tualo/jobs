@@ -61,11 +61,11 @@ Ext.define('Tualo.routes.jobs.CopyPanel', {
             ]
         }
     },
-    url: 'jobs-copy(/:{jobid})',
+    url: 'jobs-copy(/:{jobnumber})',
     handler: {
         action: function (values) {
             Ext.getApplication().addView('Tualo.jobs.lazy.Copy', {
-                jobid: values.jobid,
+                jobnumber: values.jobnumber,
             });
         },
         before: function (values, action) {
