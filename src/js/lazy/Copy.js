@@ -12,7 +12,7 @@ Ext.define('Tualo.jobs.lazy.Copy', {
     },
 
     config: {
-        jobid: null
+        jobnumber: null
     },
     bind: {
         title: '{title}'
@@ -25,8 +25,9 @@ Ext.define('Tualo.jobs.lazy.Copy', {
         boxready: 'onBoxReady'
     },
 
-    setJobNumber: function (val) {
-        this.getController().setJobNumber(val);
+    setJobnumber: function (val) {
+        console.log('setJobnumber called with:', val);
+        this.getController().setJobnumber(val);
         return val;
     },
 
@@ -99,7 +100,7 @@ Ext.define('Tualo.jobs.lazy.Copy', {
 
                     html: '<div style="margin-top: 1rem;margin-bottom: 2rem;"><i class="fa-solid fa-copy" style="font-size: 4rem;"></i>'
                         + '<div><h3>Job-Kopieren</h3>'
-                        + '<span>Wählen Sie die Daten aus, die Sie kopieren möchten. Lassen Sie den Ziel-Job leer, um die Daten in einen neuen Job zu kopieren.</span></div></div>'
+                        + '<span>Wählen Sie die Daten aus, die Sie kopieren möchten.</span></div></div>'
                 },
                 {
                     xtype: 'panel',
@@ -108,7 +109,34 @@ Ext.define('Tualo.jobs.lazy.Copy', {
                         align: 'start'
                     },
                     items: [
-
+                        {
+                            xtype: 'form',
+                            items: [
+                                {
+                                    fieldLabel: 'Ziel-Kunde',
+                                    xtype: 'combobox_adressen_kundennummer',
+                                    placeHolder: 'Wählen Sie einen Kunden aus',
+                                    minWidth: 300,
+                                    bind: {
+                                        value: '{kundennummer}'
+                                    }
+                                },
+                                {
+                                    boxLabel: 'Job-Stammdaten kopieren',
+                                    xtype: 'checkbox',
+                                    bind: {
+                                        value: '{copyJobData}'
+                                    }
+                                },
+                                {
+                                    boxLabel: 'technische Daten',
+                                    xtype: 'checkbox',
+                                    bind: {
+                                        value: '{copyTechnicalData}'
+                                    }
+                                }
+                            ]
+                        }
 
                         /*{
                             formLabel: 'Ziel-Job',
@@ -120,29 +148,8 @@ Ext.define('Tualo.jobs.lazy.Copy', {
                             }
                         },
                         */
-                        {
-                            formLabel: 'Ziel-Kunde',
-                            xtype: 'combobox_adressen_kundennummer',
-                            placeHolder: 'Wählen Sie einen Kunden aus',
-                            minWidth: 300,
-                            bind: {
-                                value: '{kundennummer}'
-                            }
-                        },
-                        {
-                            boxLabel: 'Job-Stammdaten kopieren',
-                            xtype: 'checkbox',
-                            bind: {
-                                value: '{copyJobData}'
-                            }
-                        },
-                        {
-                            boxLabel: 'technische Daten',
-                            xtype: 'checkbox',
-                            bind: {
-                                value: '{copyTechnicalData}'
-                            }
-                        }/*,
+
+                        /*,
                         {
                             boxLabel: 'Kalkulation',
                             xtype: 'checkbox',

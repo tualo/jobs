@@ -8,15 +8,15 @@ Ext.define('Tualo.jobs.lazy.controller.Copy', {
         let store = this.getView().getComponent('copy-source').getComponent('combobox_jobid').getStore();
         let view = this.getView();
 
-        if (!Ext.empty(view.getViewModel().get('jobnumber'))) {
+        if (!Ext.isEmpty(view.getViewModel().get('jobnumber'))) {
             this.getView().getComponent('copy-source').getComponent('combobox_jobid').doQuery(view.getViewModel().get('jobnumber'));
         }
     },
-    setJobNumber: function (val) {
-        console.log('setJobNumber called with:', val);
+    setJobnumber: function (val) {
+        console.log('setJobnumber called with:', val);
         let view = this.getView();
 
-        view.getViewModel().set('jobid', val);
+        view.getViewModel().set('jobnumber', val);
         return val;
     },
     showNext: function () {
