@@ -25,7 +25,7 @@ Ext.define('Tualo.routes.jobs.Panel', {
 
 console.log('Tualo.routes.jobs.Panel loaded');
 
-Ext.define('Tualo.routes.jobs.Panel', {
+Ext.define('Tualo.routes.jobs.PanelInvoice', {
     statics: {
         load: async function () {
             return [
@@ -42,6 +42,30 @@ Ext.define('Tualo.routes.jobs.Panel', {
             Ext.getApplication().addView('Tualo.jobs.lazy.Panel', {
                 jobid: values.jobid,
                 reportType: 'rechnung'
+            });
+        },
+        before: function (values, action) {
+            action.resume();
+        }
+    }
+});
+
+Ext.define('Tualo.routes.jobs.CopyPanel', {
+    statics: {
+        load: async function () {
+            return [
+                {
+                    name: 'jobs-copy',
+                    path: '#jobs-copy'
+                }
+            ]
+        }
+    },
+    url: 'jobs-copy(/:{jobid})',
+    handler: {
+        action: function (values) {
+            Ext.getApplication().addView('Tualo.jobs.lazy.Copy', {
+                jobid: values.jobid,
             });
         },
         before: function (values, action) {
