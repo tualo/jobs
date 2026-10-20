@@ -92,7 +92,9 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
             if (model.get('reportType') === texts_record.get('reporttype')) {
                 texts_array.push({
                     text: texts_record.get('text'),
-                    typ: texts_record.get('placement')
+                    typ: texts_record.get('placement'),
+                    type: texts_record.get('placement'),
+                    id: texts_record.get('id'),
                 })
             }
         });

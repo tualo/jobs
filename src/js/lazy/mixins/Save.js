@@ -60,6 +60,7 @@ Ext.define('Tualo.jobs.lazy.mixins.Save', {
 
 
         texts.getRange().forEach((texts_record) => {
+            console.log('Processing text record', texts_record.id);
             let elm = iframeDocument.getElementById(texts_record.id);
             if (elm) {
                 console.log('elm', elm.innerHTML);
