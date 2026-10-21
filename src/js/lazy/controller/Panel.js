@@ -25,18 +25,27 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
         let model = this.getViewModel();
         if (model.get('reportType') === 'rechnung') {
             let grid = this.getView().getComponent('westPanel').getComponent('calculationGrid');
-            grid.columns.forEach(column => {
-                if (column.dataIndex === 'use_real_amount' || column.dataIndex === 'ist_anzahl') {
-                    column.setVisible(true);
-                }
-            });
+            try {
+                grid.columns.forEach(column => {
+                    if (column.dataIndex === 'use_real_amount' || column.dataIndex === 'ist_anzahl') {
+                        column.setVisible(true);
+                    }
+                });
+            } catch (e) {
+                console.error(e);
+            }
+
         } else {
             let grid = this.getView().getComponent('westPanel').getComponent('calculationGrid');
-            grid.columns.forEach(column => {
-                if (column.dataIndex === 'use_real_amount' || column.dataIndex === 'ist_anzahl') {
-                    column.setVisible(false);
-                }
-            });
+            try {
+                grid.columns.forEach(column => {
+                    if (column.dataIndex === 'use_real_amount' || column.dataIndex === 'ist_anzahl') {
+                        column.setVisible(false);
+                    }
+                });
+            } catch (e) {
+                console.error(e);
+            }
         }
     },
 
