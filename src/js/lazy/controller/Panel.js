@@ -707,6 +707,11 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
         let templateData = await this.createTemplateData(),
             syncNeeded = false;
 
+        if (records && records.length == 0) {
+            console.log('NO Records found:', records);
+            // alert('No records found');
+        }
+
         // console.log('onTextStoreLoad',store,records);
         for (i = 0; i < l; i++) {
             let currentText = records[i].get('text');
