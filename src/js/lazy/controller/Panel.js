@@ -748,9 +748,13 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             templateData = {};
 
 
+        me.getViewModel().set('jobData', jobData);
+
+
 
         templateData.job_name = jobRecord.get('job_name');
         templateData.order_date = Ext.util.Format.deDate(jobRecord.get('order_date'));
+        templateData.delivery_date = Ext.util.Format.deDate(jobRecord.get('delivery_date'));
         templateData.briefanrede = 'Sehr geehrte Damen und Herren';
 
 

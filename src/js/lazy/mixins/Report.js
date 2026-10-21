@@ -107,6 +107,13 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
             taxes.push(taxes_Hash[key]);
         }
 
+        me.getViewModel().get('jobData');
+
+        let tualo_job = view.getViewModel().getStore('tualo_job'),
+            briefanreden = view.getViewModel().getStore('briefanreden'),
+            jobRecord = tualo_job.getRange()[0];
+
+
         let reportTemplate = {
 
             "show_nettotal": model.get('show_nettotal'),
@@ -119,6 +126,10 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
             "currency_link": 1,
 
             "date": Ext.util.Format.date(new Date(), "Y-m-d"),
+
+            "service_period_stop": Ext.util.Format.date(jobRecord.get('delivery_date'), "Y-m-d"),
+            "service_period_start": Ext.util.Format.date(jobRecord.get('delivery_date'), "Y-m-d"),
+
 
             "document_name": model.get('document_name'),
 
@@ -177,8 +188,6 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
             "paytype": "bar",
             "zbeleg": null,
             "zbeleg_zusatz": null,
-            "service_period_stop": Ext.util.Format.date(new Date(), "Y-m-d"),
-            "service_period_start": Ext.util.Format.date(new Date(), "Y-m-d"),
             "zurueck": 0,
             "address": model.get('address'),
             "companycode": "0000",
