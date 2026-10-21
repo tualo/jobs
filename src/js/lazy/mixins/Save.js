@@ -15,7 +15,7 @@ Ext.define('Tualo.jobs.lazy.mixins.Save', {
 
         let report = this.getReport();
 
-        view.setDisabled(true);
+
 
         console.log('report', 'document_name', model.get('document_name'));
 
@@ -99,7 +99,7 @@ Ext.define('Tualo.jobs.lazy.mixins.Save', {
         })
 
         calcStore.sync();
-        view.setDisabled(false);
+        //view.setDisabled(false);
 
     }
 });
