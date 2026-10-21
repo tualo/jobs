@@ -66,7 +66,7 @@ Ext.define('Tualo.jobs.lazy.mixins.Save', {
                 console.log('elm', elm.innerHTML);
                 let fn = async function () {
                     let tablename = 'tualo_job_offer_text';
-                    if (model.get('reporttype') === 'rechnung') {
+                    if (model.get('reportType') === 'rechnung') {
                         tablename = 'tualo_job_invoice_text';
                     }
                     let response = await fetch('./ds/' + tablename + '/update', {
