@@ -299,6 +299,11 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
                             "buchungskreis_id": "0000"
                         }
                     ]
+                },
+                {
+                    "spalte": "04",
+                    "name": "SP4",
+                    "zeilen": [{ "wert": "Sparkasse Chemnitz", "position": 10, "start_am": "2026-10-21", "ende_am": "2099-12-31", "buchungskreis_id": "0000" }, { "wert": "BIC-Code: CHEKDE81", "position": 11, "start_am": "2026-10-21", "ende_am": "2099-12-31", "buchungskreis_id": "0000" }, { "wert": "IBAN: DE29 8705 0000 3140 0127", "position": 12, "start_am": "2026-10-21", "ende_am": "2099-12-31", "buchungskreis_id": "0000" }]
                 }
             ],
             "report_title": "Vorschau",

@@ -737,6 +737,10 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
         }
     },
 
+    onBrieffusstextspaltenStoreLoad: function (store, records) {
+        console.log('Brieffusstextspalten Store Loaded:', records);
+    },
+
     createTemplateData: async function () {
         let me = this,
             view = this.getView(),

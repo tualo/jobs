@@ -112,7 +112,10 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
 
         view_blg_brieffusstextspalten: {
             type: 'view_blg_brieffusstextspalten_store',
-            autoLoad: true
+            autoLoad: true,
+            listeners: {
+                load: 'onBrieffusstextspaltenStoreLoad',
+            }
         },
 
         tualo_allowed_document_colors_rgb: {
