@@ -71,6 +71,7 @@ Ext.define('Tualo.jobs.lazy.Panel', {
                             name: 'bezeichnung',
                             displayField: 'name',
                             valueField: 'name',
+                            forceSelection: true,
 
                             bind: {
                                 store: '{document_names}',

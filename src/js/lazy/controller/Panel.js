@@ -496,7 +496,10 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             store = model.getStore('data'),
             range = store.getRange();
 
-        store.load();
+        if (!Ext.isEmpty(newValue)) {
+            model.set('document_name_filter', newValue);
+            store.load();
+        }
         /*
         range.forEach((record) => {
             console.log('Panel.onChangeDocumentName.range.forEach');
