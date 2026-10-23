@@ -804,6 +804,18 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
     },
 
+    openJob: function () {
+        let me = this,
+            view = me.getView(),
+            model = view.getViewModel(),
+            job = model.get('job');
+        if (job) {
+            console.log('Opening job:', job.get('job_number'));
+            Ext.getApplication().redirectTo("ds/tualo_job/job_number/" + encodeURIComponent(job.get('job_number')));
+        } else {
+            console.log('No job to open');
+        }
+    },
 
     onTextStoreLoad: function (store, records) {
         console.log('Panel.onTextStoreLoad');
