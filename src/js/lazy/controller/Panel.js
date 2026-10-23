@@ -177,7 +177,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
     onAdressenStoreLoad: function (store, records, successful, operation, eOpts) {
         console.log('Panel.onAdressenStoreLoad');
         let model = this.getViewModel(),
-            store = model.getStore('adressen'),
+            storex = model.getStore('adressen'),
             data = store.getRange();
 
         if (records.length > 0) {
