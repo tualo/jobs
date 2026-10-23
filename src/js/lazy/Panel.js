@@ -66,7 +66,7 @@ Ext.define('Tualo.jobs.lazy.Panel', {
                     xtype: 'form',
                     title: null,
                     layout: {
-                        type: 'vbox',
+                        type: 'hbox',
                         align: 'stretch'
                     },
                     items: [
