@@ -16,6 +16,7 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
             rowNumber = 1,
             taxes_Hash = {};
 
+        me.gruppenPreise();
         range.forEach((record) => {
             let localRecord = { ...record.data };
             if (record.get('use_in_offer') == 0) return;
