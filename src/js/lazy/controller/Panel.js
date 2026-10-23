@@ -263,6 +263,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
         // this.documentNames(records);
         this.gruppenPreise();
+        this.updateSelectionData();
     },
 
     /*
@@ -386,7 +387,6 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
     updateSelectionData: function () {
         console.log('Panel.updateSelectionData');
-        this.gruppenPreise();
         let fn = () => {
             console.log('Panel.updateSelectionData.timeout');
             let model = this.getViewModel(),
