@@ -68,7 +68,7 @@ Ext.define('Tualo.jobs.lazy.Panel', {
                     items: [
                         {
                             xtype: 'combobox',
-                            fieldLabel: 'Bezeichnung',
+                            fieldLabel: 'Filter',
                             name: 'bezeichnung',
                             displayField: 'name',
                             valueField: 'name',
@@ -78,6 +78,22 @@ Ext.define('Tualo.jobs.lazy.Panel', {
                             bind: {
                                 store: '{document_names}',
                                 value: '{document_name_filter}'
+                            },
+                            listeners: {
+                                change: 'onChangeDocumentNameDD'
+                            }
+                        },
+                        {
+                            xtype: 'combobox',
+                            fieldLabel: 'Dokument',
+                            name: 'bezeichnung',
+                            displayField: 'name',
+                            valueField: 'name',
+
+                            forceSelection: true,
+
+                            bind: {
+                                value: '{document_name}'
                             },
                             listeners: {
                                 change: 'onChangeDocumentName'

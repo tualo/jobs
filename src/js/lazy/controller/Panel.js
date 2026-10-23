@@ -519,6 +519,23 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             model = me.getViewModel(),
             store = model.getStore('data'),
             range = store.getRange();
+        range.forEach((record) => {
+            console.log('Panel.onChangeDocumentName.range.forEach');
+            if (record.get('use_in_offer') == 1) {
+                record.set('document_name', newValue);
+            }
+        });
+
+        // model.set('document_name', newValue);
+
+    },
+
+    onChangeDocumentNameDD: function (field, newValue, oldValue) {
+        console.log('Panel.onChangeDocumentNameDD');
+        let me = this,
+            model = me.getViewModel(),
+            store = model.getStore('data'),
+            range = store.getRange();
 
         if (!Ext.isEmpty(newValue)) {
             model.set('document_name_filter', newValue);
