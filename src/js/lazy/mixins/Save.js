@@ -68,7 +68,7 @@ Ext.define('Tualo.jobs.lazy.mixins.Save', {
                 console.log('Processing text record', texts_record.id);
                 let elm = iframeDocument.getElementById(texts_record.id);
                 if (elm) {
-                    console.log('elm', elm.innerHTML);
+                    console.log('elm', elm.innerHTML.substring(0, 10));
                     let tablename = 'tualo_job_offer_text';
                     if (model.get('reportType') === 'rechnung') {
                         tablename = 'tualo_job_invoice_text';
