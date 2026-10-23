@@ -298,9 +298,25 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
     },
 
 
+    onTextStoreBeforeLoad: function (store, operation, eOpts) {
+        console.log('Panel.onTextStoreBeforeLoad');
+        let extraParams = store.getProxy().getExtraParams(),
+            filters = [];
+
+        filters.push({
+            property: 'tualo_job_id',
+            value: this.getViewModel().get('jobid'),
+            operator: 'eq'
+        });
+        extraParams.filter = Ext.JSON.encode(filters);
+        store.getProxy().setExtraParams(extraParams);
+    },
+
     // shared mit ?
     refreshJobTexts: function () {
         console.log('Panel.refreshJobTexts');
+
+        /*
         let model = this.getViewModel(),
             view = this.getView(),
             store = model.getStore('texts'),
@@ -322,7 +338,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
         store.getProxy().setExtraParams(extraParams);
         store.load();
 
-
+        */
 
 
     },

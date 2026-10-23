@@ -95,6 +95,7 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
             autoSync: false,
             pageSize: 100000,
             listeners: {
+                beforeload: 'onTextStoreBeforeLoad',
                 load: 'onTextStoreLoad',
             }
         },
