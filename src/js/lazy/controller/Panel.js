@@ -264,7 +264,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             }
         });
 
-        store.setData(list);
+        store.loadData(list);
 
     },
 
@@ -790,6 +790,18 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
         extraParams.filter = Ext.JSON.encode(filters);
         extraParams.sort = Ext.JSON.encode(sorters);
         store.getProxy().setExtraParams(extraParams);
+    },
+    onJobStoreLoad: function (store, records) {
+        let me = this,
+            view = me.getView(),
+            model = view.getViewModel();
+        console.log('Panel.onJobStoreLoad');
+        if (records.length == 0) {
+            console.log('No job records found');
+            return;
+        }
+        model.set('job', records[0]);
+
     },
 
 

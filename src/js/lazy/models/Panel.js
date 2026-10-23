@@ -5,6 +5,7 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
         jobid: null,
         reportType: null,
         url: 'about:blank',
+        job: null,
         record: null,
         total_net: 0,
         total_amount: 0,
@@ -31,9 +32,13 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
             return '<unbekannt>';
         },
         title: function (get) {
-            if (get('reportType') == 'angebot') return "Kalkulation zu Angebot";
-            if (get('reportType') == 'rechnung') return "Kalkulation zu Rechnung";
-            return '<unbekannt>';
+            let txt = 'unbekannt';
+            if (get('reportType') == 'angebot') txt = "Kalkulation zu Angebot";
+            if (get('reportType') == 'rechnung') txt = "Kalkulation zu Rechnung";
+            if (!Ext.isEmpty(get('job'))) {
+                txt += " " + get('job').get('job_number');
+            }
+            return txt;
         },
         canEdit: function (get) {
             return get('hasRecord') !== false;
@@ -164,6 +169,7 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
             pageSize: 100000,
             listeners: {
                 beforeload: 'onJobStoreBeforeLoad',
+                load: 'onJobStoreLoad',
             }
         },
         briefanreden: {
