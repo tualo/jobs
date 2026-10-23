@@ -242,6 +242,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
         let model = this.getViewModel(),
             store = model.getStore('data'),
             range = store.getRange(),
+            reporttype = model.get('reportType'),
             gruppierungen = {};
 
 
@@ -254,7 +255,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
                 };
             }
             console.log('Panel.gruppenPreise.each', record.get('ist_netto'));
-            if (record.get('use_real_amount') == 1) {
+            if ((record.get('use_real_amount') == 1) && (reporttype == 'rechnung')) {
                 gruppierungen['k' + record.get('gruppierung')].netto += record.get('ist_netto');
                 gruppierungen['k' + record.get('gruppierung')].brutto += record.get('ist_brutto');
             } else {
