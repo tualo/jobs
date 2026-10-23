@@ -130,6 +130,57 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
             briefanreden = view.getViewModel().getStore('briefanreden'),
             jobRecord = tualo_job.getRange()[0];
 
+        /*
+        "report_taxes": [
+            {
+                "beleg": 262327,
+                "_prio": 200019,
+                "cssattr": "tax",
+                "text": "Steuer (19%):",
+                "wert": "17,70 €",
+                "pos_text": "Steuer (19%):",
+                "pos_wert": "17,70 €"
+            },
+            {
+                "beleg": 262327,
+                "_prio": 100019,
+                "cssattr": "totalnet",
+                "text": "Netto (19%):",
+                "wert": "93,16 €",
+                "pos_text": "Netto (19%, 17,70EUR):",
+                "pos_wert": "93,16 €"
+            },
+            {
+                "beleg": 262327,
+                "_prio": 900000,
+                "cssattr": "total",
+                "text": "Gesamt:",
+                "wert": "110,86 €",
+                "pos_text": "Gesamt:",
+                "pos_wert": "110,86 €"
+            }
+        ]
+        */
+        let report_taxes = [], sum = 0;
+        for (let key in taxes_Hash) {
+            report_taxes.push({
+                "cssattr": "tax",
+                "text": "Steuer (" + Tualo.tualojs.Format.Renderer.fullPercentRenderer(taxes_Hash[key].rate) + "%):",
+                "wert": Tualo.tualojs.Format.Renderer.euroRenderer(taxes_Hash[key].tax)
+            });
+            sum += taxes_Hash[key].gross;
+            report_taxes.push({
+                "cssattr": "totalnet",
+                "text": "Netto (" + Tualo.tualojs.Format.Renderer.fullPercentRenderer(taxes_Hash[key].rate) + "%):",
+                "wert": Tualo.tualojs.Format.Renderer.euroRenderer(taxes_Hash[key].net)
+            });
+        }
+
+        report_taxes.push({
+            "cssattr": "total",
+            "text": "Gesamt:",
+            "wert": Tualo.tualojs.Format.Renderer.euroRenderer(sum)
+        });
 
         let reportTemplate = {
 
@@ -324,35 +375,7 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
                 }
             ],
             "report_title": "Vorschau",
-            "report_taxes": [
-                {
-                    "beleg": 47297,
-                    "_prio": 200000,
-                    "cssattr": "tax",
-                    "text": "Steuer (0%):",
-                    "wert": "0,00 €",
-                    "pos_text": "Steuer (0%):",
-                    "pos_wert": "0,00 €"
-                },
-                {
-                    "beleg": 47297,
-                    "_prio": 100000,
-                    "cssattr": "totalnet",
-                    "text": "Netto (0%):",
-                    "wert": "2.552,72 €",
-                    "pos_text": "Netto (0%, 0,00EUR):",
-                    "pos_wert": "2.552,72 €"
-                },
-                {
-                    "beleg": 47297,
-                    "_prio": 900000,
-                    "cssattr": "total",
-                    "text": "Gesamt:",
-                    "wert": "2.552,72 €",
-                    "pos_text": "Gesamt:",
-                    "pos_wert": "2.552,72 €"
-                }
-            ],
+            "report_taxes": report_taxes,
             "report_images": [],
             "offen": 2552.72,
             "sender_address": false
