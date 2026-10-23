@@ -19,7 +19,7 @@ Ext.define('Tualo.jobs.lazy.mixins.Save', {
 
         console.log('report', 'document_name', model.get('document_name'));
 
-        if (model.get('document_name') == '') {
+        if (Ext.isEmpty(model.get('document_name'))) {
             Ext.MessageBox.prompt(
                 'Dokument-Name',
                 'Bitte geben Sie einen Dokumentnamen ein:',

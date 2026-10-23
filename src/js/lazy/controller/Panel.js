@@ -233,7 +233,32 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             */
 
         });
+        this.documentNames(records);
         this.gruppenPreise();
+    },
+
+    documentNames: function (records) {
+        let model = this.getViewModel(),
+            store = model.getStore('document_names'),
+            reporttype = model.get('reportType'),
+            hash = {},
+            list = [];
+
+        records.forEach((record) => {
+            if (record.get('use_in_offer') == 1) {
+                let name = record.get(reporttype + '_title');
+                if (Ext.isEmpty(model.get('document_name'))) {
+                    model.set('document_name', name);
+                }
+                if (!hash[name]) {
+                    hash[name] = true;
+                    list.push({ "name": name });
+                }
+            }
+        });
+
+        store.setData(list);
+
     },
 
 
@@ -352,7 +377,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
                     epreis = record.get('epreis');
                     total_amount += record.get('anzahl');
 
-                    model.set('document_name', record.get(reporttype + '_title'));
+
                 }
             });
             records.forEach((record) => {

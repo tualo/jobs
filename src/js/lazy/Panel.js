@@ -66,10 +66,14 @@ Ext.define('Tualo.jobs.lazy.Panel', {
                     title: null,
                     items: [
                         {
-                            xtype: 'textfield',
+                            xtype: 'combobox',
                             fieldLabel: 'Bezeichnung',
                             name: 'bezeichnung',
+                            displayField: 'name',
+                            valueField: 'name',
+
                             bind: {
+                                store: '{document_names}',
                                 value: '{document_name}'
                             },
                             listeners: {
