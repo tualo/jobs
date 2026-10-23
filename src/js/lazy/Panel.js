@@ -71,13 +71,12 @@ Ext.define('Tualo.jobs.lazy.Panel', {
                             name: 'bezeichnung',
                             displayField: 'name',
                             valueField: 'name',
+
                             forceSelection: true,
 
                             bind: {
                                 store: '{document_names}',
-                                value: '{document_name_filter}',
-                                displayField: '{document_names_displayField}',
-                                valueField: '{document_names_valueField}'
+                                value: '{document_name_filter}'
                             },
                             listeners: {
                                 change: 'onChangeDocumentName'
