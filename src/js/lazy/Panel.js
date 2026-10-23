@@ -65,6 +65,7 @@ Ext.define('Tualo.jobs.lazy.Panel', {
                 {
                     xtype: 'form',
                     title: null,
+                    bodyPadding: 5,
                     layout: {
                         type: 'hbox',
                         align: 'stretch'
@@ -353,6 +354,13 @@ Ext.define('Tualo.jobs.lazy.Panel', {
                     handler: 'onClearClick'
                 },
                 '->',
+
+                {
+                    xtype: 'button',
+                    text: 'Neu Laden',
+                    iconCls: 'fa fa-reload',
+                    handler: 'onPreviewReload'
+                },
 
                 {
                     xtype: 'button',

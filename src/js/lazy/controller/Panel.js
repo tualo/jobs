@@ -25,12 +25,28 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
     onReload: function () {
         console.log('Panel.onReload');
+
         let model = this.getViewModel(),
-            store = model.getStore('data');
-        store.load();
+            store = model.getStore('data'),
+            modifiedRecords = store.getModifiedRecords();
 
+        if (modifiedRecords.length > 0) {
+            Ext.Msg.confirm('Änderungen', 'Es gibt ungespeicherte Änderungen. Fortfahren?', (btn) => {
+                if (btn === 'yes') {
+                    store.load();
+                }
+            });
+            return;
+        }
 
+    },
 
+    onPreviewReload: function () {
+        console.log('Panel.onPreviewReload');
+        let previewFrame = this.getView().getComponent('previewOuterFrame').getComponent('previewFrame');
+        if (previewFrame) {
+            previewFrame.getEl().dom.querySelector('iframe').contentWindow.document.location.reload();
+        }
     },
 
     showRealAmountColumns: function () {
