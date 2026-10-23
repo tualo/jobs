@@ -83,6 +83,7 @@ Ext.define('Tualo.jobs.lazy.Panel', {
                     itemId: 'calculationGrid',
                     title: null,
                     scrollable: true,
+                    stateful: false,
                     xtype: 'dslist_view_job_calculation_to_report',
                     selModel: {
                         type: 'tualomultirowmodel'
