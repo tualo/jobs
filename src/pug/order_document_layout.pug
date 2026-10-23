@@ -1,0 +1,85 @@
+doctype html
+html(lang="de")
+  head
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+    link(rel="stylesheet" href="../../../scss/order-document.min.css")
+    link(rel="stylesheet" href="../../../../fontawesome/pro/css/all.min.css")
+    style.
+        @media print {
+            .page input[type="text"],
+            .page input:not([type]),
+            .page select,
+            .page textarea,
+            .page input[type="checkbox"] {
+                -webkit-appearance: none !important;
+                appearance: none !important;
+                border: 0.75pt solid #000 !important;
+                box-shadow: none !important;
+                opacity: 1 !important;
+            }
+
+            .page input[type="checkbox"] {
+                display: inline-grid !important;
+                place-content: center;
+                box-sizing: border-box;
+                width: 3.5mm !important;
+                height: 3.5mm !important;
+                padding: 0 !important;
+                border-radius: 0 !important;
+                background: none !important;
+                vertical-align: middle;
+            }
+
+            .page input[type="checkbox"]::before {
+                content: "" !important;
+                position: static !important;
+                display: block !important;
+                width: 0.9mm !important;
+                height: 1.8mm !important;
+                border: solid #000 !important;
+                border-width: 0 0.5mm 0.5mm 0 !important;
+                background: none !important;
+                transform: rotate(45deg) !important;
+                visibility: hidden !important;
+            }
+
+            .page input[type="checkbox"]:checked::before {
+                visibility: visible !important;
+            }
+        }
+    
+    title Auftragsbeleg
+    script.
+        async function saveFormData(job_id,id){
+            let formValues = Object.fromEntries(new FormData(document.querySelectorAll('form')[0]).entries()),
+                values = {
+                    job_id: job_id,
+                    id: id,
+                    __table_name: "tualo_job_auftragsbeleg",
+                    __id: id,
+                    form_data:  JSON.stringify(formValues)
+                };
+
+            let data = await fetch(
+                '../../../ds/tualo_job_auftragsbeleg/create',
+                {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(values)
+                }
+            ).then((response) => { return response.json() });
+        }
+
+  body
+    .page
+        //.shell
+        block content
+    script.
+        let disabled = !{request.get('disabled')} == 1;
+        if (disabled){
+            document.querySelectorAll('form input, form select, form textarea, form button, form fieldset, form optgroup, form option, button').forEach(el => el.disabled = true);
+            document.querySelector("body > div > div > div > button").disabled = true;
+        }

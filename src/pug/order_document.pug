@@ -1,0 +1,325 @@
+extends order_document_layout
+include order_document_mixins
+block content
+    // pre=print_r(data,true)
+    each record in data
+        include order_document_php_job
+        // pre=print_r(projectmanager,true)
+
+        
+        - const report = {}
+        - report.title = 'Auftragsbeleg Produktion'
+        - report.jobNumber = job.job_number
+        - report.jobTitle = job.job_name
+        - report.orderDate = job.order_date
+        - report.palDate = job.delivery_date
+        - report.order_number = job.order_number
+        - report.manager = auftragsmanager.firstname+' '+auftragsmanager.lastname
+        - report.projectManager = projectmanager.name
+
+        - report.company = kunde.name
+        - report.contactFirstName = ansprechpartner.vorname
+        - report.contactLastName = ansprechpartner.nachname
+        - report.customerNumber = kunde.kundenkonto
+        - report.phone = ansprechpartner.telefon
+        - report.fax = ansprechpartner.telefax
+        - report.street = kunde.strasse
+        - report.zip = kunde.plz
+        - report.city = kunde.ort
+        - report.email = ansprechpartner.mail
+        - report.edition = ''
+        - report.variants = ''
+        - report.dataPreparation = { deliveryChannel: 'Datenbereitstellung per', deliveryType: 'E-Mail', by: 'durch', owner: 'Auftragsmanager', plannedMinutes: 'dd.MM.yyyy', note: 'geplante AM-Std' }
+        - report.dataCheck = [{ label: 'Kontrollkästchen 1', text: 'postalischer Adresscheck' }, { label: 'Kontrollkästchen 3', text: 'postalische Korrektur' }, { label: 'Kontrollkästchen 5', text: 'Dublettenabgleich' }, { label: 'Kontrollkästchen 2', text: 'Datenarchivierung' }, { label: 'Kontrollkästchen 3', text: 'Automationsfähige Prüfung' }]
+        - report.freight = [{ label: 'Kontrollkästchen 26', text: 'DPAG'}, { label: 'Kontrollkästchen 26', text: 'PoMo' }, { label: 'Kontrollkästchen 22', text: 'Werbliche Post' }, { label: 'Kontrollkästchen 22', text: 'Vollbezahlte Post' }, { label: 'Kontrollkästchen 22', text: 'Standardbrief' }, { label: 'Kontrollkästchen 22', text: 'Kompaktbrief' }, { label: 'Kontrollkästchen 22', text: 'Großbrief' }, { label: 'Kontrollkästchen 22', text: 'Postkarte' }, { label: 'Kontrollkästchen 22', text: 'Paket' }, { label: 'Kontrollkästchen 24', text: 'Premiumadress', extraText: " ", extraList: ['----','1 Basis', '2 Plus', '3 Fokus', '4 Retour', '5 Report', '6 Hybrid', '7 Retoure Extra']}, { label: 'Kontrollkästchen 1', text: 'vorsteuerabzugsberechtigt' }, { label: 'Kontrollkästchen 22', text: 'Dialogpost' }, { label: 'Kontrollkästchen 22', text: 'Postwurfspezial' }, { label: 'Kontrollkästchen 22', text: 'Postaktuell' }, { label: 'Kontrollkästchen 22', text: 'Vario' },{label: 'Kontrollkästchen 26', text: 'ID', extra: ' ' },{ label: 'Kontrollkästchen 24', text: 'EKP', extra: 'EKP-Nummer' }]
+        - report.freight_2 = [{ label: 'frg2', text: 'DV-Freimachung'},{ label: 'frg2', text: 'Einlieferer', extraList: ['----', 'Kunde', 'WVD']},{ label: 'frg2', text: 'Absender', extraList: ['----', 'Kunde', 'WVD']},{ label: 'frg2', text: 'Zahler', extraList: ['----', 'Kunde', 'WVD']},{ label: 'frg2', text: 'vorsteuerabzugsberechtigt'} ]
+        - report.freight_3 = [{ label: 'frg3', text: 'Dialogpost'},{ label: 'frg3', text: 'Postwurfspezial'},{ label: 'frg3', text: 'Postaktuell'},{ label: 'frg3', text: 'Vario'}, {label: 'frg3', text: 'Format', extra: ' ' }, {label: 'frg3', text: 'Gewicht', extra: ' ' }, {label: 'frg3', text: 'Stück pro Kiste ', extra: ' ' }]
+        - report.freight_4 = [{ label: 'frg4', text: 'BZA (ab 5.000 Stck.)', extra: ' ' },{label: 'frg4', text: 'BZE (ab 250 Stck. pro LR)', extra: ' ' }]
+
+        - report.freight_5 = [{label: 'frg5', text: 'Frankierservice', extraList: ['----', 'DPAG', 'WVD']},{ label: 'frg5', text: 'Postcon'},{ label: 'frg5', text: 'Briefmarken'},{ label: 'frg5', text: 'Einschreiben', extraList: ['----', 'Einwurf', 'Rückschein']} ,{ label: 'frg5', text: 'Postvertriebsstück'}  ,{ label: 'frg5', text: 'Pressepost'}  ,{ label: 'frg5', text: 'Streifbandzeitung'}  ,{ label: 'frg5', text: 'Selbstabholung Kunde'} ,{ label: 'frg5', text: 'Hauspost'} ,{ label: 'frg5', text: 'Kurier', extraList: ['----', 'Winde', 'Heider', 'EuroCourier']},{ label: 'frg5', text: 'siehe Bemerkung'}]
+        - report.endv = [{ label: 'endv_1', text: 'maschinelle Kuv. exkl. VSU', extraList: ['--', '1','2','3','4','5','6','7','8','9','10']},{ label: 'endv_2', text: 'manuelle Kuv.', extraList: ['--', '1','2','3','4','5','6','7','8','9','10']},{ label: 'endv_3', text: 'maschinell aufspenden', extraList: ['--', 'Klebepunkte','Rubbeletiketten','Briefmarken','Karten']},{ label: 'endv_4', text: 'manuell aufspenden', extraList: ['--', 'Klebepunkte','Rubbeletiketten','Briefmarken','Karten']},{ label: 'endv_5', text: 'Kameravergleichslesung'},{ label: 'endv_6', text: 'Falzen', extraList: ['--', 'DIN A4 auf DIN lang', 'DIN A4 auf DIN A6', 'DIN A4 auf DIN A6', 'DIN A5 auf DIN A6', 'DIN A3 auf DIN A4', 'DIN A3 auf DIN A5', 'DIN A3 auf DIN lang','Sonstiges']},{ label: 'endv_7', text: 'Zur Weiterverarbeitung bei:', extraList: ['--', 'Dämmig','Gröer','Buchbinderei'],extraText: ' '},{ label: 'endv_8', text: 'Schneiden'},{ label: 'endv', text: 'Rillen'},{ label: 'endv_9', text: 'Heften'},{ label: 'endv_10', text: 'Etikettieren'},{ label: 'endv_11', text: 'Mustermann fertigen'}]
+        - report.verp = [{label: 'verp', text: 'gelb'} ,{label: 'verp', text: 'rot'} ,{label: 'verp', text: 'Kartons'} ,{label: 'verp', text: 'Palette'} ,{label: 'verp', text: 'Wagen'},{ label: 'rest', text: 'Muster liegt bei'}]
+        - report.rest = [{ label: 'rest', text: 'an den Kunden senden, Adresse', extra: ' ' },{ label: 'rest', text: 'einlagern'},{ label: 'rest', text: 'vernichten'},{ label: 'rest', text: 'Pakete', extraList: ['----', 'mit LS', 'ohne LS'] },{ label: 'rest', text: 'Abholung durch', extra: ' ' }]
+        - report.printtypeList = [{ label: '' },{ label: '' },{ label: '' },{ label: '' }]
+        - report.format = ''
+        - report.weight = ''
+        - report.piecesPerBox = ''
+        - report.addresses = [{ name: 'Muster Kunde', value: '', suffix: 'Stück (keine Testadressen)' }, { name: 'Muster WVD', value: '', suffix: 'Stück' }]
+        - report.productionLog = [{ area: 'Adressmanagement', status: '' }, { area: 'Druck', status: '' }, { area: 'Endverarbeitung', status: '' }]
+        - report.conclusion = [{ label: 'conclusion', text: 'Umschläge ausgetragen'},{ label: 'conclusion', text: 'Proad aktualisiert'}]
+        form.shell
+            header.hero
+                h1.hero__title
+                    .grid.grid--two
+                        div(style="width: 95%; text-align: start; ")=report.title
+                        - var intLink="https://fb-wvd.tualo.io/server/pugreporthtml/tualo_job/order_document/"+job.id+"?disabled=1"
+                        - var abcode = barcode('qr',intLink)
+                        div.qrcode(style="width: 95%; text-align: end;") !{abcode}
+
+            .content
+                section.section
+                    .section__head
+                        h2.section__title Stammdaten
+                    table.sdtable
+                        tbody
+                            tr
+                                td.sdtd1 Jobnummer:
+                                td.sdtd2=report.jobNumber
+                                td.sdtd3 Jobbezeichnung:
+                                td.sdtd4=report.jobTitle
+                            tr
+                                td.sdtd1 Auftragsmanager:
+                                td.sdtd2=report.manager
+                                td.sdtd3 Projektmanager:
+                                td.sdtd4 #{projectmanager.firstname} #{projectmanager.lastname}
+                            tr 
+                                td.sdtd1 Auftragserteilung:
+                                td.sdtd2=date_format(date_create(record.orderDate ),"d.m.Y")
+                                td.sdtd3 Produktionsmanager:
+                                td.sdtd4 #{production_manager.firstname} #{production_manager.lastname}
+                            tr
+                                td.sdtd1 Name
+                                td.sdtd2=record.document_name
+                                td.sdtd3 PAL:
+                                td.sdtd4=date_format(date_create(record.vdatum ),"d.m.Y")
+                section.section
+                    .section__head
+                        h2.section__title Kundendaten
+                    table.sdtable
+                        tbody
+                            tr
+                                td.sdtd1 Firma
+                                td.sdtd2= report.company
+                                td.sdtd3 Ansprechpartner
+                                td.sdtd4 #{report.contactFirstName} #{report.contactLastName}
+                            tr
+                                td.sdtd1 Kd.-Nr.
+                                td.sdtd2= report.customerNumber
+                                td.sdtd3 Telefon
+                                td.sdtd4= report.phone
+                            tr
+                                td.sdtd1 Str./HNr.
+                                td.sdtd2= report.street
+                                td.sdtd3 Bestellnummer
+                                td.sdtd4= report.order_number
+                            tr
+                                td.sdtd1 PLZ/Ort
+                                td.sdtd2 #{report.zip} #{report.city}
+                                td.sdtd3 E-Mail
+                                td.sdtd4= report.email
+                            tr
+                                td(colspan="4") 
+                                    hr
+                            tr
+                                td.sdtd1 ca. Auflage
+                                td.sdtd2
+                                    input(type="text",name="ca_auflage" value=values.ca_auflage)
+                                td.sdtd3 Sorten/Varianten
+                                td.sdtd4
+                                    input(type="text",name="sort_var" value=values.sort_var)
+
+                        
+                section.section
+                    .section__head
+                        h2.section__title Datenaufbereitung
+                    .list.hrafter
+                        .choice
+                            span Datenbereitstellung per 
+                                if datapreparation
+                                    select(name="datapreparation")
+                                        each row in datapreparation
+                                            if values.datapreparation==row.name
+                                                option(selected style="font-weight: bold;")=row.name
+                                            else 
+                                                option=row.name
+                            span durch
+                                +combobox('datapreparation_by',values.datapreparation_by)
+                            span am 
+                                input(type="text",name="datapreparation_date" value=values.datapreparation_date)
+                            span   geplante AM-Std.  
+                                input(type="text",name="datapreparation_planned_time" size="4" value=values.datapreparation_planned_time)
+
+                    .list.list--two
+                        each item in report.dataCheck
+                            +choiceItem(item,"datapreparation",values)
+                    .list.hints
+                        label(for="datapreparation_notes") Bemerkung
+                        textarea(id="datapreparation_notes" name="datapreparation_notes" rows="3" ) !{values.datapreparation_notes}
+
+                section.section
+                    .section__head
+                        h2.section__title Freimachung
+    
+                    .list.list--three
+                        - c = 0 
+                        each item,index in report.freight
+                            +choiceItem(item,"freight_"+c,values)
+                            - c++                        
+                    hr
+                    .list.list--three
+                        each item in report.freight_2
+                            +choiceItem(item,"freight_2_"+c,values)
+                            - c++    
+                    hr    
+                    .list.list--three
+                        each item in report.freight_3
+                            +choiceItem(item,"freight_3_"+c,values)
+                            - c++
+                    hr
+                    .list.list--three
+                        each item in report.freight_4
+                            +choiceItem(item,"freight_4_"+c,values)
+                            - c++
+                    hr
+                    .list.list--three
+                        each item in report.freight_5
+                            +choiceItem(item,"freight_5_"+c,values)
+                            - c++
+                section.section.pbpa
+                    .section__head
+                        h2.section__title Druck + Material
+                    .list.list
+                        +printtypesTable(4)
+                        .choice
+                            .choice__mark
+                                if values.etikettensizes_checked=='on'
+                                    input(type="checkbox",name="etikettensizes_checked", checked)
+                                else
+                                    input(type="checkbox",name="etikettensizes_checked")
+                            span Direktadressierung
+                            if etikettensizes
+                                select(name="etikettensizes")
+                                    each row in etikettensizes
+                                        if values.etikettensizes==row.name
+                                            option(selected)=row.name
+                                        else 
+                                            option=row.name
+                            input(type="text",name="etikettensizes_note" size="20" value=values.etikettensizes_note)
+                            .choice__mark
+                                if values.etiketten_checked=='on'
+                                    input(type="checkbox",name="etiketten_checked", checked)
+                                else
+                                    input(type="checkbox",name="etiketten_checked")
+                            span Etiketten
+                        .list.list
+                            label(for="etikettensizes_hints") Bemerkung
+                            textarea(id="etikettensizes_hints" name="etikettensizes_hints" rows="3") !{values.etikettensizes_hints}
+
+                section.section
+                    .section__head
+                        h2.section__title Endverarbeitung
+                    ///.list.list--two
+                    .grid.grid--two
+                        each item in report.endv
+                            +choiceItemEndv(item,'endv',values)
+                    .list.hints
+                        label(for="endv_notes") Bemerkung
+                        textarea(id="endv_notes" name="endv_notes" rows="3") !{values.endv_notes}
+                    br 
+                section.section
+                    .section__head
+                        h2.section__title Bestandteile
+                    .best
+                        +BestTabelle(6,ddlisten,values)
+                    .list.hints
+                        label(for="best_notes") Bemerkung
+                        textarea(id="best_notes" name="best_notes" rows="3") !{values.best_notes}
+                    br
+                section.section
+                    .section__head
+                        h2.section__title Verpackung
+                    .list.list--three
+                        each item in report.verp
+                            +choiceItem(item,"verpackung_",values)
+                    .list.hints
+                        label(for="verp_notes") Bemerkung
+                        textarea(id="verp_notes" name="verp_notes" rows="3") !{values.verp_notes}
+                    br 
+                section.section
+                    .section__head
+                        h2.section__title Restmaterial
+                    .list.list--two
+                        - var c=0
+                        each item in report.rest
+                            +choiceItem(item,"rest_"+c,values)
+                            - c++
+                    //- report.verp
+                
+        br
+        .shell
+            header.hero
+                // .hero__eyebrow Web-Template aus Word-Export
+                h1.hero__title Auftragsprotokoll Produktion
+                br
+                b Jobnummer: !{report.jobNumber)} &nbsp;&nbsp;&nbsp; Jobbezeichnung: !{report.jobTitle}
+            .content
+                section.section
+                    .section__head
+                        h2.section__title Testadressen und Abschluss
+                        p.section__meta Der zweite Dokumentteil mit Protokoll und Prüfhinweisen
+                    table.table
+                        thead
+                        tr
+                            th Bereich
+                            th Bearbeiter, Datum und Unterschrift
+                        tbody
+                        each row in report.productionLog
+                            tr
+                            td
+                                strong= row.area
+                            td= row.status || ' '
+                    .spacer
+                    table.table.table--dense
+                        thead
+                        tr
+                            th Testadressen
+                            th Anzahl Muster (keine Einrichter)
+                        tbody
+                            tr
+                                td
+                                    textarea(id="prot_notes" name="endv_notes" rows="3" cols="50")
+                                td
+                                    each row in report.addresses
+                                        strong= row.name
+                                        | #{row.value || '________'} #{row.suffix}
+                                        br
+                .spacer
+                section.section
+                    .section__head
+                        h2.section__title Informationen zur Rechnungslegung - Porto
+                    table.table
+                        thead
+                            tr
+                                th(style="width:40%;")
+                                    b Postdienstleister
+                                th(style="width:40%;")
+                                    b Sendungsart
+                                th(style="width:20%;")
+                                    b Anzahl
+                        tbody
+                            - var n = 0
+                            while n < 10
+                                - n++
+                                tr
+                                    td &nbsp;
+                                    td &nbsp;
+                                    td &nbsp;
+                    br
+                .spacer
+                section.section
+                    .section__head
+                        h2.section__title Abschlussbericht:
+                    .list
+                        b Übersicht
+                    .list.list--two
+                        each item in report.conclusion
+                            +choiceItem(item)       
+                    .list
+                        h3.section__title Probleme und Hinweise
+                        textarea(name="allhints"  name="allhints" rows="6" cols="50")
+                br
+                button(onclick="saveFormData('"+job.id+"','"+record.id+"')" name="knopf") speichern
+                script.
+                    function save(job_id,id){
+                        saveFormData('#{job.id}','#{record.id}');
+                    }

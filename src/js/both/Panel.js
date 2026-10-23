@@ -23,6 +23,33 @@ Ext.define('Tualo.routes.jobs.Panel', {
     }
 });
 
+
+
+Ext.define('Tualo.routes.jobs.Job2ReportV2', {
+    statics: {
+        load: async function () {
+            return [
+                {
+                    name: 'job2report/panel',
+                    path: '#job2report/panel'
+                }
+            ]
+        }
+    },
+    url: 'job2report(/:{reportType}/:{jobid})',
+    handler: {
+        action: function (values) {
+            Ext.getApplication().addView('Tualo.jobs.lazy.Job2ReportV2', {
+                jobid: values.jobid,
+                reportType: values.reportType
+            });
+        },
+        before: function (values, action) {
+            action.resume();
+        }
+    }
+});
+
 console.log('Tualo.routes.jobs.Panel loaded');
 
 Ext.define('Tualo.routes.jobs.PanelInvoice', {

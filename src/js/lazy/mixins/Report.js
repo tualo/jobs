@@ -48,10 +48,27 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
 
 
 
+            if (localRecord.use_real_amount) {
+                localRecord.net = localRecord.ist_netto;
+                localRecord.amount = localRecord.amount;
+                localRecord.gross = localRecord.ist_brutto;
+            }
 
-            localRecord.net = localRecord.ist_netto;
-            localRecord.amount = localRecord.amount;
-            localRecord.gross = localRecord.ist_brutto;
+            localRecord.taxvalue = localRecord.gross - localRecord.net;
+            // gegenprüfung, sicherstellen dass taxvalue zum steuersatz passt
+            let expectedTaxValue = Math.round(localRecord.net * localRecord.tax * 100) / 100;
+            if (Math.abs(localRecord.taxvalue - expectedTaxValue) > 0.01) {
+                console.warn('Tax value mismatch for record:', localRecord);
+                /*
+                Ext.toast.show({
+                    html: 'Tax value mismatch for record: ' + JSON.stringify(localRecord),
+                    title: 'Warning',
+                    width: 300,
+                    align: 't'
+                });
+                */
+            }
+
 
 
             if (Ext.isEmpty(localRecord.pos_text)) {

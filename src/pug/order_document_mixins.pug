@@ -1,0 +1,193 @@
+mixin combobox(name,isnow)
+    select(name=name)
+        each eintrag in ddlisten
+            if eintrag.name==name
+                if eintrag.wert==isnow
+                    option(selected)=eintrag.wert
+                else
+                    option=eintrag.wert
+
+mixin summaryItem(label, value)
+    .card
+        span.label= label
+        if value
+            span.value= value
+        else
+            span.value.value--empty —
+
+mixin choiceItem(item,name,values)
+    .choice
+        - var id = uniqid()
+        .choice__mark
+            if (values[item.text+index]=='on')
+                input(type="checkbox",name=item.text+index,id=id,checked)
+            else
+                input(type="checkbox",name=item.text+index,id=id)
+
+        label(for=id).choice__text= item.text
+
+        if item.extra
+            .choice__sub= item.extra
+                input(type="text",name=name+"_extra"+index,value=values[name+"_extra"+index])
+        if item.extraList
+            .choice__sub= item.extraText
+                select(name=name+index+"_extra_list")
+                    each line in item.extraList
+                        if (values[name+index+"_extra_list"]==line)
+                            option(selected style="font-weight:bold;")=line
+                        else
+                            option=line
+
+mixin choiceItemEndv(item,name,values)
+    .choice
+        .choice__mark
+            if (values[item.label]=='on')
+                input(type="checkbox",name=item.label,checked)
+            else
+                input(type="checkbox",name=item.label)
+
+        .choice__text
+            span= item.text
+        if item.extra
+            .choice__sub= item.extra
+                input(type="text",name=item.label+"_extra",value=values[item.label+"_extra"])
+        if item.extraList
+            .choice__sub= item.extraText
+                select(name=item.label+"_extra_list")
+                    each line in item.extraList
+                        if values[item.label+"_extra_list"]==line
+                            option(selected)=line
+                        else
+                            option=line
+
+mixin BestTabelle(repeats,ddlisten,values)
+    - i=0
+    table.table.parts
+        thead
+            tr
+                th
+                th 
+                    b Teil
+                th
+                    b Bereitstellung durch
+                th
+                    b Am
+                th
+                    b Lagerort
+        tbody
+            while i < repeats
+                - i++
+                tr
+                    td
+                        .choice__mark
+                            if (values["bestand_"+i] == "on")
+                                input(checked type="checkbox" name="bestand_"+i)
+                            else 
+                                input(type="checkbox" name="bestand_"+i)
+                    td
+                        select(name="bestand_teile_"+i)
+                            each eintrag in ddlisten
+                                if eintrag.name=='bestand_teile'
+                                    if (values["bestand_teile_"+i] == eintrag.wert)
+                                        option(selected)=eintrag.wert
+                                    else
+                                        option=eintrag.wert
+                    td
+                        select(name="bestand_geber_"+i)
+                            each eintrag in ddlisten
+                                if eintrag.name=='bestand_geber'
+                                    if (values["bestand_geber_"+i] == eintrag.wert)
+                                        option(selected)=eintrag.wert
+                                    else
+                                        option=eintrag.wert                                
+
+                    td
+                        input(type="text" name="bestand_datum_"+i value=values["bestand_datum_"+i]) 
+                    td
+                        input(type="text"  name="bestand_lagerort_"+i value=values["bestand_lagerort_"+i])
+
+mixin printtypesTable(repeats)
+    //pre=print_r(values,true)
+    - i=0
+
+    
+    table.table.parts
+        thead
+            tr
+                th
+                th
+                    b Farbe
+                th 
+                    b Varianten
+                th
+                    b Papier
+                th
+                    b Gewicht
+                th
+                    b Farbigkeit
+                th
+                    b Nutzen
+                th
+                    b Hinweis
+        tbody
+            while i < repeats
+                - i++
+                tr
+                    td
+                        .choice__mark
+                            // b !{$values['paperprintvariants_'+i]}                 
+                            if (values["prt_checked_"+i]=='on')
+                                input(type="checkbox",name="prt_checked_"+i,checked)
+                            else
+                                input(type="checkbox",name="prt_checked_"+i)
+                    td
+                        select(name="papercolors_"+i)
+                            each eintrag in ddlisten
+                                if eintrag.name=='papercolors'
+                                    if $values['papercolors_'+i]==eintrag.wert
+                                        option(selected)=eintrag.wert
+                                    else
+                                        option=eintrag.wert
+                    td
+                    
+                        if paperprintvariants
+                            select(name="paperprintvariants_"+i)
+                                each row in paperprintvariants
+                                    if $values['paperprintvariants_'+i]==row.name
+                                        option(selected)=row.name
+                                    else
+                                        option=row.name
+                    td
+                        if papertypes
+                            select(name="papertypes_"+i)
+                                each row in papertypes
+                                    if $values['papertypes_'+i]==row.name
+                                        option(selected)=row.name
+                                    else
+                                        option=row.name                            
+                    td
+                        if paperweights
+                            select(name="paperweights_"+i)
+                                each row in paperweights
+                                    if $values['paperweights_'+i]==row.name
+                                        option(selected)=row.name
+                                    else                                
+                                        option=row.name
+                    td
+                        if paperprintcolorvariants
+                            select(name="paperprintcolorvariants_"+i)
+                                each row in paperprintcolorvariants
+                                    if $values['paperprintcolorvariants_'+i]==row.name
+                                        option(selected)=row.name
+                                    else                                
+                                        option=row.name
+                    td
+                        -var f = ['----',1,2,4,6,8,10,12,16,25]
+                        select(name="times_"+i)
+                            each row in f
+                                if $values['times_'+i]==row
+                                    option(selected)=row
+                                else
+                                    option=row
+                    td
+                        input(type="text",name="paper_det_hint_"+i, value=$values['paper_det_hint_'+i])

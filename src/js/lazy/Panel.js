@@ -87,29 +87,15 @@ Ext.define('Tualo.jobs.lazy.Panel', {
                     selModel: {
                         type: 'tualomultirowmodel'
                     },
-                    /*
-                    features: [{
-                        ftype: 'grouping',
-                        // groupHeaderTpl: 'Subject: {name}',
-                        showSummaryRow: true
-                    }],
-                    */
                     bind: {
                         store: '{data}'
                     },
-
-                    /*
-                    viewConfig: {
-                        listeners: {
-                            drop: 'onDropGrid'
-                        }
-                    },
-                    */
-
                     listeners: {
                         selectionchange: 'onSelectionchange',
                         drop: 'onDropGrid'
                     }
+
+
                 },
                 {
                     // region: 'south',

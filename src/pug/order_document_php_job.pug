@@ -1,0 +1,81 @@
+:php
+    $job =  $dstable('tualo_job')->f('id','eq',$record['job_id'])->getSingle();
+
+
+    $ab_values = $dstable('tualo_job_auftragsbeleg')->f('id','eq',$record['id'])->getSingle();
+    $values = [];
+    if ($ab_values!=false){
+        $values = json_decode($ab_values['form_data'],true);
+        $abID=$ab_values['id'];
+    }
+
+    
+
+    $ddlisten = $dstable('tualo_job_auftragsbeleg_ddlisten')->s('position','asc')->get();
+
+
+    
+
+    $kunde = $dstable('adressen')->f('kundennummer','eq',$job['kundennummer'])->getSingle();
+
+
+    if (empty($values['freight_16_extra16'])){
+            if (!empty($job['production_ekp'])){
+                $values['freight_16_extra16']=$job['production_ekp'];
+            }else if (!empty($kunde['ekp'])){
+                $values['freight_16_extra16']=$kunde['ekp'];
+            }
+    }
+
+
+
+    $ansprechpartner = $dstable('ansprechpartner')->f('id','eq',$job['primary_contact'])->getSingle();
+    if ($ansprechpartner==false){
+        $ansprechpartner['vorname']='-';
+        $ansprechpartner['nachname']='-';
+        $ansprechpartner['mail']='-';
+    }
+    $auftragsmanager = $dstable('staff')->f('urno','eq',$job['manager'])->getSingle();
+    if ($auftragsmanager==false){
+        $auftragsmanager['firstname']='-';
+        $auftragsmanager['lastname']='-';
+    }
+    $projectmanager = $dstable('staff')->f('urno','eq',$job['supervisor'])->getSingle();
+    if ($projectmanager==false){
+        $projectmanager['name']='-';
+    }
+    $production_manager = $dstable('staff')->f('urno','eq',$job['production_manager'])->getSingle();
+    if ($production_manager==false){
+        $production_manager['name']='-';
+    }
+
+    $paperprintvariants = $dstable('paperprintvariants')->f('active','eq',1)->get();
+    if ($paperprintvariants==false){
+        $paperprintvariants = [];
+    }
+    $etikettensizes = $dstable('etikettensizes')->s('pos','asc')->get();
+    if ($etikettensizes==false){
+        $etikettensizes = [];
+    }
+    
+    
+    $paperweights = $dstable('paperweights')->f('active','eq',1)->s('pos','asc')->get();
+    if ($paperweights==false){
+        $paperweights = [];
+    }
+    $papertypes = $dstable('papertypes')->f('active','eq',1)->s('pos','asc')->get();
+    if ($papertypes==false){
+        $papertypes = [];
+    }
+    $paperprintcolorvariants = $dstable('paperprintcolorvariants')->f('active','eq',1)->s('pos','asc')->get();
+    if ($paperprintcolorvariants==false){
+        $paperprintcolorvariants = [];
+    }
+    $datapreparation = $dstable('datapreparation')->s('pos','asc')->get();
+    if ($datapreparation==false){
+        $datapreparation = [];
+    }
+    $directaddresssizes = $dstable('directaddresssizes')->f('active','eq',1)->s('pos','asc')->get();
+    if ($directaddresssizes==false){
+        $directaddresssizes = [];
+    }

@@ -66,6 +66,7 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
         },
         artikelgruppen: {
             type: 'artikelgruppen_store',
+            // ******
             autoLoad: true,
             autoSync: false,
             pageSize: 100000
@@ -73,6 +74,7 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
 
         templates: {
             type: 'blg_config_position_templates_store',
+            // ******
             autoLoad: true,
             autoSync: false,
             pageSize: 100000
@@ -88,7 +90,8 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
         texts: {
             //type: 'tualo_job_offer_text_store',
             type: 'view_job_texts_store',
-            autoLoad: false,
+            // ******
+            autoLoad: true,
             autoSync: false,
             pageSize: 100000,
             listeners: {
@@ -112,6 +115,7 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
 
         view_blg_brieffusstextspalten: {
             type: 'view_blg_brieffusstextspalten_store',
+            // ******
             autoLoad: true,
             listeners: {
                 load: 'onBrieffusstextspaltenStoreLoad',
@@ -120,6 +124,7 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
 
         tualo_allowed_document_colors_rgb: {
             type: 'tualo_allowed_document_colors_rgb_store',
+            // ******
             autoLoad: true,
             listeners: {
                 load: 'onColorStoreLoad'
@@ -129,7 +134,8 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
 
         data: {
             type: 'view_job_calculation_to_report_store',
-            autoLoad: true,
+            // ******
+            autoLoad: false,
             autoSync: false,
             pageSize: 100000,
             listeners: {
@@ -142,6 +148,7 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
 
         tualo_job: {
             type: 'tualo_job_store',
+            // ******
             autoLoad: true,
             autoSync: false,
             pageSize: 100000,
@@ -152,6 +159,7 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
         briefanreden: {
             type: 'briefanreden_store',
             pageSize: 10000,
+            // ******
             autoLoad: true
         }
     }

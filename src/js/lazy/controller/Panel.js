@@ -8,11 +8,22 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
     ],
     onBoxReady: function () {
+        console.log('Panel.onBoxReady');
         console.log('onBoxReady');
+
+        setTimeout(() => {
+            this.showRealAmountColumns();
+        }, 100);
+
+        setTimeout(() => {
+            this.getView().getComponent('westPanel').getComponent('calculationGrid').updateLayout();
+        }, 1000);
+
         this.canSaveReport();
     },
 
     onReload: function () {
+        console.log('Panel.onReload');
         let model = this.getViewModel(),
             store = model.getStore('data');
         store.load();
@@ -22,11 +33,14 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
     },
 
     showRealAmountColumns: function () {
+        console.log('Panel.showRealAmountColumns');
         let model = this.getViewModel();
+        window.c = this;
         if (model.get('reportType') === 'rechnung') {
             let grid = this.getView().getComponent('westPanel').getComponent('calculationGrid');
             try {
                 grid.columns.forEach(column => {
+                    console.log('Panel.showRealAmountColumns.columns.forEach');
                     if (column.dataIndex === 'use_real_amount' || column.dataIndex === 'ist_anzahl') {
                         column.setVisible(true);
                     }
@@ -39,6 +53,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             let grid = this.getView().getComponent('westPanel').getComponent('calculationGrid');
             try {
                 grid.columns.forEach(column => {
+                    console.log('Panel.showRealAmountColumns.columns.forEach');
                     if (column.dataIndex === 'use_real_amount' || column.dataIndex === 'ist_anzahl') {
                         column.setVisible(false);
                     }
@@ -50,10 +65,12 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
     },
 
     onDropGrid: function () {
+        console.log('Panel.onDropGrid');
         this.numberRows();
     },
 
     numberRows: function () {
+        console.log('Panel.numberRows');
         var i,
             view = this.getView(),
             model = this.getViewModel(),
@@ -81,6 +98,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
     // shared
     loadAddress: function () {
+        console.log('Panel.loadAddress');
         let model = this.getViewModel(),
             view = this.getView(),
             store = model.getStore('view_tualo_job_address'),
@@ -106,6 +124,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
     },
     // shared
     onAddressStoreLoad: function () {
+        console.log('Panel.onAddressStoreLoad');
         let model = this.getViewModel(),
             store = model.getStore('view_tualo_job_address'),
             data = store.getRange();
@@ -119,6 +138,8 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
     // shared
     onDataStoreBeforeLoad: function (store, operation) {
+        console.trace('Panel data store beforeload');
+        console.log('Panel.onDataStoreBeforeLoad', store);
         let model = this.getViewModel(),
             view = this.getView(),
             listfilter = store.getFilters(),
@@ -130,9 +151,11 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
 
         listsorters.each(function (item) {
+            console.log('Panel.onDataStoreBeforeLoad.sorters.each');
             sorters.push(item.getConfig());
         });
         listfilter.each(function (item) {
+            console.log('Panel.onDataStoreBeforeLoad.filters.each');
             filters.push(item.getConfig());
         });
         if (Ext.isEmpty(extraParams)) { extraParams = {}; };
@@ -158,8 +181,6 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
         //this.refreshBlgPosCalculation();
         this.refreshJobTexts();
-
-
         this.loadAddress();
 
         return true;
@@ -167,14 +188,14 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
     },
 
     onDataStoreLoad: function (store, records, successful, operation, eOpts) {
+        console.log('Panel.onDataStoreLoad');
         let model = this.getViewModel(),
             reporttype = model.get('reportType'),
-
             artikelgruppen = model.getStore('artikelgruppen');
-        this.showRealAmountColumns();
 
 
         records.forEach((record) => {
+            console.log('Panel.onDataStoreLoad.records.forEach');
             if (Ext.isEmpty(record.get('leistungsbeschreibung')) && (!Ext.isEmpty(record.get('langtext')))) {
                 record.set('leistungsbeschreibung', record.get('langtext'));
             }
@@ -200,17 +221,17 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             }
 
             /*
-
-        if (Ext.isEmpty(record.get('gruppenpreis_netto'))) {
-            record.set('gruppenpreis_netto', record.get('ist_netto'));
-        }
-        if (Ext.isEmpty(record.get('gruppenpreis_brutto'))) {
-            record.set('gruppenpreis_brutto', record.get('brutto'));
-        }
-
-        // bitte später entfernen, wenn nicht mehr benötigt
-        record.set('netto', Math.round(record.get('epreis') * record.get('anzahl') * 100) / 100);
-        */
+ 
+            if (Ext.isEmpty(record.get('gruppenpreis_netto'))) {
+                record.set('gruppenpreis_netto', record.get('ist_netto'));
+            }
+            if (Ext.isEmpty(record.get('gruppenpreis_brutto'))) {
+                record.set('gruppenpreis_brutto', record.get('brutto'));
+            }
+ 
+            // bitte später entfernen, wenn nicht mehr benötigt
+            record.set('netto', Math.round(record.get('epreis') * record.get('anzahl') * 100) / 100);
+            */
 
         });
         this.gruppenPreise();
@@ -218,32 +239,42 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
 
     gruppenPreise: function () {
+        console.log('Panel.gruppenPreise');
         let model = this.getViewModel(),
             store = model.getStore('data'),
+            range = store.getRange(),
             gruppierungen = {};
-        store.each((record) => {
-            if (!Ext.isEmpty(record.get('gruppierung'))) {
-                if (!gruppierungen[record.get('gruppierung')]) {
-                    gruppierungen[record.get('gruppierung')] = {
-                        netto: 0,
-                        brutto: 0
-                    };
-                }
-                gruppierungen[record.get('gruppierung')].netto += record.get('ist_netto');
-                gruppierungen[record.get('gruppierung')].brutto += record.get('ist_brutto');
-            }
-        });
 
-        store.each((record) => {
-            if (!Ext.isEmpty(record.get('gruppierung'))) {
-                record.set('gruppenpreis_netto', gruppierungen[record.get('gruppierung')].netto);
-                record.set('gruppenpreis_brutto', gruppierungen[record.get('gruppierung')].brutto);
+
+        for (let i = 0; i < range.length; i++) {
+            let record = range[i];
+            if (!gruppierungen['k' + record.get('gruppierung')]) {
+                gruppierungen['k' + record.get('gruppierung')] = {
+                    netto: 0,
+                    brutto: 0
+                };
             }
-        });
+            console.log('Panel.gruppenPreise.each', record.get('ist_netto'));
+            if (record.get('use_real_amount') == 1) {
+                gruppierungen['k' + record.get('gruppierung')].netto += record.get('ist_netto');
+                gruppierungen['k' + record.get('gruppierung')].brutto += record.get('ist_brutto');
+            } else {
+                gruppierungen['k' + record.get('gruppierung')].netto += record.get('netto');
+                gruppierungen['k' + record.get('gruppierung')].brutto += record.get('brutto');
+            }
+        }
+
+        for (let i = 0; i < range.length; i++) {
+            let record = range[i];
+            console.log('Panel.gruppenPreise.assign.each');
+            record.set('gruppenpreis_netto', gruppierungen['k' + record.get('gruppierung')].netto);
+            record.set('gruppenpreis_brutto', gruppierungen['k' + record.get('gruppierung')].brutto);
+        }
         console.log('gruppenPreise', gruppierungen);
     },
 
     refreshBlgPosCalculation: function () {
+        console.log('Panel.refreshBlgPosCalculation');
         let model = this.getViewModel(),
             view = this.getView(),
             store = model.getStore('blg_pos_calculation'),
@@ -269,6 +300,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
     // shared mit ?
     refreshJobTexts: function () {
+        console.log('Panel.refreshJobTexts');
         let model = this.getViewModel(),
             view = this.getView(),
             store = model.getStore('texts'),
@@ -301,6 +333,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
 
     runCalculation: function () {
+        console.log('Panel.runCalculation');
 
 
         // this.gruppenPreise();
@@ -310,7 +343,9 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
     },
 
     updateSelectionData: function () {
+        console.log('Panel.updateSelectionData');
         let fn = () => {
+            console.log('Panel.updateSelectionData.timeout');
             let model = this.getViewModel(),
                 view = this.getView(),
                 store = model.getStore('data'),
@@ -325,6 +360,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
                 sumUse = 0;
 
             store.each((record) => {
+                console.log('Panel.updateSelectionData.store.each');
                 if (record.get('use_in_offer') == 1) {
                     sumUse += record.get('ist_netto');
                     epreis = record.get('epreis');
@@ -334,6 +370,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
                 }
             });
             records.forEach((record) => {
+                console.log('Panel.updateSelectionData.records.forEach');
                 selectedSum += record.get('ist_netto');
             });
 
@@ -365,6 +402,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             let acc = 0;
             model.set('selectedMenge',
                 records.reduce((acc, current) => {
+                    console.log('Panel.updateSelectionData.records.reduce');
                     console.log('aggregation', aggregation, acc, current);
                     switch (aggregation) {
                         case "zero":
@@ -390,15 +428,18 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
     },
     onFramedLoaded: function () {
+        console.log('Panel.onFramedLoaded');
         let me = this,
             view = me.getView(),
             previewFrame = view.getComponent('previewOuterFrame').getComponent('previewFrame');
 
         previewFrame.getEl().dom.querySelector('iframe').contentWindow.document.querySelectorAll(".editable").forEach(function (element) {
+            console.log('Panel.onFramedLoaded.editable.forEach');
             element.addEventListener("input", me.frameContentChanged.bind(me), false);
         });
     },
     frameContentChanged: function (event) {
+        console.log('Panel.frameContentChanged');
         let me = this,
             elementID = event.srcElement.id,
             model = me.getViewModel(),
@@ -410,6 +451,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
         if ((field == 'leistungsbeschreibung') || (field == 'pos_text')) {
             store.getRange().forEach((record) => {
+                console.log('Panel.frameContentChanged.description.forEach');
                 if (record.get('gruppierung') == firstRecord.get('gruppierung')) {
                     me.lastFrameUpdate = (new Date()).getTime();
                     record.set(field, event.srcElement.innerHTML);
@@ -420,6 +462,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
         if (field == 'teilueberschrift') {
             let oldValue = firstRecord.get(field);
             store.getRange().forEach((record) => {
+                console.log('Panel.frameContentChanged.heading.forEach');
                 if (record.get(field) == oldValue) {
                     me.lastFrameUpdate = (new Date()).getTime();
                     record.set(field, event.srcElement.innerHTML);
@@ -429,12 +472,14 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
     },
 
     onChangeDocumentName: function (field, newValue, oldValue) {
+        console.log('Panel.onChangeDocumentName');
         let me = this,
             model = me.getViewModel(),
             store = model.getStore('data'),
             range = store.getRange();
 
         range.forEach((record) => {
+            console.log('Panel.onChangeDocumentName.range.forEach');
             if (record.get('use_in_offer') == 1) {
                 record.set('document_name', newValue);
             }
@@ -445,6 +490,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
     },
 
     canSaveReport: async function () {
+        console.log('Panel.canSaveReport');
         let model = this.getViewModel();
         let response = await fetch('./jobs/cansave/' + model.get('reportType'));
         let result = await response.json();
@@ -454,29 +500,32 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
     hasInitializedFrameEventLoaded: false,
     lastFrameUpdate: 0,
     updatePreviewFrame: async function () {
+        console.log('Panel.updatePreviewFrame');
         let model = this.getViewModel(),
             view = this.getView(),
             store = model.getStore('data'),
             usedRecords = 0,
             previewFrame = view.getComponent('previewOuterFrame').getComponent('previewFrame');
-        this.gruppenPreise()
+        //this.gruppenPreise()
         if (this.lastFrameUpdate + 1000 > (new Date()).getTime()) {
             return;
         }
         this.lastFrameUpdate = (new Date()).getTime();
         if (!this.hasInitializedFrameEventLoaded) {
             previewFrame.getEl().dom.querySelector('iframe').addEventListener('load', () => {
+                console.log('Panel.updatePreviewFrame.iframe.load');
                 this.onFramedLoaded();
             });
             this.hasInitializedFrameEventLoaded = true;
         }
-        window.f = previewFrame;
+
         store.each((record) => {
+            console.log('Panel.updatePreviewFrame.store.each');
             if (record.get('use_in_offer') == 1) {
                 usedRecords++;
             }
         });
-        window.r = this.getReport();
+
         if (usedRecords > 0) {
             if ('about:blank' == previewFrame.src) {
                 console.log('previewFrame', previewFrame.src);
@@ -501,10 +550,12 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
 
                 setTimeout(() => {
+                    console.log('Panel.updatePreviewFrame.firstTimeout');
                     previewFrame.src = './pugreporthtml/view_blg_list_calculation/report_invoice/-1';
                     previewFrame.load(previewFrame.src + "?key=" + res.key);
 
                     setTimeout(() => {
+                        console.log('Panel.updatePreviewFrame.secondTimeout');
                         previewFrame.getEl().dom.querySelector('iframe').contentWindow.scrollBy(oldXPos, oldYPos);
                     }, 4000);
 
@@ -521,6 +572,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
 
     onSelectionchange: function (view, records) {
+        console.log('Panel.onSelectionchange');
         let model = this.getViewModel(),
             initialValue = 0,
             aggregation = model.get('selectedAggregation');
@@ -532,6 +584,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
     },
 
     calculateTemplate: function () {
+        console.log('Panel.calculateTemplate');
         let model = this.getViewModel(),
             view = this.getView(),
             selectedTemplate = model.get('selectedTemplate'),
@@ -552,6 +605,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
     },
 
     onUseRow: function () {
+        console.log('Panel.onUseRow');
         let me = this,
             model = me.getViewModel(),
             view = me.getView(),
@@ -560,6 +614,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             grouingId = (new Date()).getTime();
 
         selection.forEach((record) => {
+            console.log('Panel.onUseRow.selection.forEach');
             record.set('gruppierung', grouingId);
             record.set('use_in_offer', 1);
             record.set('use_in_offer', 1);
@@ -574,6 +629,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
         grid.getStore().sync({
             callback: function (batch, options) {
+                console.log('Panel.onUseRow.sync.callback');
                 console.log('onUseRow sync', batch, options);
                 me.runCalculation.call(me);
             }
@@ -581,6 +637,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
     },
 
     onDataDataChanged: function () {
+        console.log('Panel.onDataDataChanged');
         /*
         localRecord.singleprice = localRecord.epreis;
                 localRecord.net = localRecord.epreis * localRecord.amount;
@@ -599,6 +656,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
 
     onPrintClick: function () {
+        console.log('Panel.onPrintClick');
         var me = this,
             view = me.getView(),
             previewFrame = view.getComponent('previewOuterFrame').getComponent('previewFrame'),
@@ -607,6 +665,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
     },
 
     onBoldClick: function () {
+        console.log('Panel.onBoldClick');
         var me = this,
             view = me.getView(),
             previewFrame = view.getComponent('previewOuterFrame').getComponent('previewFrame'),
@@ -615,6 +674,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             wnd.document.execCommand('bold', false, null);
     },
     onItalicClick: function () {
+        console.log('Panel.onItalicClick');
         var me = this,
             view = me.getView(),
             previewFrame = view.getComponent('previewOuterFrame').getComponent('previewFrame'),
@@ -626,6 +686,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
 
     onColorClick: function (btn) {
+        console.log('Panel.onColorClick');
         var me = this,
             newValue = btn.rgb,
             view = me.getView(),
@@ -637,6 +698,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
     },
 
     onColorStoreLoad: function (store, records) {
+        console.log('Panel.onColorStoreLoad');
         var me = this,
             view = me.getView(),
             previewOuterFrame = view.getComponent('previewOuterFrame'),
@@ -644,6 +706,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             menu = button.getMenu();
 
         records.forEach(element => {
+            console.log('Panel.onColorStoreLoad.records.forEach');
             menu.add({
                 text: element.get('name'),
                 rgb: element.get('rgb'),
@@ -656,6 +719,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
     },
     onClearClick: function () {
+        console.log('Panel.onClearClick');
         var me = this,
             view = me.getView(),
             previewFrame = view.getComponent('previewOuterFrame').getComponent('previewFrame'),
@@ -667,6 +731,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
 
     onJobStoreBeforeLoad: function (store) {
+        console.log('Panel.onJobStoreBeforeLoad');
         let model = this.getViewModel(),
             view = this.getView(),
             listfilter = store.getFilters(),
@@ -678,9 +743,11 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
 
         listsorters.each(function (item) {
+            console.log('Panel.onJobStoreBeforeLoad.sorters.each');
             sorters.push(item.getConfig());
         });
         listfilter.each(function (item) {
+            console.log('Panel.onJobStoreBeforeLoad.filters.each');
             filters.push(item.getConfig());
         });
         if (Ext.isEmpty(extraParams)) { extraParams = {}; };
@@ -703,16 +770,22 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
 
     onTextStoreLoad: function (store, records) {
+        console.log('Panel.onTextStoreLoad');
         this.prepareTexts(store, records);
     },
 
     prepareTexts: async function (store, records) {
+        console.log('Panel.prepareTexts');
         let i = 0,
             l = records.length;
         let me = this,
             view = this.getView(),
-            model = view.getViewModel();
+            model = view.getViewModel(),
+            tualo_job = view.getViewModel().getStore('tualo_job'),
+            jobRecord = tualo_job.getRange();
         if (Ext.isEmpty(model.get('jobid'))) return;
+        if (jobRecord.length == 0) return;
+
         let templateData = await this.createTemplateData(),
             syncNeeded = false;
 
@@ -738,10 +811,12 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
     },
 
     onBrieffusstextspaltenStoreLoad: function (store, records) {
+        console.log('Panel.onBrieffusstextspaltenStoreLoad');
         console.log('Brieffusstextspalten Store Loaded:', records);
     },
 
     createTemplateData: async function () {
+        console.log('Panel.createTemplateData');
         let me = this,
             view = this.getView(),
             tualo_job = view.getViewModel().getStore('tualo_job'),
@@ -772,6 +847,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
         let dataTable = ['<table>'];
         jobData.forEach((item) => {
+            console.log('Panel.createTemplateData.jobData.forEach');
 
             dataTable.push('<tr><td>' + item.name + '</td><td>' + item.value + '</td></tr>');
 
@@ -786,6 +862,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
     },
 
     queryJobData: async function (id) {
+        console.log('Panel.queryJobData');
         const formData = new FormData();
         let filter = [{ "property": "job_id", "value": id, "operator": "eq" } /*,{"property":"show_in_offer","value":1,"operator":"eq"}*/];
         let sorter = [{ "property": "position", "direction": "asc" }];
@@ -807,6 +884,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
     },
 
     queryContact: async function (id) {
+        console.log('Panel.queryContact');
         const formData = new FormData();
         let sorter = [{ "property": "name", "direction": "asc" }];
 
@@ -830,6 +908,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
 
     saveOfferReport: async function () {
+        console.log('Panel.saveOfferReport');
         let model = this.getViewModel(),
             view = this.getView(),
             reporttype = model.get('reportType');
