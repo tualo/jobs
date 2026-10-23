@@ -137,6 +137,25 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
     },
 
+    onDocumentNamesStoreBeforeLoad: function (store, operation) {
+        console.log('Panel.onDocumentNamesStoreBeforeLoad');
+        let model = this.getViewModel(),
+            view = model.getView(),
+            filters = [],
+            extraParams = store.getProxy().getExtraParams();
+
+
+        filters.push({
+            property: 'jobid',
+            value: model.get('jobid'),
+            operator: 'eq'
+        });
+
+
+        extraParams.filter = Ext.JSON.encode(filters);
+        store.getProxy().setExtraParams(extraParams);
+    },
+
     // shared
     onDataStoreBeforeLoad: function (store, operation) {
         console.trace('Panel data store beforeload');
@@ -244,10 +263,11 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
         setTimeout(() => {
             this.documentNames(records);
         }, 1000);
-        this.documentNames(records);
+        // this.documentNames(records);
         this.gruppenPreise();
     },
 
+    /*
     documentNames: function (records) {
         let model = this.getViewModel(),
             store = model.getStore('document_names'),
@@ -272,6 +292,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
         store.loadData(list);
 
     },
+    */
 
 
     gruppenPreise: function () {

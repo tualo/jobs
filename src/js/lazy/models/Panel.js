@@ -140,9 +140,15 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
         },
 
         document_names: {
-            type: 'json',
-            fields: ['name', 'id'],
-            data: []
+
+            type: 'view_job_calculation_to_report_store',
+            // ******
+            autoLoad: false,
+            autoSync: false,
+            pageSize: 100000,
+            listeners: {
+                beforeload: 'onDocumentNamesStoreBeforeLoad',
+            }
         },
 
         data: {
