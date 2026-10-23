@@ -16,6 +16,7 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
         renderedTemplate: '',
         selectedAggregation: 'sum',
         document_name: '',
+        document_name_filter: '',
         selectedSum: 0,
         selectedMenge: 1,
         show_nettotal: 1,

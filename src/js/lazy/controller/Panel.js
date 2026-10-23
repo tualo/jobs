@@ -174,6 +174,13 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             value: model.get('reportType'),
             operator: 'eq'
         });
+        if (!Ext.isEmpty(model.get('document_name_filter'))) {
+            filters.push({
+                property: 'document_name',
+                value: model.get('document_name_filter'),
+                operator: 'eq'
+            });
+        }
 
         extraParams.filter = Ext.JSON.encode(filters);
         extraParams.sort = Ext.JSON.encode(sorters);
@@ -489,12 +496,15 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             store = model.getStore('data'),
             range = store.getRange();
 
+        store.load();
+        /*
         range.forEach((record) => {
             console.log('Panel.onChangeDocumentName.range.forEach');
             if (record.get('use_in_offer') == 1) {
                 record.set('document_name', newValue);
             }
         });
+        */
 
         // model.set('document_name', newValue);
 
