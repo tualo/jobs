@@ -20,6 +20,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
         }, 1000);
 
         this.canSaveReport();
+        this.onReload();
     },
 
     onReload: function () {
