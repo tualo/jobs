@@ -69,6 +69,7 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
                 */
             }
 
+            console.warn('Report record:', localRecord);
 
 
             if (Ext.isEmpty(localRecord.pos_text)) {
