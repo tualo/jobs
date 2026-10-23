@@ -386,6 +386,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
     updateSelectionData: function () {
         console.log('Panel.updateSelectionData');
+        this.gruppenPreise();
         let fn = () => {
             console.log('Panel.updateSelectionData.timeout');
             let model = this.getViewModel(),
@@ -404,7 +405,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             store.each((record) => {
                 console.log('Panel.updateSelectionData.store.each');
                 if (record.get('use_in_offer') == 1) {
-                    sumUse += record.get('ist_netto');
+                    sumUse += record.get('gruppenpreis_netto');
                     epreis = record.get('epreis');
                     total_amount += record.get('anzahl');
 
@@ -413,7 +414,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             });
             records.forEach((record) => {
                 console.log('Panel.updateSelectionData.records.forEach');
-                selectedSum += record.get('ist_netto');
+                selectedSum += record.get('gruppenpreis_netto');
             });
 
             model.set('total_net', sumUse);
