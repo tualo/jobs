@@ -358,7 +358,7 @@ Ext.define('Tualo.jobs.lazy.Panel', {
                 {
                     xtype: 'button',
                     text: 'Neu Laden',
-                    iconCls: 'fa fa-reload',
+                    iconCls: 'fa-solid fa-rotate-right',
                     handler: 'onPreviewReload'
                 },
 
