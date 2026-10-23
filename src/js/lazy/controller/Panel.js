@@ -260,9 +260,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             */
 
         });
-        setTimeout(() => {
-            this.documentNames(records);
-        }, 1000);
+
         // this.documentNames(records);
         this.gruppenPreise();
     },
