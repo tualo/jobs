@@ -11,6 +11,9 @@ Ext.define('Tualo.jobs.lazy.controller.Copy', {
         if (!Ext.isEmpty(view.getViewModel().get('jobnumber'))) {
             this.getView().getComponent('copy-source').getComponent('combobox_jobid').doQuery(view.getViewModel().get('jobnumber'));
         }
+        //view.down('combobox_adressen_kundennummer').getStore().load();
+        this.getView().getComponent('copy-source').getComponent('combobox_jobid').doQuery(view.getViewModel().get('jobnumber'));
+
     },
     setJobnumber: function (val) {
         console.log('setJobnumber called with:', val);
@@ -97,6 +100,11 @@ Ext.define('Tualo.jobs.lazy.controller.Copy', {
         }
         console.log('Fetched job data:', data);
 
+        //view.down('combobox_adressen_kundennummer').getStore().load();
+        view.down('combobox_adressen_kundennummer').doQuery(view.getViewModel().get('jobnumber'));
+        //this.getView().getComponent('copy-source').getComponent('combobox_jobid').doQuery(view.getViewModel().get('jobnumber'));
+
+
         newJobData = data.data[0];
         delete newJobData.id; // Reset the ID for the new job copy
         delete newJobData.__id; // Reset the creation date for the new job copy
@@ -104,7 +112,10 @@ Ext.define('Tualo.jobs.lazy.controller.Copy', {
         delete newJobData.create_date; // Reset the creation date for the new job copy
         newJobData.order_date = Ext.util.Format.date(new Date(), 'Y-m-d'); // Reset the creation date for the new job copy
         newJobData.status = 1; // Set the status for the new job copy
-        newJobData.kundennummer = view.getViewModel().get('kundennummer');
+        if (!Ext.isEmpty(view.getViewModel().get('kundennummer'))) {
+            newJobData.kundennummer = view.getViewModel().get('kundennummer');
+        }
+        console.log('New job data:', newJobData);
         view.getViewModel().set('jobData', newJobData);
 
         next();

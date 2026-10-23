@@ -149,8 +149,41 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
         if (data.length > 0) {
             model.set('address', data[0].get('address'));
             model.set('kundennummer', data[0].get('kundennummer'));
+            model.getStore('adressen').load();
         }
 
+    },
+
+    onAdressenStoreBeforeLoad: function (store, operation) {
+        console.log('Panel.onAdressenStoreBeforeLoad');
+        let model = this.getViewModel(),
+            extraParams = store.getProxy().getExtraParams(),
+            filters = [];
+
+        filters.push({
+            property: 'kundennummer',
+            value: model.get('kundennummer'),
+            operator: 'eq'
+        });
+        filters.push({
+            property: 'kostenstelle',
+            value: model.get('kostenstelle'),
+            operator: 'eq'
+        });
+
+        extraParams.filter = Ext.JSON.encode(filters);
+        store.getProxy().setExtraParams(extraParams);
+    },
+    onAdressenStoreLoad: function (store, records, successful, operation, eOpts) {
+        console.log('Panel.onAdressenStoreLoad');
+        let model = this.getViewModel(),
+            store = model.getStore('adressen'),
+            data = store.getRange();
+
+        if (records.length > 0) {
+            model.set('kostenstelle', records[0].get('kostenstelle'));
+            model.set('kunde', records[0]);
+        }
     },
 
     onDocumentNamesStoreBeforeLoad: function (store, operation) {
@@ -924,9 +957,13 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
     createTemplateData: async function () {
         console.log('Panel.createTemplateData');
         let me = this,
-            view = this.getView(),
-            tualo_job = view.getViewModel().getStore('tualo_job'),
-            briefanreden = view.getViewModel().getStore('briefanreden'),
+            view = me.getView(),
+            model = view.getViewModel(),
+            tualo_job = model.getStore('tualo_job'),
+            job = model.get('job'),
+            briefanreden = model.getStore('briefanreden'),
+            kunde = model.get('kunde'),
+
             jobRecord = tualo_job.getRange()[0],
             jobData = await this.queryJobData(jobRecord.get('__id')),
             contactData = await this.queryContact(jobRecord.get('primary_contact')),
@@ -935,7 +972,14 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
 
         me.getViewModel().set('jobData', jobData);
 
+        if (!Ext.isEmpty(kunde)) {
+            templateData.kunde = kunde.getData()
+        };
 
+        if (!Ext.isEmpty(job)) {
+            templateData.job = job.getData();
+
+        }
 
         templateData.job_name = jobRecord.get('job_name');
         templateData.order_date = Ext.util.Format.deDate(jobRecord.get('order_date'));

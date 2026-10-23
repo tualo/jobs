@@ -23,7 +23,9 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
         show_nettotal: 1,
         show_total: 0,
         show_subtotals: 1,
-        address: ''
+        address: '',
+        kundennummer: '',
+        kostenstelle: 0
     },
     formulas: {
         name: function (get) {
@@ -187,6 +189,16 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
             pageSize: 10000,
             // ******
             autoLoad: true
+        },
+        adressen: {
+            type: 'adressen_store',
+            pageSize: 10000,
+            // ******
+            autoLoad: true,
+            listeners: {
+                beforeload: 'onAdressenStoreBeforeLoad',
+                load: 'onAdressenStoreLoad',
+            }
         }
     }
 });
