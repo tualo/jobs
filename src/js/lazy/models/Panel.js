@@ -61,7 +61,13 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
         },
         saveButtonText: function (get) {
             return get('reportType') == 'angebot' ? 'Angebot erstellen' : 'Rechnung erstellen';
-        }
+        },
+        document_names_displayField: function (get) {
+            return get('reportType') + '_title';
+        },
+        document_names_valueField: function (get) {
+            return get('reportType') + '_title';
+        },
     },
     stores: {
         time_mat_entry: {
@@ -141,7 +147,7 @@ Ext.define('Tualo.jobs.lazy.models.Panel', {
 
         document_names: {
 
-            type: 'view_job_calculation_to_report_store',
+            type: 'view_document_names_store',
             // ******
             autoLoad: false,
             autoSync: false,
