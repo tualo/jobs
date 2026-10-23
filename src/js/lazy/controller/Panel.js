@@ -180,7 +180,6 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
         store.getProxy().setExtraParams(extraParams);
 
         //this.refreshBlgPosCalculation();
-        this.refreshJobTexts();
         this.loadAddress();
 
         return true;
@@ -312,36 +311,6 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
         store.getProxy().setExtraParams(extraParams);
     },
 
-    // shared mit ?
-    refreshJobTexts: function () {
-        console.log('Panel.refreshJobTexts');
-
-        /*
-        let model = this.getViewModel(),
-            view = this.getView(),
-            store = model.getStore('texts'),
-            listfilter = store.getFilters(),
-            listsorters = store.getSorters(),
-            filters = [],
-            sorters = [],
-            extraParams = store.getProxy().getExtraParams();
-
-        filters.push({
-            property: 'tualo_job_id',
-            value: model.get('jobid'),
-            operator: 'eq'
-        });
-
-
-        extraParams.filter = Ext.JSON.encode(filters);
-        extraParams.sort = Ext.JSON.encode(sorters);
-        store.getProxy().setExtraParams(extraParams);
-        store.load();
-
-        */
-
-
-    },
 
 
 
