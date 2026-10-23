@@ -65,6 +65,10 @@ Ext.define('Tualo.jobs.lazy.Panel', {
                 {
                     xtype: 'form',
                     title: null,
+                    layout: {
+                        type: 'vbox',
+                        align: 'stretch'
+                    },
                     items: [
                         {
                             xtype: 'combobox',
@@ -84,13 +88,8 @@ Ext.define('Tualo.jobs.lazy.Panel', {
                             }
                         },
                         {
-                            xtype: 'combobox',
+                            xtype: 'textfield',
                             fieldLabel: 'Dokument',
-                            name: 'bezeichnung',
-                            displayField: 'name',
-                            valueField: 'name',
-
-                            forceSelection: true,
 
                             bind: {
                                 value: '{document_name}'
