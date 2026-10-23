@@ -264,6 +264,7 @@ Ext.define('Tualo.jobs.lazy.controller.Panel', {
             }
         });
 
+        console.log('documentNames', list);
         store.setData(list);
 
     },
