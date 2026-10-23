@@ -21,6 +21,7 @@ Ext.define('Tualo.jobs.lazy.Panel', {
     },
     applyJobid: function (jobid) {
         this.getViewModel().set('jobid', jobid);
+        this.getViewModel().getStore('document_names').load();
     },
     applyReportType: function (reportType) {
         this.getViewModel().set('reportType', reportType);
