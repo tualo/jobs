@@ -93,6 +93,7 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
                     "tax": 0
                 };
             }
+            console.log('Processing tax for record:', localRecord);
 
             taxes_Hash["" + localRecord.tax].net += localRecord.net;
             taxes_Hash["" + localRecord.tax].gross += localRecord.gross;
