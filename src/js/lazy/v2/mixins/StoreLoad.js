@@ -80,8 +80,8 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.StoreLoad', {
             model = me.getViewModel(),
             reporttype = model.get('reportType'),
             artikelgruppen = model.getStore('artikelgruppen'),
-            typenStore = model.getStore('typen'),
-            namenStore = model.getStore('namen'),
+            //typenStore = model.getStore('typen'),
+            //namenStore = model.getStore('namen'),
             typen = {},
             names = {};
 
@@ -118,8 +118,8 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.StoreLoad', {
 
         });
 
-        typenStore.loadData(Object.values(typen).map((name) => ({ name: name })));
-        namenStore.loadData(Object.values(names).map((name) => ({ name: name })));
+        //typenStore.loadData(Object.values(typen).map((name) => ({ name: name })));
+        //namenStore.loadData(Object.values(names).map((name) => ({ name: name })));
         //model.getStore('document_names').loadData(Object.values(names).map((name) => ({ name })));
 
         // this.documentNames(records);

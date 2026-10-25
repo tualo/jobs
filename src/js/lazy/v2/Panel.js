@@ -112,7 +112,8 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
                     itemId: 'calculationGrid',
                     title: null,
                     scrollable: true,
-                    stateful: true,
+                    stateful: false,
+                    statefulFilters: false,
                     xtype: 'dslist_view_job_calculation_to_report',
                     plugins: {
                         gridfilters: true
@@ -131,8 +132,8 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
 
 
                 },
+
                 {
-                    // region: 'south',
                     border: true,
                     layout: {
                         type: 'vbox',
@@ -214,14 +215,7 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
                                         value: '{selectedMenge}'
                                     }
                                 }
-                            ]/*,
-                            buttons:[
-                                '->',
-                                {
-                                    text: 'Speichern',
-                                    handler: 'onSave'
-                                }
-                            ]*/
+                            ]
 
                         },
 
@@ -378,6 +372,10 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
                     xtype: 'tualo_pugbrowser_liveview',
                     bind: {
                         templateName: '{template}'
+                    },
+                    listeners: {
+                        frameLoaded: 'frameLoaded',
+                        frameContentChanged: 'frameContentChanged'
                     }
                 }
             ]

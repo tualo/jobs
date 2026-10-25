@@ -11,7 +11,8 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
         'Tualo.jobs.lazy.v2.mixins.CreateTemplateData',
         'Tualo.jobs.lazy.v2.mixins.GruppenPreise',
         'Tualo.jobs.lazy.v2.mixins.PreviewEditor',
-        'Tualo.jobs.lazy.v2.mixins.GridOperations'
+        'Tualo.jobs.lazy.v2.mixins.GridOperations',
+        'Tualo.jobs.lazy.v2.mixins.Frame'
 
     ],
 
@@ -60,29 +61,29 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
     },
     onCalculationGridBeforeRender: function (grid) {
         let model = this.getViewModel(),
-            filterPlugin = grid.getPlugin('gridfilters'),
-            typenStore = model.getStore('typen');
+            filterPlugin = grid.getPlugin('gridfilters');
+        /*typenStore = model.getStore('typen');
 
-        if (!filterPlugin) {
-            Ext.raise('Grid filter plugin is not available on calculationGrid');
-        }
-        if (!typenStore) {
-            Ext.raise('The typen store is not available in the Panel view model');
-        }
-
+    if (!filterPlugin) {
+        Ext.raise('Grid filter plugin is not available on calculationGrid');
+    }
+    if (!typenStore) {
+        Ext.raise('The typen store is not available in the Panel view model');
+    }
+    */
         filterPlugin.addFilter({
             dataIndex: 'reporting_type',
             type: 'list',
-            store: typenStore,
-            idField: 'name',
-            labelField: 'name'
+
         });
         filterPlugin.addFilter({
-            dataIndex: 'document_name',
+            dataIndex: 'calculation_name',
             type: 'list',
-            store: model.getStore('namen'),
-            idField: 'name',
-            labelField: 'name'
+
+        });
+        filterPlugin.addFilter({
+            dataIndex: 'kurztext',
+            type: 'list'
         });
     },
     renderDelay: 200,

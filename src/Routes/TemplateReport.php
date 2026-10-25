@@ -33,6 +33,7 @@ class TemplateReport extends \Tualo\Office\Basic\RouteWrapper
                     $report['report_title'] = $reporttypes['name'];
                     try {
                         $report['address'] = $db->singleValue('select address from  view_editor_relation_' . $matches['type'] . ' where referencenr = {referencenr} and costcenter = {costcenter}', $report, 'address');
+                        $report['address_sql'] = $db->last_sql;
                     } catch (\Exception $e) {
                         App::result('msg', $e->getMessage());
                     }

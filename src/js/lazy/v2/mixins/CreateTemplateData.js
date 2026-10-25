@@ -1,5 +1,26 @@
 Ext.define('Tualo.jobs.lazy.v2.mixins.CreateTemplateData', {
 
+    calculateTemplate: function () {
+        console.log('Panel.calculateTemplate');
+        let model = this.getViewModel(),
+            view = this.getView(),
+            selectedTemplate = model.get('selectedTemplate'),
+            record = model.get('selectedRecord'),
+            templateStore = model.getStore('templates'),
+            templateRecord = templateStore.findRecord('id', selectedTemplate, 0, false, true, true);
+        if (templateRecord) {
+            console.log('templateRecord', templateRecord.get('template'));
+
+            let tpl = new Ext.XTemplate(templateRecord.get('template'));
+
+            let object = record.data;
+            object.anzahl = model.get('selectedMenge');
+
+            model.set('renderedTemplate', tpl.apply(object))
+        }
+
+    },
+
     createTemplateData: async function () {
         console.log('Panel.createTemplateData');
         let me = this,

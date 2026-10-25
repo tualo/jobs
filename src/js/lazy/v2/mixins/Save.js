@@ -1,4 +1,65 @@
 Ext.define('Tualo.jobs.lazy.v2.mixins.Save', {
+    syncVisibleChanges: async function (store) {
+        let visibleRecords = new Set(store.getRange()),
+            filters = store.getFilters().getRange(),
+            matchesFilters = function (record) {
+                return filters.every((filter) => {
+                    if (filter.getDisabled && filter.getDisabled()) {
+                        return true;
+                    }
+                    let filterFn = filter.getFilterFn();
+                    return !filterFn || filterFn(record);
+                });
+            },
+            deferredRecords = new Map(),
+            deferredRemoved = [],
+            removedRecords = store.getRemovedRecords(),
+            syncRemoved = removedRecords.filter(matchesFilters);
+
+        store.getNewRecords().concat(store.getUpdatedRecords()).forEach((record) => {
+            if (!visibleRecords.has(record)) {
+                deferredRecords.set(record, {
+                    dirty: record.dirty,
+                    phantom: record.phantom
+                });
+                record.dirty = false;
+                record.phantom = false;
+            }
+        });
+
+        deferredRemoved.push(...removedRecords.filter((record) => !syncRemoved.includes(record)));
+        store.removed = syncRemoved;
+
+        try {
+            await new Promise((resolve) => {
+                store.sync({
+                    success: function () {
+                        console.log('Sync successful');
+                    },
+                    failure: function () {
+                        Ext.toast({
+                            html: "Fehler beim Synchronisieren",
+                            title: 'Fehler',
+                            width: 400,
+                            align: 't'
+                        });
+                    },
+                    callback: resolve
+                });
+            });
+        } finally {
+            deferredRecords.forEach((state, record) => {
+                record.dirty = state.dirty;
+                record.phantom = state.phantom;
+            });
+
+            let remainingRemoved = store.getRemovedRecords();
+            store.removed = remainingRemoved.concat(
+                deferredRemoved.filter((record) => !remainingRemoved.includes(record))
+            );
+        }
+    },
+
     onSave: async function () {
 
         let model = this.getViewModel(),
@@ -97,24 +158,8 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Save', {
                 calcStore.getUpdatedRecords().length ||
                 calcStore.getRemovedRecords().length) {
 
-                // nur ungefilterte Änderungen synchronisieren
-
-                await new Promise((resolve) => {
-                    calcStore.sync({
-                        success: function () {
-                            console.log('Sync successful');
-                        },
-                        failure: function () {
-                            Ext.toast({
-                                html: "Fehler beim Synchronisieren",
-                                title: 'Fehler',
-                                width: 400,
-                                align: 't'
-                            });
-                        },
-                        callback: resolve
-                    });
-                });
+                // Nur aktuell sichtbare Änderungen synchronisieren.
+                await this.syncVisibleChanges(calcStore);
             }
         } catch (error) {
             console.error('Fehler beim Speichern', error);

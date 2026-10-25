@@ -111,6 +111,7 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
             // ******
             autoLoad: false,
             remoteFilter: false,
+            statefulFilters: false,
             autoSync: false,
             pageSize: 100000,
             listeners: {
@@ -150,7 +151,7 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
             // ******
             autoLoad: false
         },
-
+        /*
         typen: {
             type: 'array',
             fields: ['name'],
@@ -162,6 +163,7 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
             fields: ['name'],
             data: []
         }
+            */
         /*
         artikelgruppen: {
             type: 'artikelgruppen_store',

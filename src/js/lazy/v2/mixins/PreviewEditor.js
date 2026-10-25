@@ -43,6 +43,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.PreviewEditor', {
 
     onColorStoreLoad: function (store, records) {
         console.log('Panel.onColorStoreLoad');
+
         var me = this,
             view = me.getView(),
             previewOuterFrame = view.getComponent('previewOuterFrame'),
