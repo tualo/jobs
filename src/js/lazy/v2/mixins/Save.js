@@ -1,15 +1,10 @@
 Ext.define('Tualo.jobs.lazy.v2.mixins.Save', {
     onSave: async function () {
-        let model = this.getViewModel(),
+        let me = this,
+            model = this.getViewModel(),
             view = this.getView(),
             grid = view.getComponent('westPanel').getComponent('calculationGrid'),
-            selection = grid.getSelectionModel().getSelection(),
-            previewFrame = this.getView().getComponent('previewOuterFrame').getComponent('previewFrame'),
-            iframeDocument = previewFrame.getFrameDocument(),
-            texts = model.getStore('texts'),
-            data = model.getStore('data'),
             reporttype = model.get('reportType'),
-            blg_pos_calculation = model.getStore('blg_pos_calculation'),
             calcPositions = grid.getStore().getRange();
 
 
@@ -30,15 +25,25 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Save', {
                                 rec.set(reporttype + '_title', txt);
                             }
                         })
+                        me.onSaveGoAhead();
                     }
                 },
                 false,
                 ''
             );
+        } else {
+            this.onSaveGoAhead();
         }
+    },
+    onSaveGoAhead: async function () {
 
-
-        let calcStore = grid.getStore(),
+        let model = this.getViewModel(),
+            view = this.getView(),
+            grid = view.getComponent('westPanel').getComponent('calculationGrid'),
+            previewFrame = this.getView().getComponent('previewOuterFrame').getComponent('previewFrame'),
+            iframeDocument = previewFrame.getFrameDocument(),
+            texts = model.getStore('texts'),
+            calcStore = grid.getStore(),
             updatedRecords = calcStore.getUpdatedRecords(),
             changedFields = new Set();
 
@@ -107,14 +112,14 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Save', {
 
                 for (let index = 0; index < filtered; index++) {
                     let rec = calcStore.getData().getAt(index);
-                    if (rec.get('use_in_offer') == 1) {
-                        let record = rec.getData({
-                            persist: true,
-                            serialize: true
-                        });
-                        console.log('Record to update:', record);
-                        updateData.push(record);
-                    }
+                    //if (rec.get('use_in_offer') == 1) {
+                    let record = rec.getData({
+                        persist: true,
+                        serialize: true
+                    });
+                    console.log('Record to update:', record);
+                    updateData.push(record);
+                    //}
                 }
 
                 console.log('Updating table:', updateData);
@@ -135,6 +140,8 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Save', {
                         width: 400,
                         align: 't'
                     });
+                } else {
+                    calcStore.commitChanges();
                 }
                 /*
                         

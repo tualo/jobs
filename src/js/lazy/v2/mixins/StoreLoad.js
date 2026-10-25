@@ -91,7 +91,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.StoreLoad', {
             names[record.get('document_name')] = record.get('document_name');
             console.log('Panel.onDataStoreLoad.records.forEach');
             if (record.get('use_in_offer') == 1) {
-                model.set('document_name', record.get(reporttype + '_title'))
+                // model.set('document_name', record.get(reporttype + '_title'))
                 if (Ext.isEmpty(record.get('leistungsbeschreibung')) && (!Ext.isEmpty(record.get('langtext')))) {
                     record.set('leistungsbeschreibung', record.get('langtext'));
                 }
