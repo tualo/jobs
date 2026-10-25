@@ -110,9 +110,15 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.GridOperations', {
             store.each((record) => {
                 console.log('Panel.updateSelectionData.store.each');
                 if (record.get('use_in_offer') == 1) {
-                    sumUse += record.get('gruppenpreis_netto');
+                    if ((record.get('use_real_amount') == 1) && (reporttype == 'rechnung')) {
+                        sumUse += record.get('ist_netto');
+                        total_amount += record.get('ist_anzahl');
+                    } else {
+                        sumUse += record.get('netto');
+                        total_amount += record.get('anzahl');
+                    }
                     epreis = record.get('epreis');
-                    total_amount += record.get('anzahl');
+
 
 
                 }
