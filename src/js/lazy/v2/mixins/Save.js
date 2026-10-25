@@ -106,27 +106,38 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Save', {
                     filtered = calcStore.getData().getCount();
 
                 for (let index = 0; index < filtered; index++) {
-                    let record = calcStore.getData().getAt(index).getData({
-                        persist: true,
-                        serialize: true
-                    });
-                    updateData.push(record);
-                }
-                console.log('Updating table:', updateData);
-                /*
-                        let response = await fetch('./ds/' + tablename + '/update', {
-                            method: 'POST',
-                            headers: {
-                                "Accept": "application/json",
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({
-                                __table_name: tablename,
-                                __id: texts_record.id,
-                                id: texts_record.id,
-                                text: elm.innerHTML
-                            })
+                    let rec = calcStore.getData().getAt(index);
+                    if (rec.get('use_in_offer') == 1) {
+                        let record = rec.getData({
+                            persist: true,
+                            serialize: true
                         });
+                        console.log('Record to update:', record);
+                        updateData.push(record);
+                    }
+                }
+
+                console.log('Updating table:', updateData);
+                let calc_response = await fetch('./ds/blg_pos_calculation/update', {
+                    method: 'POST',
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                let calcJsonData = await calc_response.json();
+                if (calcJsonData.success !== true) {
+                    Ext.toast({
+                        html: calcJsonData.msg,
+                        title: 'Fehler',
+                        width: 400,
+                        align: 't'
+                    });
+                }
+                /*
+                        
     
                     await new Promise((resolve) => {
                         calcStore.sync({
