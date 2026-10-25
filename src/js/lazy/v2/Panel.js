@@ -116,7 +116,11 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
                     statefulFilters: false,
                     xtype: 'dslist_view_job_calculation_to_report',
                     plugins: {
-                        gridfilters: true
+                        gridfilters: true,
+                        cellediting: {
+                            ptype: 'cellediting',
+                            clicksToEdit: 1
+                        }
                     },
                     selModel: {
                         type: 'tualomultirowmodel'
