@@ -119,6 +119,14 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
             dataIndex: 'kurztext',
             type: 'list'
         });
+        filterPlugin.addFilter({
+            dataIndex: 'rechnung_title',
+            type: 'list'
+        });
+        filterPlugin.addFilter({
+            dataIndex: 'angebot_title',
+            type: 'list'
+        });
     },
     renderDelay: 200,
     renderTimeout: null,
