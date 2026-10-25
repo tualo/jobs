@@ -1,6 +1,6 @@
 Ext.define('Tualo.jobs.lazy.v2.mixins.Save', {
     onSave: async function () {
-        window.me = this;
+
         let model = this.getViewModel(),
             view = this.getView(),
             grid = view.getComponent('westPanel').getComponent('calculationGrid'),
@@ -13,7 +13,6 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Save', {
             blg_pos_calculation = model.getStore('blg_pos_calculation'),
             calcPositions = grid.getStore().getRange();
 
-        console.log('report', 'document_name', model.get('document_name'));
 
         if (Ext.isEmpty(model.get('document_name'))) {
             Ext.MessageBox.prompt(
@@ -97,6 +96,9 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Save', {
             if (calcStore.getNewRecords().length ||
                 calcStore.getUpdatedRecords().length ||
                 calcStore.getRemovedRecords().length) {
+
+                // nur ungefilterte Änderungen synchronisieren
+
                 await new Promise((resolve) => {
                     calcStore.sync({
                         success: function () {

@@ -58,6 +58,33 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
         console.log('Tualo.jobs.lazy.v2.controller.Panel', 'onBoxReady');
         me.fetchInformation();
     },
+    onCalculationGridBeforeRender: function (grid) {
+        let model = this.getViewModel(),
+            filterPlugin = grid.getPlugin('gridfilters'),
+            typenStore = model.getStore('typen');
+
+        if (!filterPlugin) {
+            Ext.raise('Grid filter plugin is not available on calculationGrid');
+        }
+        if (!typenStore) {
+            Ext.raise('The typen store is not available in the Panel view model');
+        }
+
+        filterPlugin.addFilter({
+            dataIndex: 'reporting_type',
+            type: 'list',
+            store: typenStore,
+            idField: 'name',
+            labelField: 'name'
+        });
+        filterPlugin.addFilter({
+            dataIndex: 'document_name',
+            type: 'list',
+            store: model.getStore('namen'),
+            idField: 'name',
+            labelField: 'name'
+        });
+    },
     renderDelay: 200,
     renderTimeout: null,
     renderPreview: function () {
@@ -179,4 +206,3 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
 
 
 });
-

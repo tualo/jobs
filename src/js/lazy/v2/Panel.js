@@ -114,6 +114,9 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
                     scrollable: true,
                     stateful: true,
                     xtype: 'dslist_view_job_calculation_to_report',
+                    plugins: {
+                        gridfilters: true
+                    },
                     selModel: {
                         type: 'tualomultirowmodel'
                     },
@@ -121,6 +124,7 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
                         store: '{data}'
                     },
                     listeners: {
+                        beforerender: 'onCalculationGridBeforeRender',
                         selectionchange: 'onSelectionchange',
                         drop: 'onDropGrid'
                     }

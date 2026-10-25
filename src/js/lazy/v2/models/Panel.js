@@ -155,6 +155,12 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
             type: 'array',
             fields: ['name'],
             data: []
+        },
+
+        namen: {
+            type: 'array',
+            fields: ['name'],
+            data: []
         }
         /*
         artikelgruppen: {
