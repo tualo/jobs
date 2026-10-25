@@ -112,7 +112,7 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
                     itemId: 'calculationGrid',
                     title: null,
                     scrollable: true,
-                    stateful: false,
+                    stateful: true,
                     xtype: 'dslist_view_job_calculation_to_report',
                     selModel: {
                         type: 'tualomultirowmodel'
@@ -290,34 +290,34 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
 
                     ],
                     buttons: [
+                        {
+                            text: 'Auffrischen / Verwerfen',
+                            handler: 'onReload'
+                        },
                         '->',
                         {
                             bind: {
-                                disabled: '{disableForm}'
+                                disabled: '{disableGrouping}',
+                                text: '{groupingText}',
                             },
-                            text: 'Als Gruppe verwenden',
-                            handler: 'onUseRow'
+
+                            handler: 'onGrouping'
                         },
 
+
                         {
-                            text: 'Auffrischen',
-                            handler: 'onReload'
+                            bind: {
+                                disabled: '{disableSave}'
+                            },
+                            text: 'Speichern',
+                            handler: 'onSave',
                         },
                         {
-                            /*
                             bind: {
-                                disabled: '{disableForm}'
+                                disabled: '{disableSaveReport}',
+                                text: '{saveReportButtonText}'
                             },
-                            */
-                            text: 'Speichern',
-                            handler: 'onSave'
-                        }, {
-                            bind: {
-                                disabled: '{disableSaveOfferReport}',
-                                text: '{saveButtonText}'
-                            },
-                            // text: 'Angebot erstellen',
-                            handler: 'saveOfferReport'
+                            handler: 'saveReport'
 
                         }
                     ]
@@ -360,13 +360,6 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
                     handler: 'onClearClick'
                 },
                 '->',
-
-                {
-                    xtype: 'button',
-                    text: 'Neu Laden',
-                    iconCls: 'fa-solid fa-rotate-right',
-                    handler: 'onPreviewReload'
-                },
 
                 {
                     xtype: 'button',

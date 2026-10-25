@@ -1,20 +1,21 @@
 
 Ext.define('Tualo.jobs.lazy.v2.mixins.PrepareText', {
-    prepareTexts: async function (store, records) {
-        console.log('Panel.prepareTexts');
-        let i = 0,
-            l = records.length;
+    prepareTexts: async function () {
         let me = this,
-            view = this.getView(),
-            model = view.getViewModel(),
-            tualo_job = view.getViewModel().getStore('tualo_job'),
-            jobRecord = tualo_job.getRange();
+            view = me.getView(),
+            model = me.getViewModel(),
+            store = model.getStore('data'),
+            job = model.get('job'),
+            records = store.getRange(),
+            i = 0,
+            l = records.length;
+
         if (Ext.isEmpty(model.get('jobid'))) {
             console.error('Panel.prepareTexts', 'No jobid found');
             return false;
         }
-        if (jobRecord.length == 0) {
-            console.error('Panel.prepareTexts', 'No job record found');
+        if (Ext.isEmpty(job)) {
+            console.error('Panel.prepareTexts', 'No job record found', job, model);
             return false;
         };
 
@@ -28,9 +29,12 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.PrepareText', {
         // console.log('onTextStoreLoad',store,records);
         for (i = 0; i < l; i++) {
             let currentText = records[i].get('text');
+            if (Ext.isEmpty(currentText)) {
+                continue;
+            }
             let tpl = new Ext.XTemplate(currentText);
             let newText = tpl.apply(templateData);
-            //console.log("-----",currentText!=newText,currentText,newText);
+            console.log("-----", currentText != newText, currentText, newText);
             if (currentText != newText) {
                 records[i].set('text', newText);
                 syncNeeded = true;

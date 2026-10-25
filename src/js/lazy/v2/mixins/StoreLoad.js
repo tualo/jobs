@@ -20,7 +20,6 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.StoreLoad', {
 
     // shared
     onDataStoreBeforeLoad: function (store, operation) {
-        console.trace('Panel data store beforeload');
         console.log('Panel.onDataStoreBeforeLoad', store);
         let model = this.getViewModel(),
             view = this.getView(),
@@ -80,54 +79,51 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.StoreLoad', {
         let me = this,
             model = me.getViewModel(),
             reporttype = model.get('reportType'),
-            artikelgruppen = model.getStore('artikelgruppen');
+            artikelgruppen = model.getStore('artikelgruppen'),
+            typenStore = model.getStore('typen'),
+            typen = {},
+            names = {};
 
 
         records.forEach((record) => {
+            typen[record.get('reporting_type')] = record.get('reporting_type');
+            names[record.get('document_name')] = record.get('document_name');
             console.log('Panel.onDataStoreLoad.records.forEach');
-            if (Ext.isEmpty(record.get('leistungsbeschreibung')) && (!Ext.isEmpty(record.get('langtext')))) {
-                record.set('leistungsbeschreibung', record.get('langtext'));
-            }
-            if (Ext.isEmpty(record.get('leistungsbeschreibung'))) {
-                let artikel = artikelgruppen.findRecord('gruppen_id', record.get('artikel'), 0, false, true, true);
-                record.set('leistungsbeschreibung', record.get('artikel'));
-                if (!Ext.isEmpty(artikel)) {
-                    record.set('leistungsbeschreibung', artikel.get('langtext'));
-                }
-                if (!Ext.isEmpty(record.get('bemerkung'))) {
-                    record.set('leistungsbeschreibung', record.get('leistungsbeschreibung') + "\n" + record.get('bemerkung'));
-                }
-
-                record.commit();
-            }
-
-            if (Ext.isEmpty(record.get('gruppierung'))) {
-                record.set('gruppierung', (new Date()).getTime() + Math.floor(Math.random() * 1000));
-            }
-
             if (record.get('use_in_offer') == 1) {
                 model.set('document_name', record.get(reporttype + '_title'))
-            }
+                if (Ext.isEmpty(record.get('leistungsbeschreibung')) && (!Ext.isEmpty(record.get('langtext')))) {
+                    record.set('leistungsbeschreibung', record.get('langtext'));
+                }
+                if (Ext.isEmpty(record.get('leistungsbeschreibung'))) {
+                    let artikel = artikelgruppen.findRecord('gruppen_id', record.get('artikel'), 0, false, true, true);
+                    record.set('leistungsbeschreibung', record.get('artikel'));
+                    if (!Ext.isEmpty(artikel)) {
+                        record.set('leistungsbeschreibung', artikel.get('langtext'));
+                    }
+                    if (!Ext.isEmpty(record.get('bemerkung'))) {
+                        record.set('leistungsbeschreibung', record.get('leistungsbeschreibung') + "\n" + record.get('bemerkung'));
+                    }
 
-            /*
- 
-            if (Ext.isEmpty(record.get('gruppenpreis_netto'))) {
-                record.set('gruppenpreis_netto', record.get('ist_netto'));
+                    record.commit();
+                }
+
+                if (Ext.isEmpty(record.get('gruppierung'))) {
+                    record.set('gruppierung', (new Date()).getTime() + Math.floor(Math.random() * 1000));
+                }
+                if (Ext.isEmpty(model.get('document_name'))) {
+                    model.set('document_name', record.get(reporttype + '_title'))
+                }
             }
-            if (Ext.isEmpty(record.get('gruppenpreis_brutto'))) {
-                record.set('gruppenpreis_brutto', record.get('brutto'));
-            }
- 
-            // bitte später entfernen, wenn nicht mehr benötigt
-            record.set('netto', Math.round(record.get('epreis') * record.get('anzahl') * 100) / 100);
-            */
 
         });
+
+        typenStore.loadData(Object.values(typen).map((name) => ({ name: name })));
+        //model.getStore('document_names').loadData(Object.values(names).map((name) => ({ name })));
 
         // this.documentNames(records);
         // this.gruppenPreise();
         // this.updateSelectionData();
-        me.checkedInitialRendering();
+
     },
 
     onTextStoreBeforeLoad: function (store, operation, eOpts) {
@@ -146,7 +142,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.StoreLoad', {
     onTextStoreLoad: function (store, records) {
         console.log('Panel.onTextStoreLoad');
         let me = this;
-        me.checkedInitialRendering();
+
     },
 
 
@@ -193,12 +189,14 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.StoreLoad', {
             view = me.getView(),
             model = view.getViewModel();
         console.log('Panel.onJobStoreLoad');
+
+
         if (records.length == 0) {
             console.log('No job records found');
             return;
         }
         model.set('job', records[0]);
-        me.checkedInitialRendering();
+        console.log('######### Job record set in model:', records[0]);
 
     },
 });

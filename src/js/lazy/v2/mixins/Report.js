@@ -9,7 +9,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
             store = model.getStore('data'),
             artikelgruppen = model.getStore('artikelgruppen'),
             texts = model.getStore('texts'),
-
+            reportTemplate = model.get('reportTemplate'),
             range = store.getRange(),
             positions = [],
             sumUse = 0,
@@ -19,6 +19,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
         me.gruppenPreise();
         range.forEach((record) => {
             let localRecord = { ...record.data };
+            console.log(record.get('use_in_offer'))
             if (record.get('use_in_offer') == 0) return;
 
             localRecord.amount = localRecord.anzahl;
@@ -70,7 +71,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
                 */
             }
 
-            console.warn('Report record:', localRecord);
+            // console.warn('Report record:', localRecord);
 
 
             if (Ext.isEmpty(localRecord.pos_text)) {
@@ -95,7 +96,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
                     "tax": 0
                 };
             }
-            console.log('Processing tax for record:', localRecord);
+            // console.log('Processing tax for record:', localRecord);
 
             taxes_Hash["" + localRecord.tax].net += localRecord.net;
             taxes_Hash["" + localRecord.tax].gross += localRecord.gross;
@@ -133,48 +134,17 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
             briefanreden = view.getViewModel().getStore('briefanreden'),
             jobRecord = tualo_job.getRange()[0];
 
-        /*
-        "report_taxes": [
-            {
-                "beleg": 262327,
-                "_prio": 200019,
-                "cssattr": "tax",
-                "text": "Steuer (19%):",
-                "wert": "17,70 €",
-                "pos_text": "Steuer (19%):",
-                "pos_wert": "17,70 €"
-            },
-            {
-                "beleg": 262327,
-                "_prio": 100019,
-                "cssattr": "totalnet",
-                "text": "Netto (19%):",
-                "wert": "93,16 €",
-                "pos_text": "Netto (19%, 17,70EUR):",
-                "pos_wert": "93,16 €"
-            },
-            {
-                "beleg": 262327,
-                "_prio": 900000,
-                "cssattr": "total",
-                "text": "Gesamt:",
-                "wert": "110,86 €",
-                "pos_text": "Gesamt:",
-                "pos_wert": "110,86 €"
-            }
-        ]
-        */
         let report_taxes = [], sum = 0;
         for (let key in taxes_Hash) {
             report_taxes.push({
                 "cssattr": "tax",
-                "text": "Steuer (" + Tualo.tualojs.Format.Renderer.fullPercentRenderer(taxes_Hash[key].rate) + "%):",
+                "text": "Steuer (" + Tualo.tualojs.Format.Renderer.fullPercentRenderer(taxes_Hash[key].rate) + "):",
                 "wert": Tualo.tualojs.Format.Renderer.euroRenderer(taxes_Hash[key].tax)
             });
             sum += taxes_Hash[key].gross;
             report_taxes.push({
                 "cssattr": "totalnet",
-                "text": "Netto (" + Tualo.tualojs.Format.Renderer.fullPercentRenderer(taxes_Hash[key].rate) + "%):",
+                "text": "Netto (" + Tualo.tualojs.Format.Renderer.fullPercentRenderer(taxes_Hash[key].rate) + "):",
                 "wert": Tualo.tualojs.Format.Renderer.euroRenderer(taxes_Hash[key].net)
             });
         }
@@ -185,7 +155,32 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
             "wert": Tualo.tualojs.Format.Renderer.euroRenderer(sum)
         });
 
-        let reportTemplate = {
+        reportTemplate.show_nettotal = model.get('show_nettotal');
+        reportTemplate.show_total = model.get('show_total');
+        reportTemplate.show_subtotals = model.get('show_subtotals');
+
+        reportTemplate.bookingdate = Ext.util.Format.date(new Date(), "Y-m-d");
+        reportTemplate.date = Ext.util.Format.date(new Date(), "Y-m-d");
+        reportTemplate.service_period_stop = Ext.util.Format.date(jobRecord.get('delivery_date'), "Y-m-d");
+        reportTemplate.service_period_start = Ext.util.Format.date(jobRecord.get('delivery_date'), "Y-m-d");
+        reportTemplate.document_name = model.get('document_name');
+        reportTemplate.report_taxes = report_taxes;
+        reportTemplate.texts = texts_array;
+        reportTemplate.positions = positions;
+        reportTemplate.kundennummer = model.get('kundennummer');
+
+        reportTemplate.jobid = model.get('jobid');
+
+
+
+
+
+        return reportTemplate;
+    },
+});
+
+/*
+let reportTemplateX = {
 
             "show_nettotal": model.get('show_nettotal'),
             "show_total": model.get('show_total'),
@@ -383,9 +378,4 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
             "offen": 2552.72,
             "sender_address": false
         };
-
-
-
-        return reportTemplate;
-    },
-});
+*/

@@ -9,8 +9,47 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
         'Tualo.jobs.lazy.v2.mixins.DataChange',
         'Tualo.jobs.lazy.v2.mixins.PrepareText',
         'Tualo.jobs.lazy.v2.mixins.CreateTemplateData',
+        'Tualo.jobs.lazy.v2.mixins.GruppenPreise',
+        'Tualo.jobs.lazy.v2.mixins.PreviewEditor',
+        'Tualo.jobs.lazy.v2.mixins.GridOperations'
 
     ],
+
+    onReload: function () {
+        console.log('Panel.onReload');
+
+        let model = this.getViewModel(),
+            store = model.getStore('data'),
+            modifiedRecords = store.getModifiedRecords();
+
+        if (modifiedRecords.length > 0) {
+            Ext.Msg.confirm('Änderungen', 'Es gibt ungespeicherte Änderungen. Ohne speichern fortfahren?', (btn) => {
+                if (btn === 'yes') {
+                    store.load();
+                }
+            });
+            return;
+        }
+
+    },
+
+    loadStore: function (store) {
+        return new Promise((resolve, reject) => {
+            console.log('loadStore', 'Loading store:', store.type, store);
+            store.load({
+                callback: (records, operation, success) => {
+                    if (success) {
+                        console.log('loadStore', 'success:', store.type, store);
+                        resolve(records);
+                    } else {
+                        console.log('loadStore', 'failure:', store.type, store);
+                        reject(operation.getError() || new Error('Store konnte nicht geladen werden'));
+                    }
+                }
+            });
+        });
+    },
+
     onBoxReady: function () {
         let me = this,
             view = me.getView(),
@@ -18,36 +57,73 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
             dataStore = model.getStore('data');
         console.log('Tualo.jobs.lazy.v2.controller.Panel', 'onBoxReady');
         me.fetchInformation();
-        dataStore.load();
     },
-    checkedInitialRendering: function () {
-        console.log('Panel.checkedInitialRendering');
-        let me = this;
-        me.checkedInitialRenderingAsync();
-    },
-    checkedInitialRenderingAsync: async function () {
+    renderDelay: 200,
+    renderTimeout: null,
+    renderPreview: function () {
         let me = this,
             view = me.getView(),
             model = me.getViewModel(),
-            dataStore = model.getStore('data'),
             previewFrame = view.getComponent('previewOuterFrame').getComponent('previewFrame');
 
-        let r = await me.prepareTexts(dataStore, dataStore.getRange())
-        console.log('Prepared texts result:', r);
-        if (r) {
-            previewFrame.setData({ report: model.get('reportTemplate') });
-        } else {
-            console.error('Failed to prepare texts');
-
+        if (me.renderTimeout) {
+            clearTimeout(me.renderTimeout);
         }
-        return true;
+        me.renderTimeout = setTimeout(() => {
+            let report = me.getReport();
+            console.log('Rendering report:', report);
+            if (report) {
+                //let oldScroll = me.getScrollPosition();
+                previewFrame.setData({ report: report });
+                //me.scrollPosition(oldScroll);
+            } else {
+                console.error('No report template available for rendering');
+            }
+        }, me.renderDelay);
+
+
+    },
+    getScrollPosition: function () {
+        let me = this,
+            view = me.getView(),
+            previewFrame = view.getComponent('previewOuterFrame').getComponent('previewFrame');
+
+        return {
+            x: previewFrame.getEl().dom.querySelector('iframe').contentWindow.scrollX,
+            y: previewFrame.getEl().dom.querySelector('iframe').contentWindow.scrollY
+        };
+    },
+    scrollPosition: function (old) {
+        let me = this,
+            view = me.getView(),
+            previewFrame = view.getComponent('previewOuterFrame').getComponent('previewFrame');
+
+        previewFrame.getEl().dom.querySelector('iframe').contentWindow.scrollBy(old.x, old.y);
     },
     fetchInformation: async function () {
-        let me = this;
-        if (await me.queryReportTemplate()) {
-            await me.queryAddress();
-            me.checkedInitialRendering();
-        }
+        let me = this,
+            view = me.getView(),
+            model = me.getViewModel();
+
+        console.log('fetchInformation', 'Fetching information');
+        await Promise.all([
+            me.queryReportTemplate(),
+            me.queryAddress(),
+            me.loadStore(model.getStore('document_names')),
+            me.loadStore(model.getStore('tualo_allowed_document_colors_rgb')),
+            me.loadStore(model.getStore('briefanreden')),
+            me.loadStore(model.getStore('tualo_job')),
+            me.loadStore(model.getStore('texts')),
+            me.loadStore(model.getStore('data')),
+
+        ]);
+        await me.prepareTexts();
+
+        let report = model.get('reportTemplate');
+        report.address = model.get('address');
+        model.set('reportTemplate', report);
+        me.renderPreview();
+        console.log('fetchInformation', 'Fetching done', model.get('reportTemplate'));
     },
     queryReportTemplate: async function () {
         let me = this,
@@ -85,9 +161,7 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
                 .then(res => res);
         if (data.success) {
             model.set('address', data.data[0].address);
-            let report = model.get('reportTemplate');
-            report.address = model.get('address');
-            model.set('reportTemplate', report);
+
             return true;
         } else {
             console.error('Failed to fetch address', data);

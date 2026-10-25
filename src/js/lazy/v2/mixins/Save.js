@@ -1,21 +1,17 @@
 Ext.define('Tualo.jobs.lazy.v2.mixins.Save', {
     onSave: async function () {
+        window.me = this;
         let model = this.getViewModel(),
             view = this.getView(),
-            previewFrame = view.getComponent('previewOuterFrame').getComponent('previewFrame');
-        let grid = view.getComponent('westPanel').getComponent('calculationGrid'),
+            grid = view.getComponent('westPanel').getComponent('calculationGrid'),
             selection = grid.getSelectionModel().getSelection(),
-            iframe = previewFrame.getEl().dom.firstChild,
-            iframeDocument = iframe.contentWindow.document,
+            previewFrame = this.getView().getComponent('previewOuterFrame').getComponent('previewFrame'),
+            iframeDocument = previewFrame.getFrameDocument(),
             texts = model.getStore('texts'),
             data = model.getStore('data'),
             reporttype = model.get('reportType'),
             blg_pos_calculation = model.getStore('blg_pos_calculation'),
             calcPositions = grid.getStore().getRange();
-
-        let report = this.getReport();
-
-
 
         console.log('report', 'document_name', model.get('document_name'));
 

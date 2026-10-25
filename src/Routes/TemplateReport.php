@@ -20,19 +20,24 @@ class TemplateReport extends \Tualo\Office\Basic\RouteWrapper
             $db = App::get('session')->getDB();
             App::result('success', false);
             try {
+                $reporttypes = $db->singleRow('select * from blg_config where tabellenzusatz={type} ', ['type' => $matches['type']]);
+                if (empty($reporttypes)) {
+                    throw new \Exception('Report type not found');
+                }
                 $value = $db->singleValue('select max(id) x from blg_hdr_calculation where `jobid` = {jobid}', ['jobid' => $matches['id']], 'x');
                 if ($value) {
 
                     $report = Report::get('calculation', $value);
                     App::result('success', true);
                     $report['reporttype'] = $matches['type'];
+                    $report['report_title'] = $reporttypes['name'];
                     try {
                         $report['address'] = $db->singleValue('select address from  view_editor_relation_' . $matches['type'] . ' where referencenr = {referencenr} and costcenter = {costcenter}', $report, 'address');
-                        App::result('last_sql', $db->last_sql);
                     } catch (\Exception $e) {
                         App::result('msg', $e->getMessage());
                     }
                     App::result('report', $report);
+                    App::result('reporttypes', $reporttypes);
                 }
             } catch (\Exception $e) {
                 App::result('msg', $e->getMessage());

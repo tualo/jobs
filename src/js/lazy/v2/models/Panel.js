@@ -25,7 +25,9 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
         show_subtotals: 1,
         address: '',
         kundennummer: '',
-        kostenstelle: 0
+        mixedGrouping: false,
+        kostenstelle: 0,
+        modifiedRows: 0
     },
     formulas: {
         name: function (get) {
@@ -58,10 +60,19 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
         disableForm: function (get) {
             return get('selectedRows') == 0;
         },
-        disableSaveOfferReport: function (get) {
-            return get('canSaveReport') === false;
+        disableGrouping: function (get) {
+            return get('selectedRows') == 0;
         },
-        saveButtonText: function (get) {
+        groupingText: function (get) {
+            return get('selectedRows') == 0 ? 'Keine Zeilen ausgewählt' : ((get('mixedGrouping') ? 'Gruppieren' : 'Gruppe auflösen'));
+        },
+        disableSave: function (get) {
+            return get('modifiedRows') == 0;
+        },
+        disableSaveReport: function (get) {
+            return (get('canSaveReport') === false);
+        },
+        saveReportButtonText: function (get) {
             return get('reportType') == 'angebot' ? 'Angebot erstellen' : 'Rechnung erstellen';
         },
         document_names_displayField: function (get) {
@@ -76,7 +87,7 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
         tualo_allowed_document_colors_rgb: {
             type: 'tualo_allowed_document_colors_rgb_store',
             // ******
-            autoLoad: true,
+            autoLoad: false,
             listeners: {
                 load: 'onColorStoreLoad'
             }
@@ -114,7 +125,7 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
             //type: 'tualo_job_offer_text_store',
             type: 'view_job_texts_store',
             // ******
-            autoLoad: true,
+            autoLoad: false,
             autoSync: false,
             pageSize: 100000,
             listeners: {
@@ -125,7 +136,7 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
         tualo_job: {
             type: 'tualo_job_store',
             // ******
-            autoLoad: true,
+            autoLoad: false,
             autoSync: false,
             pageSize: 100000,
             listeners: {
@@ -137,8 +148,14 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
             type: 'briefanreden_store',
             pageSize: 10000,
             // ******
-            autoLoad: true
+            autoLoad: false
         },
+
+        typen: {
+            type: 'array',
+            fields: ['name'],
+            data: []
+        }
         /*
         artikelgruppen: {
             type: 'artikelgruppen_store',
