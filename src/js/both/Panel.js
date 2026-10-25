@@ -63,7 +63,7 @@ Ext.define('Tualo.routes.jobs.PanelReport', {
             ]
         }
     },
-    url: 'job2report/:{reportType}/:{jobid}(/:{optional})',
+    url: 'job2report/:{template}/:{reportType}/:{jobid}(/:{optional})',
     handler: {
         action: function (values) {
             let optionalFilter = [];
@@ -72,8 +72,9 @@ Ext.define('Tualo.routes.jobs.PanelReport', {
             } catch (e) {
                 optionalFilter = [];
             }
-            Ext.getApplication().addView('Tualo.jobs.lazy.Panel', {
+            Ext.getApplication().addView('Tualo.jobs.lazy.v2.Panel', {
                 jobid: values.jobid,
+                template: values.template,
                 reportType: values.reportType,
                 optionalFilter: optionalFilter
             });
