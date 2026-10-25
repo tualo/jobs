@@ -1,6 +1,6 @@
 Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
     getReport: function (forSaving) {
-
+        console.log('Report.getReport', forSaving);
         let me = this,
             model = me.getViewModel(),
             view = me.getView(),
@@ -9,8 +9,9 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
             store = model.getStore('data'),
             artikelgruppen = model.getStore('artikelgruppen'),
             texts = model.getStore('texts'),
+            job = model.get('job'),
             reportTemplate = model.get('reportTemplate'),
-            range = store.getRange(),
+            range = store.getData().items,
             positions = [],
             sumUse = 0,
             rowNumber = 1,
@@ -167,7 +168,10 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
         reportTemplate.report_taxes = report_taxes;
         reportTemplate.texts = texts_array;
         reportTemplate.positions = positions;
-        reportTemplate.kundennummer = model.get('kundennummer');
+        reportTemplate.kundennummer = job.get('kundennummer');
+        reportTemplate.referencenr = job.get('kundennummer');
+        reportTemplate.costcenter = 0;
+        delete reportTemplate.id
 
         reportTemplate.jobid = model.get('jobid');
 

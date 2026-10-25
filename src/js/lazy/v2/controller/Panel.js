@@ -33,6 +33,14 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
         }
 
     },
+    canSaveReport: async function () {
+        console.log('Panel.canSaveReport');
+        let model = this.getViewModel();
+        let response = await fetch('./jobs/cansave/' + model.get('reportType'));
+        let result = await response.json();
+        model.set('canSaveReport', result.success);
+        return result.success;
+    },
 
     loadStore: function (store) {
         return new Promise((resolve, reject) => {
@@ -213,6 +221,7 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
         await Promise.all([
             me.queryReportTemplate(),
             me.queryAddress(),
+            me.canSaveReport(),
             me.loadStore(model.getStore('document_names')),
             me.loadStore(model.getStore('tualo_allowed_document_colors_rgb')),
             me.loadStore(model.getStore('briefanreden')),
