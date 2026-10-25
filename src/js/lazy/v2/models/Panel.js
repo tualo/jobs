@@ -64,7 +64,7 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
             return get('selectedRows') == 0;
         },
         groupingText: function (get) {
-            return get('selectedRows') == 0 ? 'Keine Zeilen ausgewählt' : ((get('mixedGrouping') ? 'Gruppieren' : 'Gruppe auflösen'));
+            return get('selectedRows') == 0 ? 'Keine Zeilen ausgewählt' : ((get('mixedGrouping') ? 'Gruppieren' : (get('selectedRows') > 1 ? 'Gruppe auflösen' : 'Anwenden')));
         },
         disableSave: function (get) {
             return get('modifiedRows') == 0;
@@ -150,6 +150,13 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
             pageSize: 10000,
             // ******
             autoLoad: false
+        },
+        templates: {
+            type: 'blg_config_position_templates_store',
+            // ******
+            autoLoad: false,
+            autoSync: false,
+            pageSize: 100000
         },
         /*
         typen: {

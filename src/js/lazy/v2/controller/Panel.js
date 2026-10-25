@@ -142,6 +142,7 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
             me.loadStore(model.getStore('briefanreden')),
             me.loadStore(model.getStore('tualo_job')),
             me.loadStore(model.getStore('texts')),
+            me.loadStore(model.getStore('templates')),
             me.loadStore(model.getStore('data')),
 
         ]);

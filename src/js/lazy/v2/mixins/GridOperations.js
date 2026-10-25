@@ -10,7 +10,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.GridOperations', {
             selection = grid.getSelectionModel().getSelection(),
             grouingId = (new Date()).getTime();
 
-        if (!model.get('mixedGrouping')) {
+        if (!model.get('mixedGrouping') && selection.length > 1) {
             selection.forEach((record) => {
                 record.set('gruppierung', (new Date()).getTime());
             });
@@ -50,8 +50,10 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.GridOperations', {
             groups[groupId].push(record);
         });
         if (Object.keys(groups).length > 1) {
+            console.log('Panel.onSelectionchange', 'Mixed grouping detected', Object.keys(groups).length);
             model.set('mixedGrouping', true);
         } else {
+            console.log('Panel.onSelectionchange', 'No mixed grouping detected', Object.keys(groups).length);
             model.set('mixedGrouping', false);
         }
 
@@ -114,6 +116,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.GridOperations', {
                         sumUse += record.get('ist_netto');
                         total_amount += record.get('ist_anzahl');
                     } else {
+                        console.log('Panel.updateSelectionData.else', record.get('netto'));
                         sumUse += record.get('netto');
                         total_amount += record.get('anzahl');
                     }
@@ -125,7 +128,11 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.GridOperations', {
             });
             records.forEach((record) => {
                 console.log('Panel.updateSelectionData.records.forEach');
-                selectedSum += record.get('gruppenpreis_netto');
+                if ((record.get('use_real_amount') == 1) && (reporttype == 'rechnung')) {
+                    selectedSum += record.get('ist_netto');
+                } else {
+                    selectedSum += record.get('netto');
+                }
             });
 
             model.set('total_net', sumUse);
