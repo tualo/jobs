@@ -4,7 +4,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.PrepareText', {
         let me = this,
             view = me.getView(),
             model = me.getViewModel(),
-            store = model.getStore('data'),
+            store = model.getStore('texts'),
             job = model.get('job'),
             records = store.getRange(),
             i = 0,
@@ -22,11 +22,12 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.PrepareText', {
         let templateData = await this.createTemplateData(),
             syncNeeded = false;
 
+        console.warn('Template Data:', templateData);
         if (records && records.length == 0) {
             console.log('NO Records found:', records);
         }
 
-        // console.log('onTextStoreLoad',store,records);
+        console.log('onTextStoreLoad', store, records);
         for (i = 0; i < l; i++) {
             let currentText = records[i].get('text');
             if (Ext.isEmpty(currentText)) {
