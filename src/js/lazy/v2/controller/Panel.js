@@ -94,6 +94,21 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
     },
 
     onCalculationGridBeforeRender: function (grid) {
+        grid.headerCt.insert(0, {
+            itemId: 'groupColorColumn',
+            text: '',
+            tooltip: 'Gruppierung',
+            dataIndex: 'gruppierung',
+            width: 26,
+            sortable: false,
+            filter: false,
+            menuDisabled: true,
+            hideable: false,
+            resizable: false,
+            draggable: false,
+            renderer: this.renderGroupColor
+        });
+
         let model = this.getViewModel(),
             filterPlugin = grid.getPlugin('gridfilters');
         /*typenStore = model.getStore('typen');
@@ -127,6 +142,25 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
             dataIndex: 'angebot_title',
             type: 'list'
         });
+    },
+    renderGroupColor: function (value, metaData) {
+        if (Ext.isEmpty(value) || value === 0 || value === '0') {
+            return '';
+        }
+
+        let group = String(value),
+            hash = 0;
+
+        for (let index = 0; index < group.length; index++) {
+            hash = (Math.imul(hash, 31) + group.charCodeAt(index)) | 0;
+        }
+
+        let hue = Math.floor(((hash >>> 0) * 137.508) % 360);
+        metaData.tdAttr = 'data-qtip="' + Ext.String.htmlEncode('Gruppe: ' + group) + '"';
+
+        return '<div style="width:8px;height:18px;margin:auto;border-radius:3px;' +
+            'background-color:hsl(' + hue + ',45%,82%);' +
+            'border:1px solid hsl(' + hue + ',35%,65%)"></div>';
     },
     renderDelay: 200,
     renderTimeout: null,
