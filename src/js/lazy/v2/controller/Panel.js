@@ -57,8 +57,42 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
             model = me.getViewModel(),
             dataStore = model.getStore('data');
         console.log('Tualo.jobs.lazy.v2.controller.Panel', 'onBoxReady');
+        me.showRealAmountColumns();
         me.fetchInformation();
     },
+
+    showRealAmountColumns: function () {
+        console.log('Panel.showRealAmountColumns');
+        let model = this.getViewModel();
+        window.c = this;
+        if (model.get('reportType') === 'rechnung') {
+            let grid = this.getView().getComponent('westPanel').getComponent('calculationGrid');
+            try {
+                grid.columns.forEach(column => {
+                    console.log('Panel.showRealAmountColumns.columns.forEach');
+                    if (column.dataIndex === 'use_real_amount' || column.dataIndex === 'ist_anzahl') {
+                        column.setVisible(true);
+                    }
+                });
+            } catch (e) {
+                console.error(e);
+            }
+
+        } else {
+            let grid = this.getView().getComponent('westPanel').getComponent('calculationGrid');
+            try {
+                grid.columns.forEach(column => {
+                    console.log('Panel.showRealAmountColumns.columns.forEach');
+                    if (column.dataIndex === 'use_real_amount' || column.dataIndex === 'ist_anzahl') {
+                        column.setVisible(false);
+                    }
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    },
+
     onCalculationGridBeforeRender: function (grid) {
         let model = this.getViewModel(),
             filterPlugin = grid.getPlugin('gridfilters');
