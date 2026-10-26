@@ -149,31 +149,38 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
             briefanreden = view.getViewModel().getStore('briefanreden'),
             jobRecord = tualo_job.getRange()[0];
 
-        let report_taxes = [], sum = 0;
+        let report_taxes = [], sum = 0, sum_net = 0;
         for (let key in taxes_Hash) {
-            report_taxes.push({
+            sum += taxes_Hash[key].gross;
+            sum_net += taxes_Hash[key].net;
+
+            let t = {
                 "cssattr": "tax",
                 "text": "Steuer (" + Tualo.tualojs.Format.Renderer.fullPercentRenderer(taxes_Hash[key].rate) + "):",
                 "wert": Tualo.tualojs.Format.Renderer.euroRenderer(taxes_Hash[key].tax)
-            });
-            sum += taxes_Hash[key].gross;
-
+            };
             let o = {
                 "cssattr": "totalnet",
                 "text": "Netto (" + Tualo.tualojs.Format.Renderer.fullPercentRenderer(taxes_Hash[key].rate) + "):",
                 "wert": Tualo.tualojs.Format.Renderer.euroRenderer(taxes_Hash[key].net)
             };
-            if (model.get('show_total') == 0) {
-                o.text = "Gesamt:";
-            }
+            report_taxes.push(t);
             report_taxes.push(o);
         }
+        if ((model.get('show_total') == 0) && model.get('reportType') != 'rechnung') {
+            report_taxes.push({
+                "cssattr": "total",
+                "text": "Gesamt:",
+                "wert": Tualo.tualojs.Format.Renderer.euroRenderer(sum_net)
+            });
+        } else {
 
-        report_taxes.push({
-            "cssattr": "total",
-            "text": "Gesamt:",
-            "wert": Tualo.tualojs.Format.Renderer.euroRenderer(sum)
-        });
+            report_taxes.push({
+                "cssattr": "total",
+                "text": "Gesamt:",
+                "wert": Tualo.tualojs.Format.Renderer.euroRenderer(sum)
+            });
+        }
 
         reportTemplate.show_nettotal = model.get('show_nettotal');
         reportTemplate.show_total = model.get('show_total');
