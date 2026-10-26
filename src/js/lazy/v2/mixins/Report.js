@@ -150,30 +150,51 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
             jobRecord = tualo_job.getRange()[0];
 
         let report_taxes = [], sum = 0, sum_net = 0;
-        for (let key in taxes_Hash) {
-            sum += taxes_Hash[key].gross;
-            sum_net += taxes_Hash[key].net;
 
-            let t = {
-                "cssattr": "tax",
-                "text": "Steuer (" + Tualo.tualojs.Format.Renderer.fullPercentRenderer(taxes_Hash[key].rate) + "):",
-                "wert": Tualo.tualojs.Format.Renderer.euroRenderer(taxes_Hash[key].tax)
-            };
-            let o = {
-                "cssattr": "totalnet",
-                "text": "Netto (" + Tualo.tualojs.Format.Renderer.fullPercentRenderer(taxes_Hash[key].rate) + "):",
-                "wert": Tualo.tualojs.Format.Renderer.euroRenderer(taxes_Hash[key].net)
-            };
-            report_taxes.push(t);
-            report_taxes.push(o);
-        }
         if ((model.get('show_total') == 0) && model.get('reportType') != 'rechnung') {
+            for (let key in taxes_Hash) {
+                sum += taxes_Hash[key].gross;
+                sum_net += taxes_Hash[key].net;
+
+                /*
+                let t = {
+                    "cssattr": "tax",
+                    "text": "Steuer (" + Tualo.tualojs.Format.Renderer.fullPercentRenderer(taxes_Hash[key].rate) + "):",
+                    "wert": Tualo.tualojs.Format.Renderer.euroRenderer(taxes_Hash[key].tax)
+                };
+                let o = {
+                    "cssattr": "totalnet",
+                    "text": "Netto (" + Tualo.tualojs.Format.Renderer.fullPercentRenderer(taxes_Hash[key].rate) + "):",
+                    "wert": Tualo.tualojs.Format.Renderer.euroRenderer(taxes_Hash[key].net)
+                };
+                report_taxes.push(t);
+                report_taxes.push(o);
+                */
+            }
             report_taxes.push({
-                "cssattr": "total",
+                "cssattr": "totalnet",
                 "text": "Gesamt:",
                 "wert": Tualo.tualojs.Format.Renderer.euroRenderer(sum_net)
             });
         } else {
+
+            for (let key in taxes_Hash) {
+                sum += taxes_Hash[key].gross;
+                sum_net += taxes_Hash[key].net;
+
+                let t = {
+                    "cssattr": "tax",
+                    "text": "Steuer (" + Tualo.tualojs.Format.Renderer.fullPercentRenderer(taxes_Hash[key].rate) + "):",
+                    "wert": Tualo.tualojs.Format.Renderer.euroRenderer(taxes_Hash[key].tax)
+                };
+                let o = {
+                    "cssattr": "totalnet",
+                    "text": "Netto (" + Tualo.tualojs.Format.Renderer.fullPercentRenderer(taxes_Hash[key].rate) + "):",
+                    "wert": Tualo.tualojs.Format.Renderer.euroRenderer(taxes_Hash[key].net)
+                };
+                report_taxes.push(t);
+                report_taxes.push(o);
+            }
 
             report_taxes.push({
                 "cssattr": "total",
