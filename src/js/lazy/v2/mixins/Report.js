@@ -143,11 +143,16 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
                 "wert": Tualo.tualojs.Format.Renderer.euroRenderer(taxes_Hash[key].tax)
             });
             sum += taxes_Hash[key].gross;
-            report_taxes.push({
+
+            let o = {
                 "cssattr": "totalnet",
                 "text": "Netto (" + Tualo.tualojs.Format.Renderer.fullPercentRenderer(taxes_Hash[key].rate) + "):",
                 "wert": Tualo.tualojs.Format.Renderer.euroRenderer(taxes_Hash[key].net)
-            });
+            };
+            if (model.get('show_total') == 0) {
+                o.text = "Gesamt:";
+            }
+            report_taxes.push(o);
         }
 
         report_taxes.push({
