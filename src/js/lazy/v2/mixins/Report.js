@@ -15,9 +15,12 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
             positions = [],
             sumUse = 0,
             rowNumber = 1,
+            service_period_start = (new Date()),
+            service_period_stop = (new Date('2000-01-01')),
             taxes_Hash = {};
 
         me.gruppenPreise();
+
         range.forEach((record) => {
             let localRecord = { ...record.data };
             console.log(record.get('use_in_offer'))
@@ -26,6 +29,17 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
             localRecord.amount = localRecord.anzahl;
             if (localRecord.use_real_amount) {
                 localRecord.amount = localRecord.ist_anzahl;
+            }
+
+            if (record.get('service_period_start')) {
+                if (service_period_start > new Date(record.get('service_period_start'))) {
+                    service_period_start = new Date(record.get('service_period_start'));
+                }
+            }
+            if (record.get('service_period_stop')) {
+                if (service_period_stop < new Date(record.get('service_period_stop'))) {
+                    service_period_stop = new Date(record.get('service_period_stop'));
+                }
             }
 
 
@@ -175,6 +189,10 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
         reportTemplate.positions = positions;
         reportTemplate.kundennummer = job.get('kundennummer');
         reportTemplate.referencenr = job.get('kundennummer');
+
+
+        reportTemplate.service_period_start = Ext.util.Format.date(service_period_start, "Y-m-d");
+        reportTemplate.service_period_stop = Ext.util.Format.date(service_period_stop, "Y-m-d");
 
         let zahltage = Number(model.get('customer').get('zahlungsziel'));
         let payUntilDate = new Date();
