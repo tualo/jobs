@@ -231,6 +231,7 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
             me.loadStore(model.getStore('data')),
 
         ]);
+        await me.loadStore(model.getStore('adressen'));
         await me.prepareTexts();
 
         let report = model.get('reportTemplate');

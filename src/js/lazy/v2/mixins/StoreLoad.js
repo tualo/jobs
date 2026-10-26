@@ -201,4 +201,37 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.StoreLoad', {
         console.log('######### Job record set in model:', records[0]);
 
     },
+
+
+    onAdressenStoreBeforeLoad: function (store, operation) {
+        console.log('Panel.onAdressenStoreBeforeLoad');
+        let model = this.getViewModel(),
+            extraParams = store.getProxy().getExtraParams(),
+            filters = [];
+
+        filters.push({
+            property: 'kundennummer',
+            value: model.get('job').get('kundennummer'),
+            operator: 'eq'
+        });
+        filters.push({
+            property: 'kostenstelle',
+            value: model.get('job').get('kostenstelle'),
+            operator: 'eq'
+        });
+
+        extraParams.filter = Ext.JSON.encode(filters);
+        store.getProxy().setExtraParams(extraParams);
+    },
+    onAdressenStoreLoad: function (store, records, successful, operation, eOpts) {
+        console.log('Panel.onAdressenStoreLoad');
+        let model = this.getViewModel(),
+            storex = model.getStore('adressen'),
+            data = store.getRange();
+
+        if (records.length > 0) {
+            model.set('customer', records[0]);
+            model.set('kunde', records[0]);
+        }
+    },
 });

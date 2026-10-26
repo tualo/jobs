@@ -175,6 +175,15 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
         reportTemplate.positions = positions;
         reportTemplate.kundennummer = job.get('kundennummer');
         reportTemplate.referencenr = job.get('kundennummer');
+
+        let zahltage = Number(model.get('customer').get('zahlungsziel'));
+        let payUntilDate = new Date();
+        payUntilDate.setDate(payUntilDate.getDate() + zahltage);
+        reportTemplate.paydays = zahltage;
+
+        reportTemplate.payuntildate =
+            Ext.util.Format.date(payUntilDate, "Y-m-d");
+
         reportTemplate.costcenter = 0;
         delete reportTemplate.id
 

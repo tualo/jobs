@@ -158,6 +158,16 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
             autoSync: false,
             pageSize: 100000
         },
+        adressen: {
+            type: 'adressen_store',
+            pageSize: 10000,
+            // ******
+            autoLoad: false,
+            listeners: {
+                beforeload: 'onAdressenStoreBeforeLoad',
+                load: 'onAdressenStoreLoad',
+            }
+        },
         /*
         typen: {
             type: 'array',
