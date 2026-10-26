@@ -32,13 +32,13 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
             }
 
             if (record.get('service_period_start')) {
-                if (service_period_start > new Date(record.get('service_period_start'))) {
-                    service_period_start = new Date(record.get('service_period_start'));
+                if (service_period_start > new Date(record.get('zeitraum_von'))) {
+                    service_period_start = new Date(record.get('zeitraum_von'));
                 }
             }
-            if (record.get('service_period_stop')) {
-                if (service_period_stop < new Date(record.get('service_period_stop'))) {
-                    service_period_stop = new Date(record.get('service_period_stop'));
+            if (record.get('zeitraum_bis')) {
+                if (service_period_stop < new Date(record.get('zeitraum_bis'))) {
+                    service_period_stop = new Date(record.get('zeitraum_bis'));
                 }
             }
 
