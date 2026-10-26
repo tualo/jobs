@@ -85,7 +85,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
 
 
         positions.forEach((localRecord) => {
-
+            if (record.get('use_in_offer') == 0) return;
             if (typeof taxes_Hash["" + localRecord.steuersatz] === 'undefined') {
                 taxes_Hash["" + localRecord.tax] =
                 {
