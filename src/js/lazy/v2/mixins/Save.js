@@ -59,17 +59,18 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Save', {
                 ''
             );
         } else {
-            this.onSaveGoAhead();
+            me.onSaveGoAhead();
         }
     },
     onSaveGoAhead: async function () {
 
-        let model = this.getViewModel(),
-            view = this.getView(),
+        let me = this,
+            model = me.getViewModel(),
+            view = me.getView(),
             grid = view.getComponent('westPanel').getComponent('calculationGrid'),
-            previewFrame = this.getView().getComponent('previewOuterFrame').getComponent('previewFrame'),
-            iframeDocument = previewFrame.getFrameDocument(),
-            texts = model.getStore('texts'),
+            previewFrame = me.getView().getComponent('previewOuterFrame').getComponent('previewFrame'),
+            iframeDocument = previewFrame.getStageDocument(),
+            texts = model.get('reportType') == 'angebot' ? model.getStore('tualo_job_offer_text') : model.getStore('tualo_job_invoice_text'),
             calcStore = grid.getStore(),
             updatedRecords = calcStore.getUpdatedRecords(),
             changedFields = new Set();
@@ -92,41 +93,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Save', {
 
         view.setLoading('Wird gespeichert...');
         try {
-            let list = texts.getRange();
-            for (let i = 0; i < list.length; i++) {
-                let texts_record = list[i];
-                console.log('Processing text record', texts_record.id);
-                let elm = iframeDocument.getElementById(texts_record.id);
-                if (elm) {
-                    console.log('elm', elm.innerHTML.substring(0, 10));
-                    let tablename = 'tualo_job_offer_text';
-                    if (model.get('reportType') === 'rechnung') {
-                        tablename = 'tualo_job_invoice_text';
-                    }
-                    let response = await fetch('./ds/' + tablename + '/update', {
-                        method: 'POST',
-                        headers: {
-                            "Accept": "application/json",
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            __table_name: tablename,
-                            __id: texts_record.id,
-                            id: texts_record.id,
-                            text: elm.innerHTML
-                        })
-                    });
-                    let jsonData = await response.json();
-                    if (jsonData.success !== true) {
-                        Ext.toast({
-                            html: jsonData.msg,
-                            title: 'Fehler',
-                            width: 400,
-                            align: 't'
-                        });
-                    }
-                }
-            }
+
 
             if (calcStore.getNewRecords().length ||
                 calcStore.getUpdatedRecords().length ||
@@ -150,6 +117,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Save', {
                 }
 
                 console.log('Updating table:', updateData);
+                // await me.syncStore(texts)
                 let calc_response = await fetch('./ds/blg_pos_calculation/update', {
                     method: 'POST',
                     headers: {
@@ -200,6 +168,8 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Save', {
                 align: 't'
             });
         } finally {
+            view.setLoading('Texte werden gespeichert...');
+            await me.syncStore(texts)
             if (!view.destroyed) {
                 view.setLoading(false);
             }

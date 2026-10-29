@@ -26,6 +26,7 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
         address: '',
         kundennummer: '',
         mixedGrouping: false,
+        mixedHeadline: false,
         kostenstelle: 0,
         modifiedRows: 0
     },
@@ -64,13 +65,19 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
             return get('selectedRows') == 0;
         },
         groupingText: function (get) {
-            return get('selectedRows') == 0 ? 'Keine Zeilen ausgewählt' : ((get('mixedGrouping') ? 'Gruppieren' : (get('selectedRows') > 1 ? 'Gruppe auflösen' : 'Anwenden')));
+            return get('selectedRows') == 0 ? 'Keine Zeilen ausgewählt' : ((get('mixedGrouping') ? 'Zusammenfassen' : (get('selectedRows') > 1 ? 'Auflösen' : 'Anwenden')));
+        },
+        disableHeadline: function (get) {
+            return get('selectedRows') == 0;
+        },
+        headlineText: function (get) {
+            return get('selectedRows') == 0 ? 'Keine Zeilen ausgewählt' : ((get('mixedHeadline') ? 'Überschrift' : (get('selectedRows') > 1 ? 'Überschrift' : 'Überschrift')));
         },
         disableSave: function (get) {
             return get('modifiedRows') == 0;
         },
         disableSaveReport: function (get) {
-            return (get('canSaveReport') === false);
+            return (get('canSaveReport') === false) || get('modifiedRows') > 0;
         },
         saveReportButtonText: function (get) {
             return get('reportType') == 'angebot' ? 'Angebot erstellen' : 'Rechnung erstellen';
@@ -122,8 +129,30 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
             }
         },
 
+        tualo_job_offer_text: {
+            type: 'tualo_job_offer_text_store',
+            autoLoad: false,
+            autoSync: false,
+            pageSize: 100000, listeners: {
+                beforeload: 'onTextStoreBeforeLoad',
+                datachanged: 'onTextDataChanged',
+                load: 'onTextStoreLoad',
+            }
+
+        },
+        tualo_job_invoice_text: {
+            type: 'tualo_job_invoice_text_store',
+            autoLoad: false,
+            autoSync: false,
+            pageSize: 100000,
+            listeners: {
+                beforeload: 'onTextStoreBeforeLoad',
+                datachanged: 'onTextDataChanged',
+                load: 'onTextStoreLoad',
+            }
+        },
+        /*
         texts: {
-            //type: 'tualo_job_offer_text_store',
             type: 'view_job_texts_store',
             // ******
             autoLoad: false,
@@ -131,9 +160,12 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
             pageSize: 100000,
             listeners: {
                 beforeload: 'onTextStoreBeforeLoad',
+                datachanged: 'onTextDataChanged',
                 load: 'onTextStoreLoad',
             }
         },
+        */
+
         tualo_job: {
             type: 'tualo_job_store',
             // ******

@@ -374,6 +374,7 @@ Ext.define('Tualo.jobs.lazy.Panel', {
                     itemId: 'previewFrame',
                     xtype: 'tualoiframe',
                     src: 'about:blank',
+
                 }
             ]
         },

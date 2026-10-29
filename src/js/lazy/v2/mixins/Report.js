@@ -8,7 +8,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
             epreis = 0,
             store = model.getStore('data'),
             artikelgruppen = model.getStore('artikelgruppen'),
-            texts = model.getStore('texts'),
+            texts = model.get('reportType') == 'angebot' ? model.getStore('tualo_job_offer_text') : model.getStore('tualo_job_invoice_text'),
             job = model.get('job'),
             reportTemplate = model.get('reportTemplate'),
             range = store.getData().items,
@@ -124,18 +124,19 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
         let texts_array = [];
 
 
+
         texts.getRange().forEach((texts_record) => {
-            if (model.get('reportType') === texts_record.get('reporttype')) {
-                let o = {};
-                o.text = texts_record.get('text');
-                o.typ = texts_record.get('placement');
-                o.type = texts_record.get('placement');
-                o.id = texts_record.get('id');
-                if (forSaving) {
-                    delete o.id;
-                }
-                texts_array.push(o);
+            //if (model.get('reportType') === texts_record.get('reporttype')) {
+            let o = {};
+            o.text = texts_record.get('text');
+            o.typ = texts_record.get('placement');
+            o.type = texts_record.get('placement');
+            o.id = texts_record.get('id');
+            if (forSaving) {
+                delete o.id;
             }
+            texts_array.push(o);
+            //}
         });
 
         let taxes = [];

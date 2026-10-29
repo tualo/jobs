@@ -12,7 +12,8 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
         'Tualo.jobs.lazy.v2.mixins.GruppenPreise',
         'Tualo.jobs.lazy.v2.mixins.PreviewEditor',
         'Tualo.jobs.lazy.v2.mixins.GridOperations',
-        'Tualo.jobs.lazy.v2.mixins.Frame'
+        'Tualo.jobs.lazy.v2.mixins.Frame',
+        'Tualo.jobs.lazy.v2.mixins.Headline'
 
     ],
 
@@ -51,11 +52,51 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
                         console.log('loadStore', 'success:', store.type, store);
                         resolve(records);
                     } else {
-                        console.log('loadStore', 'failure:', store.type, store);
+                        console.error('loadStore', 'failure:', store.type, store);
+
                         reject(operation.getError() || new Error('Store konnte nicht geladen werden'));
                     }
                 }
             });
+        });
+    },
+
+    syncStore: function (store) {
+        return new Promise((resolve, reject) => {
+            console.log('syncStore', 'Syncing store:', store.type, store);
+            if (store.needsSync) {
+                store.sync({
+                    callback: function (batch, options) {
+                        if (batch.hasException()) {
+                            console.error('syncStore', 'callback failure:', store.type, store);
+                            reject(new Error('Store konnte nicht synchronisiert werden'));
+                        } else {
+                            let exceptions = batch.getExceptions();
+                            exceptions.forEach(exception => {
+                                Ext.toast({
+                                    html: 'Fehler beim Synchronisieren: ' + exception.getError(),
+                                    title: 'Fehler',
+                                    width: 400,
+                                    align: 't'
+                                });
+                                console.error('syncStore', 'exception:', exception);
+                            });
+                            console.log('syncStore', 'callback success:', store.type, store);
+                            resolve();
+                        }
+                    },
+                    success: function () {
+                        console.log('syncStore', 'success:', store.type, store);
+                        resolve();
+                    },
+                    failure: function (batch, options) {
+                        console.log('syncStore', 'failure:', store.type, store);
+                        reject(new Error('Store konnte nicht synchronisiert werden'));
+                    }
+                });
+            } else {
+                resolve();
+            }
         });
     },
 
@@ -226,7 +267,8 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
             me.loadStore(model.getStore('tualo_allowed_document_colors_rgb')),
             me.loadStore(model.getStore('briefanreden')),
             me.loadStore(model.getStore('tualo_job')),
-            me.loadStore(model.getStore('texts')),
+            me.loadStore(model.getStore('tualo_job_offer_text')),
+            me.loadStore(model.getStore('tualo_job_invoice_text')),
             me.loadStore(model.getStore('templates')),
             me.loadStore(model.getStore('data')),
 

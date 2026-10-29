@@ -1,4 +1,6 @@
-CREATE OR REPLACE VIEW `view_job_calculation_to_report` AS with t as (
+CREATE OR REPLACE VIEW `view_job_calculation_to_report` AS 
+
+with t as (
     select
         'angebot' AS `reporttype`
     union
@@ -151,8 +153,11 @@ a as (
         `p`.`angebot_title` AS `angebot_title`,
         `p`.`rechnung_title` AS `rechnung_title`,
         `p`.`teilueberschrift` AS `teilueberschrift`,
-        h.zeitraum_von AS `zeitraum_von`,
-        h.zeitraum_bis AS `zeitraum_bis`
+
+        `p`.`gruppenpreis_netto` AS `gruppenpreis_netto`,
+        `p`.`gruppenpreis_brutto` AS `gruppenpreis_brutto`,
+        `h`.`zeitraum_von` AS `zeitraum_von`,
+        `h`.`zeitraum_bis` AS `zeitraum_bis`
     from
         (
             (
@@ -220,15 +225,33 @@ select
     `a`.`rechnung_title` AS `rechnung_title`,
     `a`.`teilueberschrift` AS `teilueberschrift`,
     if(
-        `a`.`gruppierung` is null,
-        `a`.`ist_netto`,
-        sum(`a`.`ist_netto`) over (partition by `a`.`beleg`, `a`.`gruppierung`)
+        `a`.`reporttype` = 'angebot',
+        if(
+            `a`.`gruppierung` is null,
+            `a`.`netto`,
+            sum(`a`.`netto`) over (partition by `a`.`reporttype`,`a`.`beleg`, `a`.`gruppierung`)
+        )
+        ,
+        if(
+            `a`.`gruppierung` is null,
+            `a`.`ist_netto`,
+            sum(`a`.`ist_netto`) over (partition by `a`.`reporttype`,`a`.`beleg`, `a`.`gruppierung`)
+        )
     ) AS `gruppenpreis_netto`,
     if(
-        `a`.`gruppierung` is null,
-        `a`.`ist_brutto`,
-        sum(`a`.`ist_brutto`) over (partition by `a`.`beleg`, `a`.`gruppierung`)
-    ) AS `gruppenpreis_brutto`,
+        `a`.`reporttype` = 'angebot',
+        if(
+            `a`.`gruppierung` is null,
+            `a`.`brutto`,
+            sum(`a`.`brutto`) over (partition by `a`.`reporttype`,`a`.`beleg`, `a`.`gruppierung`)
+        )
+        ,
+        if(
+            `a`.`gruppierung` is null,
+            `a`.`ist_brutto`,
+            sum(`a`.`ist_brutto`) over (partition by `a`.`reporttype`,`a`.`beleg`, `a`.`gruppierung`)
+        )
+     ) AS `gruppenpreis_brutto`,
     `a`.`zeitraum_von` AS `zeitraum_von`,
     `a`.`zeitraum_bis` AS `zeitraum_bis`
 from

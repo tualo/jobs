@@ -41,13 +41,23 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.GridOperations', {
         if (records.length > 0) {
             model.set('selectedRecord', records[0]);
         }
-        let groups = {};
+        let groups = {},
+            headlines = {};
         records.forEach((record) => {
             let groupId = record.get('gruppierung');
+            let headlineId = record.get('teilueberschrift');
             if (!groups[groupId]) {
                 groups[groupId] = [];
             }
             groups[groupId].push(record);
+
+
+            if (!headlines[headlineId]) {
+                headlines[headlineId] = [];
+            }
+            headlines[headlineId].push(record);
+
+
         });
         if (Object.keys(groups).length > 1) {
             console.log('Panel.onSelectionchange', 'Mixed grouping detected', Object.keys(groups).length);
@@ -55,6 +65,14 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.GridOperations', {
         } else {
             console.log('Panel.onSelectionchange', 'No mixed grouping detected', Object.keys(groups).length);
             model.set('mixedGrouping', false);
+        }
+
+        if (Object.keys(headlines).length > 1) {
+            console.log('Panel.onSelectionchange', 'Mixed headlines detected', Object.keys(headlines), Object.keys(headlines).length);
+            model.set('mixedHeadline', true);
+        } else {
+            console.log('Panel.onSelectionchange', 'No mixed headlines detected', Object.keys(headlines).length);
+            model.set('mixedHeadline', false);
         }
 
         //mixedGrouping

@@ -257,7 +257,7 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
                                         value: '{show_subtotals}'
                                     },
                                     listeners: {
-                                        change: 'runCalculation'
+                                        change: 'onFormFieldChanged'
                                     }
                                 }, {
                                     fieldLabel: 'Nettosumme',
@@ -266,7 +266,7 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
                                         value: '{show_nettotal}'
                                     },
                                     listeners: {
-                                        change: 'runCalculation'
+                                        change: 'onFormFieldChanged'
                                     }
                                 }, {
                                     fieldLabel: 'Bruttosumme',
@@ -275,7 +275,7 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
                                         value: '{show_total}'
                                     },
                                     listeners: {
-                                        change: 'runCalculation'
+                                        change: 'onFormFieldChanged'
                                     }
                                 },
                                 {
@@ -305,6 +305,17 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
 
                             handler: 'onGrouping'
                         },
+                        '-',
+                        ,
+                        {
+                            bind: {
+                                disabled: '{disableHeadline}',
+                                text: '{headlineText}',
+                            },
+
+                            handler: 'onHeadline'
+                        },
+
 
 
                         {

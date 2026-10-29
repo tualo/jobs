@@ -4,7 +4,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.PrepareText', {
         let me = this,
             view = me.getView(),
             model = me.getViewModel(),
-            store = model.getStore('texts'),
+            store = model.get('reportType') == 'angebot' ? model.getStore('tualo_job_offer_text') : model.getStore('tualo_job_invoice_text'),
             job = model.get('job'),
             records = store.getRange(),
             i = 0,
@@ -35,7 +35,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.PrepareText', {
             }
             let tpl = new Ext.XTemplate(currentText);
             let newText = tpl.apply(templateData);
-            console.log("-----", currentText != newText, currentText, newText);
+            // console.log("-----", currentText != newText, currentText, newText);
             if (currentText != newText) {
                 records[i].set('text', newText);
                 syncNeeded = true;
