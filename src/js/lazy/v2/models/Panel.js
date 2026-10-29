@@ -200,6 +200,20 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
                 load: 'onAdressenStoreLoad',
             }
         },
+
+
+        tualo_job_text_templates: {
+            type: 'tualo_job_text_templates_store',
+            autoLoad: false,
+            autoSync: false,
+            pageSize: 100000,
+            /*
+            listeners: {
+                beforeload: 'onTextTemplateStoreBeforeLoad',
+                datachanged: 'onTextTemplateDataChanged',
+                load: 'onTextTemplateStoreLoad',
+            }*/
+        },
         /*
         typen: {
             type: 'array',

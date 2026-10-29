@@ -374,6 +374,23 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
                 },
                 '->',
 
+                /*
+                {
+                    xtype: 'button',
+                    text: 'Layouts',
+                    iconCls: 'fa fa-print',
+                    menu: [],
+                    handler: 'onLayoutClick'
+                },
+                */
+                {
+                    xtype: 'button',
+                    text: 'Templates',
+                    iconCls: 'fa fa-file-lines',
+                    itemId: 'templateButton',
+                    menu: [],
+                },
+
                 {
                     xtype: 'button',
                     text: 'Vorschau',

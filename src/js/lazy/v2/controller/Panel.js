@@ -13,7 +13,8 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
         'Tualo.jobs.lazy.v2.mixins.PreviewEditor',
         'Tualo.jobs.lazy.v2.mixins.GridOperations',
         'Tualo.jobs.lazy.v2.mixins.Frame',
-        'Tualo.jobs.lazy.v2.mixins.Headline'
+        'Tualo.jobs.lazy.v2.mixins.Headline',
+        'Tualo.jobs.lazy.v2.mixins.TemplateMenu'
 
     ],
 
@@ -269,10 +270,12 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
             me.loadStore(model.getStore('tualo_job')),
             me.loadStore(model.getStore('tualo_job_offer_text')),
             me.loadStore(model.getStore('tualo_job_invoice_text')),
+            me.loadStore(model.getStore('tualo_job_text_templates')),
             me.loadStore(model.getStore('templates')),
             me.loadStore(model.getStore('data')),
 
         ]);
+        me.onTextTemplatesLoad(model.getStore('tualo_job_text_templates').getRange());
         await me.loadStore(model.getStore('adressen'));
         await me.prepareTexts();
 
@@ -282,6 +285,26 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
         me.renderPreview();
         console.log('fetchInformation', 'Fetching done', model.get('reportTemplate'));
     },
+    onTextTemplatesLoad: function (records) {
+        let me = this,
+            previewOuterFrame = me.getView().getComponent('previewOuterFrame'),
+            menu = previewOuterFrame.getDockedItems()[0].getComponent('templateButton')
+                .getMenu();
+
+        menu.removeAll();
+        records.forEach((record) => {
+            menu.add({
+                text: record.get('name'),
+                listeners: {
+                    scope: me,
+                    click: function () {
+                        me.onTemplateMenuClick(record);
+                    }
+                }
+            });
+        });
+    },
+
     queryReportTemplate: async function () {
         let me = this,
             view = me.getView(),

@@ -17,6 +17,11 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Frame', {
             field = parts.join("_"),
             firstRecord = store.findRecord('id', id, 0, false, false, true);
 
+        let editableElement = event.target || event.srcElement;
+        me.lastEditableElement = editableElement.closest
+            ? editableElement.closest('.editable')
+            : editableElement;
+
         if ((field == 'leistungsbeschreibung') || (field == 'pos_text')) {
             store.getRange().forEach((record) => {
                 console.log('Panel.frameContentChanged.description.forEach');

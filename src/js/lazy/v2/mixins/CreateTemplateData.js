@@ -55,12 +55,15 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.CreateTemplateData', {
 
 
         if (!Ext.isEmpty(contactData)) {
-            let br = briefanreden.findRecord('id', contactData[0].briefanrede, 0, false, true, true);
+            contactData = contactData[0];
+            let br = briefanreden.findRecord('id', contactData.briefanrede, 0, false, true, true);
             if (!Ext.isEmpty(br)) {
-                templateData.briefanrede = br.get('name') + ' ' + contactData[0].nachname;
+                if (!Ext.isEmpty(br.get('template'))) {
+                    let tpl = new Ext.XTemplate(br.get('template'));
+                    templateData.briefanrede = tpl.apply(contactData);
+                }
             }
         }
-
 
         let dataTable = ['<table>'];
         jobData.forEach((item) => {

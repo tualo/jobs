@@ -234,4 +234,23 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.StoreLoad', {
             model.set('kunde', records[0]);
         }
     },
+
+
+    onTextTemplateStoreBeforeLoad: function (store, operation) {
+        console.log('Panel.onTextTemplateStoreBeforeLoad');
+        let model = this.getViewModel(),
+            extraParams = store.getProxy().getExtraParams(),
+            filters = [];
+
+        if (Ext.isEmpty(extraParams)) { extraParams = {}; };
+
+        extraParams.filter = Ext.JSON.encode(filters);
+        store.getProxy().setExtraParams(extraParams);
+    },
+    onTextTemplateDataChanged: function (store, records) {
+        console.log('Panel.onTextTemplateDataChanged');
+    },
+    onTextTemplateStoreLoad: function (store, records) {
+        console.log('Panel.onTextTemplateStoreLoad');
+    }
 });
