@@ -39,6 +39,8 @@ class TemplateReport extends \Tualo\Office\Basic\RouteWrapper
                     }
                     App::result('report', $report);
                     App::result('reporttypes', $reporttypes);
+                } else {
+                    App::result('msg', 'No calculation found for the given job ID');
                 }
             } catch (\Exception $e) {
                 App::result('msg', $e->getMessage());

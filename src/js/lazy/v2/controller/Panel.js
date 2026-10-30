@@ -32,7 +32,10 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
                 }
             });
             return;
+        } else {
+            store.load();
         }
+
 
     },
     canSaveReport: async function () {

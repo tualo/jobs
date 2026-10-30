@@ -68,7 +68,9 @@ pos as (
         `p`.`gruppierung` AS `gruppierung`,
         `p`.`listenpreis_vk` AS `listenpreis_vk`,
         `p`.`listenpreis_ek` AS `listenpreis_ek`,
-        `p`.`leistungsbeschreibung` AS `leistungsbeschreibung`,
+        if (`p`.`leistungsbeschreibung` is null, ''
+        
+        , `p`.`leistungsbeschreibung`) AS `leistungsbeschreibung`,
         `p`.`gruppierungen` AS `gruppierungen`,
         `p`.`use_in_offer` AS `use_in_offer`,
         `p`.`ist_anzahl` AS `ist_anzahl`,
@@ -103,6 +105,7 @@ pos as (
                     or `p`.`oid` = 0
                 )
             )
+            left join `blg_pos_calculation` `l` on(
         )
 ),
 a as (
