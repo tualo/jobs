@@ -29,6 +29,12 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.DataChange', {
         model.set('modifiedRows', modifiedRows);
     },
     onFormFieldChanged: function () {
+        let me = this,
+            view = me.getView(),
+            model = me.getViewModel(),
+            reportTemplate = model.get('reportTemplate');
+        if (!reportTemplate) return; // not ready to render preview without a report template
+
         this.renderPreview();
     }
 });

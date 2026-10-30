@@ -20,6 +20,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
             taxes_Hash = {};
 
 
+        if (!reportTemplate) throw new Error('No report template specified');
 
         me.gruppenPreise();
 
