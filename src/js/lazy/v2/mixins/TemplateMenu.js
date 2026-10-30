@@ -38,6 +38,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.TemplateMenu', {
                 pos: maxPosition + 1,
                 type: record.get('type'),
                 placement: record.get('placement'),
+                tualo_job_id: model.get('jobid'),
                 text: templateText,
                 used_template_id: record.get('id')
             });
