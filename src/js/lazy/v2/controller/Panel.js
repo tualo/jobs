@@ -266,14 +266,13 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
         console.log('fetchInformation', 'Fetching information');
         await me.canSaveReport();
 
-        await me.loadStore(model.getStore('adressen'))
         await me.queryAddress();
-        await me.queryReportTemplate();
         await Promise.all([
             /*
             me.queryAddress(),
             me.canSaveReport(),
             */
+            me.loadStore(model.getStore('adressen')),
             me.loadStore(model.getStore('document_names')),
             me.loadStore(model.getStore('tualo_allowed_document_colors_rgb')),
             me.loadStore(model.getStore('briefanreden')),
@@ -285,6 +284,7 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
             me.loadStore(model.getStore('data')),
 
         ]);
+        await me.queryReportTemplate();
         me.onTextTemplatesLoad(model.getStore('tualo_job_text_templates').getRange());
         await me.loadStore(model.getStore('adressen'));
         await me.prepareTexts();
