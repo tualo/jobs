@@ -265,6 +265,7 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
 
         console.log('fetchInformation', 'Fetching information');
         await me.canSaveReport();
+        await me.loadStore(model.getStore('tualo_job'));
 
         await me.queryAddress();
         await me.queryReportTemplate();
@@ -277,7 +278,6 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
             me.loadStore(model.getStore('document_names')),
             me.loadStore(model.getStore('tualo_allowed_document_colors_rgb')),
             me.loadStore(model.getStore('briefanreden')),
-            me.loadStore(model.getStore('tualo_job')),
             me.loadStore(model.getStore('tualo_job_offer_text')),
             me.loadStore(model.getStore('tualo_job_invoice_text')),
             me.loadStore(model.getStore('tualo_job_text_templates')),
