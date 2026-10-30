@@ -26,7 +26,7 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
             modifiedRecords = store.getModifiedRecords();
 
         if (modifiedRecords.length > 0) {
-            Ext.Msg.confirm('Änderungen', 'Es gibt ungespeicherte Änderungen. Ohne speichern fortfahren?', (btn) => {
+            Ext.Msg.confirm('Änderungen', 'Es gibt ungespeicherte Änderungen. Ohne Speichern fortfahren?', (btn) => {
                 if (btn === 'yes') {
                     store.load();
                 }
