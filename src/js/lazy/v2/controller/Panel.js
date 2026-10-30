@@ -267,6 +267,7 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
         await me.canSaveReport();
 
         await me.queryAddress();
+        await me.queryReportTemplate();
         await Promise.all([
             /*
             me.queryAddress(),
@@ -284,7 +285,6 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
             me.loadStore(model.getStore('data')),
 
         ]);
-        await me.queryReportTemplate();
         me.onTextTemplatesLoad(model.getStore('tualo_job_text_templates').getRange());
         await me.loadStore(model.getStore('adressen'));
         await me.prepareTexts();
