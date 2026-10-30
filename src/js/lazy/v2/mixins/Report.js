@@ -19,6 +19,8 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
             service_period_stop = (new Date('2000-01-01')),
             taxes_Hash = {};
 
+
+
         me.gruppenPreise();
 
         range.forEach((record) => {

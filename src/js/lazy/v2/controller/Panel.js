@@ -260,10 +260,14 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
             model = me.getViewModel();
 
         console.log('fetchInformation', 'Fetching information');
+        await me.queryReportTemplate();
+        await me.queryAddress();
+        await me.canSaveReport();
         await Promise.all([
-            me.queryReportTemplate(),
+            /*
             me.queryAddress(),
             me.canSaveReport(),
+            */
             me.loadStore(model.getStore('document_names')),
             me.loadStore(model.getStore('tualo_allowed_document_colors_rgb')),
             me.loadStore(model.getStore('briefanreden')),
