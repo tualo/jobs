@@ -72,9 +72,6 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
                 store.sync({
                     callback: function (batch, options) {
                         if (batch.hasException()) {
-                            console.error('syncStore', 'callback failure:', store.type, store);
-                            reject(new Error('Store konnte nicht synchronisiert werden'));
-                        } else {
                             let exceptions = batch.getExceptions();
                             exceptions.forEach(exception => {
                                 Ext.toast({
@@ -85,6 +82,10 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
                                 });
                                 console.error('syncStore', 'exception:', exception);
                             });
+                            console.error('syncStore', 'callback failure:', store.type, store);
+                            reject(new Error('Store konnte nicht synchronisiert werden'));
+                        } else {
+
                             console.log('syncStore', 'callback success:', store.type, store);
                             resolve();
                         }
