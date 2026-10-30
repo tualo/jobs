@@ -264,9 +264,11 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
             model = me.getViewModel();
 
         console.log('fetchInformation', 'Fetching information');
-        await me.queryReportTemplate();
-        await me.queryAddress();
         await me.canSaveReport();
+
+        await me.loadStore(model.getStore('adressen'))
+        await me.queryAddress();
+        await me.queryReportTemplate();
         await Promise.all([
             /*
             me.queryAddress(),
