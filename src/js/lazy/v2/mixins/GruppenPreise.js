@@ -20,10 +20,10 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.GruppenPreise', {
             }
             console.log('Panel.gruppenPreise.each', record.get('ist_netto'));
             if ((record.get('use_real_amount') == 1) && (reporttype == 'rechnung')) {
-                gruppierungen['k' + record.get('gruppierung')].netto += record.get('ist_netto');
+                gruppierungen['k' + record.get('gruppierung')].netto += Math.round(record.get('ist_netto') * 100) / 100;
                 gruppierungen['k' + record.get('gruppierung')].brutto += record.get('ist_brutto');
             } else {
-                gruppierungen['k' + record.get('gruppierung')].netto += record.get('netto');
+                gruppierungen['k' + record.get('gruppierung')].netto += Math.round(record.get('netto') * 100) / 100;
                 gruppierungen['k' + record.get('gruppierung')].brutto += record.get('brutto');
             }
         }
