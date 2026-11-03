@@ -12,11 +12,13 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
 
             range = store.getRange(),
             positions = [],
+            gruppierungen = {},
             sumUse = 0,
             rowNumber = 1,
             taxes_Hash = {};
 
         me.gruppenPreise();
+
         range.forEach((record) => {
             let localRecord = { ...record.data };
             if (record.get('use_in_offer') == 0) return;
@@ -29,6 +31,78 @@ Ext.define('Tualo.jobs.lazy.mixins.Report', {
 
             localRecord.singleprice = localRecord.epreis;
             localRecord.net = localRecord.epreis * localRecord.amount;
+            localRecord.tax = localRecord.steuersatz;
+            localRecord.taxvalue = localRecord.steuersatz / 100 * localRecord.net;
+            localRecord.gross = localRecord.net + localRecord.taxvalue;
+
+            if (forSaving == true) {
+                localRecord.article = localRecord.artikel;
+
+
+
+                localRecord.vid = localRecord.id;
+
+                localRecord.vzusatz = 'calculation';
+                delete localRecord.__table_name;
+                localRecord.id = -1;
+
+                delete localRecord.__id;
+            }
+
+
+
+            if (localRecord.use_real_amount) {
+                localRecord.net = localRecord.ist_netto;
+                localRecord.amount = localRecord.amount;
+                localRecord.gross = localRecord.ist_brutto;
+            }
+
+            localRecord.taxvalue = localRecord.gross - localRecord.net;
+            // gegenprüfung, sicherstellen dass taxvalue zum steuersatz passt
+            let expectedTaxValue = Math.round(localRecord.net * localRecord.tax * 100) / 100;
+            if (Math.abs(localRecord.taxvalue - expectedTaxValue) > 0.01) {
+                console.warn('Tax value mismatch for record:', localRecord);
+                /*
+                Ext.toast.show({
+                    html: 'Tax value mismatch for record: ' + JSON.stringify(localRecord),
+                    title: 'Warning',
+                    width: 300,
+                    align: 't'
+                });
+                */
+            }
+
+            console.warn('Report record:', localRecord);
+
+
+            if (Ext.isEmpty(localRecord.pos_text)) {
+                localRecord.pos_text = rowNumber;
+            }
+
+            positions.push(localRecord);
+            rowNumber++;
+        });
+
+
+
+        // guppentest
+        positions = [];
+        range.forEach((record) => {
+            let localRecord = { ...record.data };
+            if (record.get('use_in_offer') == 0) return;
+            if (gruppierungen[localRecord.gruppierung]) {
+                return;
+            }
+            gruppierungen[localRecord.gruppierung] = true;
+
+            localRecord.amount = localRecord.anzahl;
+            if (localRecord.use_real_amount) {
+                localRecord.amount = localRecord.ist_anzahl;
+            }
+
+            localRecord.singleprice = localRecord.gruppenpreis_netto / localRecord.amount;
+
+            localRecord.net = Math.round(localRecord.singleprice * localRecord.amount * 100) / 100;
             localRecord.tax = localRecord.steuersatz;
             localRecord.taxvalue = localRecord.steuersatz / 100 * localRecord.net;
             localRecord.gross = localRecord.net + localRecord.taxvalue;
