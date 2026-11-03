@@ -31,7 +31,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.GruppenPreise', {
         for (let i = 0; i < range.length; i++) {
             let record = range[i];
             if (record.get('use_in_offer') != 1) continue;
-            record.set('gruppenpreis_netto', gruppierungen['k' + record.get('gruppierung')].netto);
+            record.set('gruppenpreis_netto', Math.round(gruppierungen['k' + record.get('gruppierung')].netto * 100) / 100);
             record.set('gruppenpreis_brutto', gruppierungen['k' + record.get('gruppierung')].brutto);
         }
         console.log('gruppenPreise', gruppierungen);
