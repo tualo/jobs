@@ -350,7 +350,7 @@ Ext.define('Tualo.jobs.lazy.Panel', {
                 {
                     xtype: 'button',
                     // text: 'Vorschau',
-                    iconCls: 'fa fa-duotone fa-solid fa-text-slash',
+                    iconCls: 'fa fa-solid fa-text-slash',
                     handler: 'onClearClick'
                 },
                 '->',

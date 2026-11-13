@@ -115,6 +115,11 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
                     stateful: false,
                     statefulFilters: false,
                     xtype: 'dslist_view_job_calculation_to_report',
+
+                    bind: {
+                        store: '{data}'
+                    },
+
                     plugins: {
                         gridfilters: true,
                         cellediting: {
@@ -124,9 +129,6 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
                     },
                     selModel: {
                         type: 'tualomultirowmodel'
-                    },
-                    bind: {
-                        store: '{data}'
                     },
                     listeners: {
                         beforerender: 'onCalculationGridBeforeRender',
@@ -350,18 +352,18 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
                 {
                     xtype: 'button',
                     // text: 'Vorschau',
-                    iconCls: 'fa fa-solid fa-bold',
+                    iconCls: 'fa-solid fa-bold',
                     handler: 'onBoldClick'
                 },
                 {
                     xtype: 'button',
                     // text: 'Vorschau',
-                    iconCls: 'fa fa-solid fa-italic',
+                    iconCls: 'fa-solid fa-italic',
                     handler: 'onItalicClick'
                 },
                 {
                     xtype: 'button',
-                    iconCls: 'fa fa-paint-roller',
+                    iconCls: 'fa-solid fa-paint-roller',
                     itemId: 'colorButton',
                     menu: []
                 },
@@ -369,7 +371,7 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
                 {
                     xtype: 'button',
                     // text: 'Vorschau',
-                    iconCls: 'fa fa-duotone fa-solid fa-text-slash',
+                    iconCls: 'fa-solid fa-text-slash',
                     handler: 'onClearClick'
                 },
                 '->',
@@ -378,7 +380,7 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
                 {
                     xtype: 'button',
                     text: 'Layouts',
-                    iconCls: 'fa fa-print',
+                    iconCls: 'fa-solid fa-print',
                     menu: [],
                     handler: 'onLayoutClick'
                 },
@@ -386,7 +388,7 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
                 {
                     xtype: 'button',
                     text: 'Templates',
-                    iconCls: 'fa fa-file-lines',
+                    iconCls: 'fa-solid fa-file-lines',
                     itemId: 'templateButton',
                     menu: [],
                 },
@@ -394,7 +396,7 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
                 {
                     xtype: 'button',
                     text: 'Vorschau',
-                    iconCls: 'fa fa-print',
+                    iconCls: 'fa-solid fa-print',
                     handler: 'onPrintClick'
                 }
             ],
