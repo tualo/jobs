@@ -5,6 +5,19 @@ Ext.define('Tualo.job.form.field.TextEditor', {
         record: null
     },
 
+
+
+    initComponent: function () {
+        var me = this;
+        me.briefanreden = Ext.create({
+            type: 'briefanreden_store',
+            pageSize: 10000,
+            // ******
+            autoLoad: true
+        });
+        me.callParent(arguments);
+    },
+
     applyRecord: function (record) {
         console.log('Tualo.job.form.field.TextEditor', 'applyRecord called', record)
         var me = this;
@@ -28,8 +41,10 @@ Ext.define('Tualo.job.form.field.TextEditor', {
     },
 
 
+
     createTemplateData: async function () {
         let me = this,
+
             templateData = {}
 
         if (!me.record) {
@@ -37,7 +52,7 @@ Ext.define('Tualo.job.form.field.TextEditor', {
         }
         let
             //tualo_job = view.getViewModel().getStore('tualo_job'),
-            //briefanreden = view.getViewModel().getStore('briefanreden'),
+            briefanreden = me.briefanreden,
             //jobRecord = tualo_job.getRange()[0],
             jobData = await me.queryJobData(me.record.get('jobid')),
             contactData = null
