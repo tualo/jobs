@@ -68,7 +68,8 @@ Ext.define('Tualo.routes.jobs.PanelReport', {
         action: function (values) {
             let optionalFilter = [];
             try {
-                optionalFilter = JSON.parse(uriDecode(values.optional))
+
+                optionalFilter = JSON.parse(decodeURIComponent(values.optional))
             } catch (e) {
                 optionalFilter = [];
             }

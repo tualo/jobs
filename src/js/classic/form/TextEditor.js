@@ -67,12 +67,12 @@ Ext.define('Tualo.job.form.field.TextEditor', {
         templateData.briefanrede = 'Sehr geehrte Damen und Herren';
 
 
-        if (!Ext.isEmpty(contactData)) {
+        /*if (!Ext.isEmpty(contactData)) {
             let br = briefanreden.findRecord('id', contactData[0].briefanrede, 0, false, true, true);
             if (!Ext.isEmpty(br)) {
                 templateData.briefanrede = br.get('name') + ' ' + contactData[0].nachname;
             }
-        }
+        }*/
 
 
         let dataTable = ['<table>'];
