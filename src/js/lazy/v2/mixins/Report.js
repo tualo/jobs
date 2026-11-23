@@ -94,7 +94,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
 
 
             if (Ext.isEmpty(localRecord.pos_text)) {
-                localRecord.pos_text = rowNumber;
+                localRecord.pos_text = positions.length + 1;
             }
 
             positions.push(localRecord);
