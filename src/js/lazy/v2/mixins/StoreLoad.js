@@ -80,6 +80,9 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.StoreLoad', {
             model = me.getViewModel(),
             reporttype = model.get('reportType'),
             artikelgruppen = model.getStore('artikelgruppen'),
+            templates = model.getStore('templates'),
+            template = templates.findRecord('id', model.get('selectedTemplate'), 0, false, true, true),
+            positionTemplate = null,
             //typenStore = model.getStore('typen'),
             //namenStore = model.getStore('namen'),
             typen = {},
@@ -92,11 +95,23 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.StoreLoad', {
             console.log('Panel.onDataStoreLoad.records.forEach');
             if (record.get('use_in_offer') == 1) {
                 // model.set('document_name', record.get(reporttype + '_title'))
-                if (Ext.isEmpty(record.get('leistungsbeschreibung')) && (!Ext.isEmpty(record.get('langtext')))) {
-                    record.set('leistungsbeschreibung', record.get('langtext'));
+                if (Ext.isEmpty(record.get('leistungsbeschreibung'))) {
+                    let description = '';
+                    if (template && !Ext.isEmpty(template.get('template'))) {
+                        if (!positionTemplate) {
+                            positionTemplate = new Ext.XTemplate(template.get('template'));
+                        }
+                        description = positionTemplate.apply(record.getData());
+                    }
+                    if (Ext.isEmpty(description)) {
+                        description = record.get('langtext');
+                    }
+                    if (!Ext.isEmpty(description)) {
+                        record.set('leistungsbeschreibung', description);
+                    }
                 }
                 if (Ext.isEmpty(record.get('leistungsbeschreibung'))) {
-                    let artikel = artikelgruppen.findRecord('gruppen_id', record.get('artikel'), 0, false, true, true);
+                    let artikel = artikelgruppen && artikelgruppen.findRecord('gruppen_id', record.get('artikel'), 0, false, true, true);
                     record.set('leistungsbeschreibung', record.get('artikel'));
                     if (!Ext.isEmpty(artikel)) {
                         record.set('leistungsbeschreibung', artikel.get('langtext'));

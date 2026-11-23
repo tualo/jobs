@@ -281,8 +281,7 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
             me.loadStore(model.getStore('tualo_job_offer_text')),
             me.loadStore(model.getStore('tualo_job_invoice_text')),
             me.loadStore(model.getStore('tualo_job_text_templates')),
-            me.loadStore(model.getStore('templates')),
-            me.loadStore(model.getStore('data')),
+            me.loadStore(model.getStore('templates')).then(() => me.loadStore(model.getStore('data'))),
 
         ]);
         me.onTextTemplatesLoad(model.getStore('tualo_job_text_templates').getRange());
