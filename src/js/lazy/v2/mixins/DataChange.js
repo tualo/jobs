@@ -1,4 +1,11 @@
 Ext.define('Tualo.jobs.lazy.v2.mixins.DataChange', {
+    onDataUpdate: function (store, record, operation, modifiedFieldNames) {
+        if (operation === Ext.data.Model.EDIT && modifiedFieldNames &&
+            modifiedFieldNames.includes('use_in_offer') && record.get('use_in_offer') == 1 &&
+            Ext.isEmpty(record.get('leistungsbeschreibung'))) {
+            this.setDefaultPositionDescription(record, this.getPositionTemplate());
+        }
+    },
     onDataDataChanged: function () {
         let me = this,
             view = me.getView(),

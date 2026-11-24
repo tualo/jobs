@@ -210,7 +210,7 @@ select
     `a`.`warengruppe` AS `warengruppe`,
     `a`.`use_in_offer` AS `use_in_offer`,
     `a`.`beleg` AS `beleg`,
-    `a`.`gruppierung` AS `gruppierung`,
+    if(`a`.`gruppierung` is null or `a`.`gruppierung` = '', cast(round(rand()*10000) as unsigned), `a`.`gruppierung`) AS `gruppierung`,
     `a`.`artikel` AS `artikel`,
     `a`.`anzahl` AS `anzahl`,
     `a`.`ist_anzahl` AS `ist_anzahl`,

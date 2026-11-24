@@ -9,6 +9,7 @@ function loadDefinition(file) {
     const Ext = {
         define: (name, value) => { definition = value; },
         isEmpty: value => value == null || value === '' || (Array.isArray(value) && value.length === 0),
+        data: { Model: { EDIT: 'edit' } },
         XTemplate: class {
             constructor(template) { this.template = template; }
             apply(data) {
@@ -44,7 +45,7 @@ function loadRecords(template, records) {
             ? { findRecord: () => template == null ? null : record({ template }) }
             : null
     };
-    storeLoad.onDataStoreLoad.call({ getViewModel: () => model }, null, records);
+    storeLoad.onDataStoreLoad.call({ ...storeLoad, getViewModel: () => model }, null, records);
 }
 
 test('renders the selected template separately for each eligible position', () => {
@@ -70,6 +71,59 @@ test('keeps the existing article fallback when neither template nor langtext has
     const item = record({ use_in_offer: 1, leistungsbeschreibung: '', langtext: '', artikel: 'A', bemerkung: 'Notiz' });
     loadRecords('', [item]);
     assert.equal(item.get('leistungsbeschreibung'), 'A\nNotiz');
+});
+
+function updateContext(template) {
+    const storeLoad = loadDefinition('src/js/lazy/v2/mixins/StoreLoad.js');
+    const dataChange = loadDefinition('src/js/lazy/v2/mixins/DataChange.js');
+    const model = {
+        get: name => name === 'selectedTemplate' ? 'default' : null,
+        getStore: name => name === 'templates'
+            ? { findRecord: () => template == null ? null : record({ template }) }
+            : null
+    };
+    return { ...storeLoad, ...dataChange, getViewModel: () => model };
+}
+
+test('activating a position renders its selected template using that position', () => {
+    const context = updateContext('{artikel}: {anzahl}');
+    const rows = [
+        record({ use_in_offer: 1, leistungsbeschreibung: '', artikel: 'A', anzahl: 2 }),
+        record({ use_in_offer: 1, leistungsbeschreibung: '', artikel: 'B', anzahl: 3 })
+    ];
+    for (const row of rows) {
+        row.commit = () => { throw new Error('an edited record must not be committed'); };
+        context.onDataUpdate(null, row, 'edit', ['use_in_offer']);
+    }
+    assert.deepEqual(rows.map(row => row.get('leistungsbeschreibung')), ['A: 2', 'B: 3']);
+});
+
+test('only activation of an empty description applies the template', () => {
+    const context = updateContext('{artikel}');
+    const existing = record({ use_in_offer: 1, leistungsbeschreibung: 'Manuell', artikel: 'A' });
+    const unchecked = record({ use_in_offer: 0, leistungsbeschreibung: '', artikel: 'B' });
+    const unrelated = record({ use_in_offer: 1, leistungsbeschreibung: '', artikel: 'C' });
+    const committed = record({ use_in_offer: 1, leistungsbeschreibung: '', artikel: 'D' });
+    context.onDataUpdate(null, existing, 'edit', ['use_in_offer']);
+    context.onDataUpdate(null, unchecked, 'edit', ['use_in_offer']);
+    context.onDataUpdate(null, unrelated, 'edit', ['anzahl']);
+    context.onDataUpdate(null, committed, 'commit', ['use_in_offer']);
+    assert.equal(existing.get('leistungsbeschreibung'), 'Manuell');
+    assert.equal(unchecked.get('leistungsbeschreibung'), '');
+    assert.equal(unrelated.get('leistungsbeschreibung'), '');
+    assert.equal(committed.get('leistungsbeschreibung'), '');
+});
+
+test('activation uses the same description fallback as loading', () => {
+    for (const [template, data, expected] of [
+        ['', { langtext: 'Langtext', artikel: 'A' }, 'Langtext'],
+        ['{missing}', { langtext: '', artikel: 'A', bemerkung: 'Notiz' }, 'A\nNotiz']
+    ]) {
+        const row = record({ use_in_offer: 1, leistungsbeschreibung: '', ...data });
+        row.commit = () => { throw new Error('an edited record must not be committed'); };
+        updateContext(template).onDataUpdate(null, row, 'edit', ['use_in_offer']);
+        assert.equal(row.get('leistungsbeschreibung'), expected);
+    }
 });
 
 test('loads position templates and units before starting the positions store', async () => {

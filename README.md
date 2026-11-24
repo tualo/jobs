@@ -1,5 +1,10 @@
 # Jobs Package
 
+Beim Aktivieren von `use_in_offer` wird eine leere Leistungsbeschreibung
+aus dem ausgewaehlten Positionstemplate erzeugt; bestehende Beschreibungen
+bleiben erhalten. Falls das Template keinen Text liefert, gelten dieselben
+Rueckfallwerte wie beim Laden der Positionen.
+
 Bei der Gruppierung mit "Paket" (`one`) wird die Gruppeneinheit `7`
 gespeichert und fuer die Position im Zielbeleg verwendet. Andere
 Gruppierungsarten und das Aufloesen der Gruppierung entfernen diese

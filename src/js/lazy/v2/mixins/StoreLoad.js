@@ -74,15 +74,43 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.StoreLoad', {
 
     },
 
+    getPositionTemplate: function () {
+        let model = this.getViewModel(),
+            template = model.getStore('templates').findRecord('id', model.get('selectedTemplate'), 0, false, true, true);
+
+        return template && !Ext.isEmpty(template.get('template'))
+            ? new Ext.XTemplate(template.get('template'))
+            : null;
+    },
+
+    setDefaultPositionDescription: function (record, template) {
+        if (!Ext.isEmpty(record.get('leistungsbeschreibung'))) return false;
+
+        let description = template ? template.apply(record.getData()) : '';
+        if (Ext.isEmpty(description)) {
+            description = record.get('langtext');
+        }
+        if (!Ext.isEmpty(description)) {
+            record.set('leistungsbeschreibung', description);
+            return false;
+        }
+
+        let artikelgruppen = this.getViewModel().getStore('artikelgruppen'),
+            artikel = artikelgruppen && artikelgruppen.findRecord('gruppen_id', record.get('artikel'), 0, false, true, true);
+        description = Ext.isEmpty(artikel) ? record.get('artikel') : artikel.get('langtext');
+        if (!Ext.isEmpty(record.get('bemerkung'))) {
+            description += "\n" + record.get('bemerkung');
+        }
+        record.set('leistungsbeschreibung', description);
+        return true;
+    },
+
     onDataStoreLoad: function (store, records, successful, operation, eOpts) {
         console.log('Panel.onDataStoreLoad');
         let me = this,
             model = me.getViewModel(),
             reporttype = model.get('reportType'),
-            artikelgruppen = model.getStore('artikelgruppen'),
-            templates = model.getStore('templates'),
-            template = templates.findRecord('id', model.get('selectedTemplate'), 0, false, true, true),
-            positionTemplate = null,
+            positionTemplate,
             //typenStore = model.getStore('typen'),
             //namenStore = model.getStore('namen'),
             typen = {},
@@ -96,31 +124,12 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.StoreLoad', {
             if (record.get('use_in_offer') == 1) {
                 // model.set('document_name', record.get(reporttype + '_title'))
                 if (Ext.isEmpty(record.get('leistungsbeschreibung'))) {
-                    let description = '';
-                    if (template && !Ext.isEmpty(template.get('template'))) {
-                        if (!positionTemplate) {
-                            positionTemplate = new Ext.XTemplate(template.get('template'));
-                        }
-                        description = positionTemplate.apply(record.getData());
+                    if (positionTemplate === undefined) {
+                        positionTemplate = me.getPositionTemplate();
                     }
-                    if (Ext.isEmpty(description)) {
-                        description = record.get('langtext');
+                    if (me.setDefaultPositionDescription(record, positionTemplate)) {
+                        record.commit();
                     }
-                    if (!Ext.isEmpty(description)) {
-                        record.set('leistungsbeschreibung', description);
-                    }
-                }
-                if (Ext.isEmpty(record.get('leistungsbeschreibung'))) {
-                    let artikel = artikelgruppen && artikelgruppen.findRecord('gruppen_id', record.get('artikel'), 0, false, true, true);
-                    record.set('leistungsbeschreibung', record.get('artikel'));
-                    if (!Ext.isEmpty(artikel)) {
-                        record.set('leistungsbeschreibung', artikel.get('langtext'));
-                    }
-                    if (!Ext.isEmpty(record.get('bemerkung'))) {
-                        record.set('leistungsbeschreibung', record.get('leistungsbeschreibung') + "\n" + record.get('bemerkung'));
-                    }
-
-                    record.commit();
                 }
 
                 if (Ext.isEmpty(record.get('gruppierung'))) {
