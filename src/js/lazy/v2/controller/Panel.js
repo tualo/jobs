@@ -47,6 +47,34 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
         return result.success;
     },
 
+    onChangeDocumentName: function (field, newValue, oldValue) {
+        console.log('Panel.onChangeDocumentName');
+        let me = this,
+            model = me.getViewModel(),
+            reporttype = model.get('reportType'),
+            store = model.getStore('data');
+
+        if (!store || Ext.isEmpty(newValue)) return;
+
+        store.getRange().forEach((record) => {
+            if (record.get('use_in_offer') == 1) {
+                record.set(reporttype + '_title', newValue);
+            }
+        });
+    },
+
+    onChangeDocumentNameDD: function (field, newValue, oldValue) {
+        console.log('Panel.onChangeDocumentNameDD');
+        let me = this,
+            model = me.getViewModel(),
+            store = model.getStore('data');
+
+        if (!store || Ext.isEmpty(newValue)) return;
+
+        model.set('document_name_filter', newValue);
+        store.load();
+    },
+
     loadStore: function (store) {
         return new Promise((resolve, reject) => {
             console.log('loadStore', 'Loading store:', store.type, store);
@@ -281,7 +309,10 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
             me.loadStore(model.getStore('tualo_job_offer_text')),
             me.loadStore(model.getStore('tualo_job_invoice_text')),
             me.loadStore(model.getStore('tualo_job_text_templates')),
-            me.loadStore(model.getStore('templates')).then(() => me.loadStore(model.getStore('data'))),
+            Promise.all([
+                me.loadStore(model.getStore('templates')),
+                me.loadStore(model.getStore('mengeneinheiten'))
+            ]).then(() => me.loadStore(model.getStore('data'))),
 
         ]);
         me.onTextTemplatesLoad(model.getStore('tualo_job_text_templates').getRange());

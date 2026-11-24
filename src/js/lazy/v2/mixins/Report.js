@@ -90,7 +90,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
                 */
             }
 
-            // console.warn('Report record:', localRecord);
+            console.warn('Report record:', localRecord);
 
 
             if (Ext.isEmpty(localRecord.pos_text)) {
@@ -103,6 +103,12 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
 
         // guppentest
         positions = [];
+        let groupSizes = new Map();
+        range.forEach((record) => {
+            if (record.get('use_in_offer') == 0) return;
+            let group = record.get('gruppierung');
+            groupSizes.set(group, (groupSizes.get(group) || 0) + 1);
+        });
 
         range.forEach((record) => {
             let localRecord = { ...record.data };
@@ -130,9 +136,30 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
             }
             gruppierungen[localRecord.gruppierung] = true;
 
+            let useGroupAmount = !Ext.isEmpty(localRecord.gruppierung) &&
+                !Ext.isEmpty(localRecord.gruppenmenge) &&
+                !(groupSizes.get(localRecord.gruppierung) === 1 && localRecord.gruppenmenge == 0);
+            if (useGroupAmount) {
+                localRecord.amount = localRecord.gruppenmenge;
+                localRecord.anzahl = localRecord.gruppenmenge;
+            }
 
-            localRecord.singleprice = localRecord.gruppenpreis_netto / localRecord.amount;
-            localRecord.net = Math.round(localRecord.singleprice * localRecord.amount * 100) / 100;
+            let groupUnit = localRecord.gruppenfunktion === 'one' ? 7 : localRecord.gruppeneinheit;
+            if (!Ext.isEmpty(groupUnit)) {
+                let unit = model.getStore('mengeneinheiten').findRecord('id', groupUnit, 0, false, true, true);
+                if (!unit) {
+                    let message = 'Mengeneinheit ' + groupUnit + ' wurde nicht gefunden.';
+                    Ext.toast({ html: message, title: 'Fehler', align: 't' });
+                    throw new Error(message);
+                }
+                localRecord.einheit = groupUnit;
+                localRecord.unit = groupUnit;
+                localRecord.einheit_symbol = unit.get('symbol');
+                localRecord.einheit_faktor = unit.get('faktor');
+            }
+
+            localRecord.singleprice = localRecord.amount == 0 ? 0 : localRecord.gruppenpreis_netto / localRecord.amount;
+            localRecord.net = Math.round(localRecord.gruppenpreis_netto * 100) / 100;
 
             localRecord.tax = localRecord.steuersatz;
             localRecord.taxvalue = localRecord.steuersatz / 100 * localRecord.net;
@@ -154,7 +181,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
 
 
 
-            if (localRecord.use_real_amount) {
+            if (localRecord.use_real_amount && !useGroupAmount) {
                 localRecord.net = localRecord.ist_netto;
                 localRecord.amount = localRecord.amount;
                 localRecord.gross = localRecord.ist_brutto;

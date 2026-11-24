@@ -13,6 +13,9 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.GridOperations', {
         if (!model.get('mixedGrouping') && selection.length > 1) {
             selection.forEach((record) => {
                 record.set('gruppierung', (new Date()).getTime());
+                record.set('gruppenmenge', null);
+                record.set('gruppeneinheit', null);
+                record.set('gruppenfunktion', null);
             });
         } else {
 
@@ -26,12 +29,44 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.GridOperations', {
                 }
                 console.log('onUseRow record', record);
                 record.set('gruppenmenge', model.get('selectedMenge'));
+                record.set('gruppeneinheit', model.get('selectedAggregation') === 'one' ? 7 : null);
+                record.set('gruppenfunktion', model.get('selectedAggregation'));
             });
         }
 
         // me.gruppenPreise();
 
     },
+    getSelectedGroupSettings: function (records) {
+        if (records.length === 0) return null;
+
+        let first = records[0],
+            group = first.get('gruppierung'),
+            amount = first.get('gruppenmenge'),
+            getAggregation = (record) => {
+                let aggregation = record.get('gruppenfunktion');
+                if (Ext.isEmpty(aggregation) && record.get('gruppeneinheit') == 7 &&
+                    record.get('gruppenmenge') == 1) {
+                    return 'one';
+                }
+                return aggregation;
+            },
+            aggregation = getAggregation(first);
+
+        if (Ext.isEmpty(group) || group == 0 || Ext.isEmpty(amount) ||
+            !['sum', 'min', 'max', 'tmax', 'one'].includes(aggregation)) {
+            return null;
+        }
+        if (!records.every((record) =>
+            record.get('gruppierung') == group &&
+            record.get('gruppenmenge') == amount &&
+            getAggregation(record) === aggregation
+        )) {
+            return null;
+        }
+        return { aggregation: aggregation, amount: amount };
+    },
+
     onSelectionchange: function (view, records) {
         console.log('Panel.onSelectionchange');
         let model = this.getViewModel(),
@@ -40,6 +75,10 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.GridOperations', {
         model.set('selectedRows', records.length);
         if (records.length > 0) {
             model.set('selectedRecord', records[0]);
+        }
+        let groupSettings = this.getSelectedGroupSettings(records);
+        if (groupSettings) {
+            model.set('selectedAggregation', groupSettings.aggregation);
         }
         let groups = {},
             headlines = {};
@@ -178,8 +217,9 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.GridOperations', {
                     initialValue = 0;
             }
 
-            let acc = 0;
+            let groupSettings = this.getSelectedGroupSettings(records);
             model.set('selectedMenge',
+                groupSettings && groupSettings.aggregation === aggregation ? groupSettings.amount :
                 records.reduce((acc, current) => {
                     console.log('Panel.updateSelectionData.records.reduce');
                     console.log('aggregation', aggregation, acc, current);

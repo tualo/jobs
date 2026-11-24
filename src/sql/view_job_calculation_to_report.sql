@@ -1,6 +1,10 @@
-CREATE OR REPLACE VIEW `view_job_calculation_to_report` AS 
+delimiter ;
 
-with t as (
+alter table `blg_pos_calculation` 
+add column if not exists `gruppeneinheit` varchar(255) after `gruppenmenge`,
+add column if not exists `gruppenfunktion` varchar(16) after `gruppeneinheit`;
+
+CREATE OR REPLACE VIEW `view_job_calculation_to_report` AS with t as (
     select
         'angebot' AS `reporttype`
     union
@@ -68,9 +72,7 @@ pos as (
         `p`.`gruppierung` AS `gruppierung`,
         `p`.`listenpreis_vk` AS `listenpreis_vk`,
         `p`.`listenpreis_ek` AS `listenpreis_ek`,
-        if (`p`.`leistungsbeschreibung` is null, ''
-        
-        , `p`.`leistungsbeschreibung`) AS `leistungsbeschreibung`,
+        `p`.`leistungsbeschreibung` AS `leistungsbeschreibung`,
         `p`.`gruppierungen` AS `gruppierungen`,
         `p`.`use_in_offer` AS `use_in_offer`,
         `p`.`ist_anzahl` AS `ist_anzahl`,
@@ -82,6 +84,8 @@ pos as (
         `p`.`gruppenpreis_netto` AS `gruppenpreis_netto`,
         `p`.`gruppenpreis_brutto` AS `gruppenpreis_brutto`,
         `p`.`gruppenmenge` AS `gruppenmenge`,
+        `p`.`gruppeneinheit` AS `gruppeneinheit`,
+        `p`.`gruppenfunktion` AS `gruppenfunktion`,
         `p`.`xzusatz` AS `xzusatz`,
         `p`.`xid` AS `xid`,
         `p`.`approved` AS `approved`,
@@ -105,7 +109,6 @@ pos as (
                     or `p`.`oid` = 0
                 )
             )
-            left join `blg_pos_calculation` `l` on(
         )
 ),
 a as (
@@ -153,14 +156,18 @@ a as (
         `p`.`leistungsbeschreibung` AS `leistungsbeschreibung`,
         `p`.`pos_text` AS `pos_text`,
         `p`.`gruppenmenge` AS `gruppenmenge`,
+        `p`.`gruppeneinheit` AS `gruppeneinheit`,
+        `p`.`gruppenfunktion` AS `gruppenfunktion`,
         `p`.`angebot_title` AS `angebot_title`,
         `p`.`rechnung_title` AS `rechnung_title`,
         `p`.`teilueberschrift` AS `teilueberschrift`,
-
         `p`.`gruppenpreis_netto` AS `gruppenpreis_netto`,
         `p`.`gruppenpreis_brutto` AS `gruppenpreis_brutto`,
         `h`.`zeitraum_von` AS `zeitraum_von`,
-        `h`.`zeitraum_bis` AS `zeitraum_bis`
+        `h`.`zeitraum_bis` AS `zeitraum_bis`,
+        `p`.`einheit` AS `einheit`,
+        `p`.`einheit_symbol` AS `einheit_symbol`,
+        `p`.`einheit_faktor` AS `einheit_faktor`
     from
         (
             (
@@ -223,22 +230,34 @@ select
     `a`.`id` AS `id`,
     `a`.`leistungsbeschreibung` AS `leistungsbeschreibung`,
     `a`.`pos_text` AS `pos_text`,
-    `a`.`gruppenmenge` AS `gruppenmenge`,
+    ifnull(`a`.`gruppenmenge`, 0)    AS `gruppenmenge`,
+    `a`.`gruppeneinheit` AS `gruppeneinheit`,
+    `a`.`gruppenfunktion` AS `gruppenfunktion`,
     `a`.`angebot_title` AS `angebot_title`,
     `a`.`rechnung_title` AS `rechnung_title`,
     `a`.`teilueberschrift` AS `teilueberschrift`,
+        `a`.`einheit` AS `einheit`,
+        `a`.`einheit_symbol` AS `einheit_symbol`,
+        `a`.`einheit_faktor` AS `einheit_faktor`,
     if(
         `a`.`reporttype` = 'angebot',
         if(
             `a`.`gruppierung` is null,
             `a`.`netto`,
-            sum(`a`.`netto`) over (partition by `a`.`reporttype`,`a`.`beleg`, `a`.`gruppierung`)
-        )
-        ,
+            sum(`a`.`netto`) over (
+                partition by `a`.`reporttype`,
+                `a`.`beleg`,
+                `a`.`gruppierung`
+            )
+        ),
         if(
             `a`.`gruppierung` is null,
             `a`.`ist_netto`,
-            sum(`a`.`ist_netto`) over (partition by `a`.`reporttype`,`a`.`beleg`, `a`.`gruppierung`)
+            sum(`a`.`ist_netto`) over (
+                partition by `a`.`reporttype`,
+                `a`.`beleg`,
+                `a`.`gruppierung`
+            )
         )
     ) AS `gruppenpreis_netto`,
     if(
@@ -246,16 +265,38 @@ select
         if(
             `a`.`gruppierung` is null,
             `a`.`brutto`,
-            sum(`a`.`brutto`) over (partition by `a`.`reporttype`,`a`.`beleg`, `a`.`gruppierung`)
-        )
-        ,
+            sum(`a`.`brutto`) over (
+                partition by `a`.`reporttype`,
+                `a`.`beleg`,
+                `a`.`gruppierung`
+            )
+        ),
         if(
             `a`.`gruppierung` is null,
             `a`.`ist_brutto`,
-            sum(`a`.`ist_brutto`) over (partition by `a`.`reporttype`,`a`.`beleg`, `a`.`gruppierung`)
+            sum(`a`.`ist_brutto`) over (
+                partition by `a`.`reporttype`,
+                `a`.`beleg`,
+                `a`.`gruppierung`
+            )
         )
-     ) AS `gruppenpreis_brutto`,
+    ) AS `gruppenpreis_brutto`,
     `a`.`zeitraum_von` AS `zeitraum_von`,
     `a`.`zeitraum_bis` AS `zeitraum_bis`
 from
-    `a`
+    `a`;
+
+INSERT IGNORE INTO `ds_column`
+    (`character_maximum_length`, `column_key`, `column_name`, `column_type`, `data_type`,
+     `default_max_value`, `default_min_value`, `deferedload`, `existsreal`, `fieldtype`,
+     `is_generated`, `is_nullable`, `is_primary`, `numeric_precision`, `numeric_scale`,
+     `privileges`, `syncable`, `table_name`, `writeable`)
+VALUES
+    (255, '', 'gruppeneinheit', 'varchar(255)', 'varchar', 0, 0, 0, 1, '',
+     'NEVER', 'YES', 0, 0, 0, 'select,insert,update,references', 0, 'blg_pos_calculation', 1),
+    (255, '', 'gruppeneinheit', 'varchar(255)', 'varchar', 0, 0, 0, 1, '',
+     'NEVER', 'YES', 0, 0, 0, 'select,insert,update,references', 0, 'view_job_calculation_to_report', 1),
+    (16, '', 'gruppenfunktion', 'varchar(16)', 'varchar', 0, 0, 0, 1, '',
+     'NEVER', 'YES', 0, 0, 0, 'select,insert,update,references', 0, 'blg_pos_calculation', 1),
+    (16, '', 'gruppenfunktion', 'varchar(16)', 'varchar', 0, 0, 0, 1, '',
+     'NEVER', 'YES', 0, 0, 0, 'select,insert,update,references', 0, 'view_job_calculation_to_report', 1);

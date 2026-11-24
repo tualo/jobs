@@ -91,6 +91,12 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
     },
     stores: {
 
+        mengeneinheiten: {
+            type: 'mengeneinheiten_store',
+            autoLoad: false,
+            pageSize: 10000
+        },
+
         tualo_allowed_document_colors_rgb: {
             type: 'tualo_allowed_document_colors_rgb_store',
             // ******

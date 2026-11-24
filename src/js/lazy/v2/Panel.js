@@ -200,7 +200,8 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
                                             { "id": "sum", "name": "Summe" },
                                             { "id": "min", "name": "Minimum" },
                                             { "id": "max", "name": "Maximum" },
-                                            { "id": "tmax", "name": "T.Max." }
+                                            { "id": "tmax", "name": "T.Max." },
+                                            { "id": "one", "name": "Paket" }
                                         ]
                                     },
                                     queryMode: 'local',

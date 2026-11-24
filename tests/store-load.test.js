@@ -72,12 +72,13 @@ test('keeps the existing article fallback when neither template nor langtext has
     assert.equal(item.get('leistungsbeschreibung'), 'A\nNotiz');
 });
 
-test('loads position templates before starting the positions store', async () => {
+test('loads position templates and units before starting the positions store', async () => {
     const controller = loadDefinition('src/js/lazy/v2/controller/Panel.js');
     const stores = {};
     const calls = [];
-    let resolveTemplates;
+    let resolveTemplates, resolveUnits;
     const templateLoad = new Promise(resolve => { resolveTemplates = resolve; });
+    const unitLoad = new Promise(resolve => { resolveUnits = resolve; });
     const model = {
         getStore(name) {
             return stores[name] ||= { name, getRange: () => [] };
@@ -96,7 +97,9 @@ test('loads position templates before starting the positions store', async () =>
         queryReportTemplate: async () => {},
         loadStore(store) {
             calls.push(store.name);
-            return store.name === 'templates' ? templateLoad : Promise.resolve();
+            if (store.name === 'templates') return templateLoad;
+            if (store.name === 'mengeneinheiten') return unitLoad;
+            return Promise.resolve();
         },
         onTextTemplatesLoad() {},
         prepareTexts: async () => {},
@@ -105,8 +108,13 @@ test('loads position templates before starting the positions store', async () =>
     const loading = controller.fetchInformation.call(context);
     await new Promise(resolve => setImmediate(resolve));
     assert.ok(calls.includes('templates'));
+    assert.ok(calls.includes('mengeneinheiten'));
     assert.ok(!calls.includes('data'));
     resolveTemplates();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.ok(!calls.includes('data'));
+    resolveUnits();
     await loading;
     assert.ok(calls.indexOf('data') > calls.indexOf('templates'));
+    assert.ok(calls.indexOf('data') > calls.indexOf('mengeneinheiten'));
 });
