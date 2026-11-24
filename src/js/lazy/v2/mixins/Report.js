@@ -14,7 +14,6 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
             range = store.getData().items,
             positions = [],
             sumUse = 0,
-            rowNumber = 1,
             gruppierungen = {},
             service_period_start = (new Date()),
             service_period_stop = (new Date('2000-01-01')),
@@ -98,7 +97,6 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
             }
 
             positions.push(localRecord);
-            rowNumber++;
         });
 
         // guppentest
@@ -206,11 +204,10 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
 
 
             if (Ext.isEmpty(localRecord.pos_text)) {
-                localRecord.pos_text = rowNumber;
+                localRecord.pos_text = positions.length + 1;
             }
 
             positions.push(localRecord);
-            rowNumber++;
         });
 
 

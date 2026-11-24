@@ -69,6 +69,30 @@ function report(records, forSaving) {
     }, forSaving);
 }
 
+test('numbers empty position texts according to the final report positions', () => {
+    const makeRow = (group, posText, useInOffer = 1) => record({
+        use_in_offer: useInOffer, gruppierung: group, pos_text: posText,
+        anzahl: 1, epreis: 10, gruppenpreis_netto: 10, steuersatz: 0
+    });
+    const rows = [
+        makeRow('excluded', '', 0),
+        makeRow('first', ''),
+        makeRow('first', ''),
+        makeRow('second', 'Eigene Position'),
+        makeRow('third', null),
+        makeRow('fourth', 0),
+        makeRow('fifth', undefined)
+    ];
+
+    for (const saving of [false, true]) {
+        const positions = report(rows, saving).positions;
+        assert.deepEqual(Array.from(positions, position => position.pos_text),
+            [1, 'Eigene Position', 3, 0, 5]);
+    }
+    assert.equal(rows[1].get('pos_text'), '');
+    assert.equal(rows[4].get('pos_text'), null);
+});
+
 test('one stores unit 7 per group and exports it without changing the source unit', () => {
     const rows = [1, 2].map(id => record({
         id, use_in_offer: 1, anzahl: 2, epreis: 10, netto: 20,
