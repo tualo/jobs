@@ -47,6 +47,53 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
         return result.success;
     },
 
+    checkCanCreateReport: async function () {
+        console.log('Panel.checkCanCreateReport');
+        let me = this,
+            view = me.getView(),
+            model = me.getViewModel(),
+            banner = view.getComponent('previewOuterFrame').getDockedComponent('canCreateReportBanner');
+        try {
+            let response = await fetch('./jobs/cancreatereport/' + model.get('reportType') + '/' + model.get('jobid'));
+            let result = await response.json();
+
+            let warnings = Ext.isArray(result.warnings) ? result.warnings : [],
+                errors = Ext.isArray(result.errors) ? result.errors : [],
+                hasWarnings = (result.hasWarnings == true) || warnings.length > 0,
+                hasErrors = errors.length > 0,
+                success = result.success == true,
+                color = '#2e7d32',
+                icon = 'fa-solid fa-circle-check',
+                lines = [];
+
+            if (hasErrors) {
+                color = '#c62828';
+                icon = 'fa-solid fa-circle-exclamation';
+            } else if (hasWarnings) {
+                color = '#ef6c00';
+                icon = 'fa-solid fa-triangle-exclamation';
+            }
+
+            errors.forEach((msg) => lines.push(Ext.String.htmlEncode(msg)));
+            warnings.forEach((msg) => lines.push(Ext.String.htmlEncode(msg)));
+            if (lines.length === 0) {
+                lines.push(Ext.String.htmlEncode(result.msg || 'Der Beleg kann erstellt werden.'));
+            }
+
+            // success entscheidet, ob der Beleg erstellt werden darf – auch bei vorhandenen Fehlern
+            model.set('canCreateReport', success);
+            banner.setStyle('background-color', color);
+            banner.setHtml('<i class="' + icon + '"></i> ' + lines.join('<br>'));
+            banner.show();
+            return success;
+        } catch (e) {
+            console.error('Panel.checkCanCreateReport', e);
+            model.set('canCreateReport', true);
+            banner.hide();
+            return true;
+        }
+    },
+
     onChangeDocumentName: function (field, newValue, oldValue) {
         console.log('Panel.onChangeDocumentName');
         let me = this,
@@ -302,6 +349,7 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
             me.queryAddress(),
             me.canSaveReport(),
             */
+            me.checkCanCreateReport(),
             me.loadStore(model.getStore('adressen')),
             me.loadStore(model.getStore('document_names')),
             me.loadStore(model.getStore('tualo_allowed_document_colors_rgb')),
@@ -328,7 +376,7 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
     onTextTemplatesLoad: function (records) {
         let me = this,
             previewOuterFrame = me.getView().getComponent('previewOuterFrame'),
-            menu = previewOuterFrame.getDockedItems()[0].getComponent('templateButton')
+            menu = previewOuterFrame.down('#templateButton')
                 .getMenu();
 
         menu.removeAll();

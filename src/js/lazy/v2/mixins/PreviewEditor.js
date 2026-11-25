@@ -47,7 +47,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.PreviewEditor', {
         var me = this,
             view = me.getView(),
             previewOuterFrame = view.getComponent('previewOuterFrame'),
-            button = previewOuterFrame.getDockedItems()[0].getComponent('colorButton'),
+            button = previewOuterFrame.down('#colorButton'),
             menu = button.getMenu();
 
         records.forEach(element => {

@@ -349,6 +349,21 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
             xtype: 'panel',
             itemId: 'previewOuterFrame',
             layout: 'fit',
+            dockedItems: [
+                {
+                    xtype: 'component',
+                    dock: 'top',
+                    itemId: 'canCreateReportBanner',
+                    hidden: true,
+                    style: {
+                        padding: '3px 10px',
+                        fontSize: '12px',
+                        lineHeight: '18px',
+                        color: '#ffffff'
+                    },
+                    html: ''
+                }
+            ],
             tbar: [
                 {
                     xtype: 'button',
