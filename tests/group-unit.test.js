@@ -69,6 +69,35 @@ function report(records, forSaving) {
     }, forSaving);
 }
 
+test('includes all selected calculation references for each report position', () => {
+    const makeRow = (id, group, useInOffer = 1) => record({
+        id, gruppierung: group, use_in_offer: useInOffer,
+        anzahl: 1, epreis: 10, gruppenpreis_netto: 10, steuersatz: 0
+    });
+    const rows = [
+        makeRow(1, 'group'),
+        makeRow(2, 'single'),
+        makeRow(3, 'group', 0),
+        makeRow(4, 'group'),
+        makeRow(5, 'excluded', 0)
+    ];
+
+    for (const saving of [false, true]) {
+        const positions = report(rows, saving).positions;
+        const references = JSON.parse(JSON.stringify(positions.map(position => position.vid_references)));
+        assert.deepEqual(references, [
+            [{ vid: 1, vzusatz: 'calculation' }, { vid: 4, vzusatz: 'calculation' }],
+            [{ vid: 2, vzusatz: 'calculation' }]
+        ]);
+        if (saving) {
+            assert.equal(positions[0].vid, 1);
+            assert.equal(positions[0].vzusatz, 'calculation');
+            assert.equal(positions[0].id, -1);
+        }
+    }
+    assert.equal(rows[0].data.vid_references, undefined);
+});
+
 test('numbers empty position texts according to the final report positions', () => {
     const makeRow = (group, posText, useInOffer = 1) => record({
         use_in_offer: useInOffer, gruppierung: group, pos_text: posText,

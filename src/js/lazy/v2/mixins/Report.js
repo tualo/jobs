@@ -102,10 +102,15 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
         // guppentest
         positions = [];
         let groupSizes = new Map();
+        let groupReferences = Object.create(null);
         range.forEach((record) => {
             if (record.get('use_in_offer') == 0) return;
             let group = record.get('gruppierung');
             groupSizes.set(group, (groupSizes.get(group) || 0) + 1);
+            if (!groupReferences[group]) {
+                groupReferences[group] = [];
+            }
+            groupReferences[group].push({ vid: record.get('id'), vzusatz: 'calculation' });
         });
 
         range.forEach((record) => {
@@ -133,6 +138,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
                 return;
             }
             gruppierungen[localRecord.gruppierung] = true;
+            localRecord.vid_references = groupReferences[localRecord.gruppierung];
 
             let useGroupAmount = !Ext.isEmpty(localRecord.gruppierung) &&
                 !Ext.isEmpty(localRecord.gruppenmenge) &&
