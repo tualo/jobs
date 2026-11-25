@@ -1,4 +1,29 @@
 Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
+    getSinglePricePrintPrecision: function (price, amount, net) {
+        if (!Number.isFinite(price) || !Number.isFinite(Number(amount)) || !Number.isFinite(Number(net))) {
+            throw new Error('Die Genauigkeit des Einzelpreises kann nicht ermittelt werden.');
+        }
+
+        if (Number(amount) === 0) return 2;
+
+        let targetCents = Math.round(Number(net) * 100);
+        if (!Number.isSafeInteger(targetCents)) {
+            throw new Error('Der Positionsbetrag ist für die Genauigkeitsprüfung zu groß.');
+        }
+        for (let precision = 2; precision <= 15; precision++) {
+            let displayedPrice = Number(price.toFixed(precision));
+            if (Math.round(displayedPrice * Number(amount) * 100) === targetCents) {
+                return precision;
+            }
+        }
+        throw new Error('Der Positionsbetrag kann mit bis zu 15 Nachkommastellen nicht dargestellt werden.');
+    },
+
+    hasSinglePricePrecisionLoss: function (price) {
+        let rounded = Number(price.toFixed(5));
+        return Math.abs(price - rounded) > Number.EPSILON * Math.abs(price) * 4;
+    },
+
     getReport: function (forSaving) {
         console.log('Report.getReport', forSaving);
         let me = this,
@@ -189,7 +214,12 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
                 localRecord.net = localRecord.ist_netto;
                 localRecord.amount = localRecord.amount;
                 localRecord.gross = localRecord.ist_brutto;
+                localRecord.singleprice = localRecord.amount == 0 ? 0 : localRecord.net / localRecord.amount;
             }
+
+            localRecord.singleprice_print_precision = me.getSinglePricePrintPrecision(
+                localRecord.singleprice, localRecord.amount, localRecord.net
+            );
 
             localRecord.taxvalue = localRecord.gross - localRecord.net;
             // gegenprüfung, sicherstellen dass taxvalue zum steuersatz passt

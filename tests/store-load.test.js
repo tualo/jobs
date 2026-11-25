@@ -9,6 +9,8 @@ function loadDefinition(file) {
     const Ext = {
         define: (name, value) => { definition = value; },
         isEmpty: value => value == null || value === '' || (Array.isArray(value) && value.length === 0),
+        isArray: Array.isArray,
+        String: { htmlEncode: value => String(value).replace(/</g, '&lt;') },
         data: { Model: { EDIT: 'edit' } },
         XTemplate: class {
             constructor(template) { this.template = template; }
@@ -139,6 +141,62 @@ test('rendering a selected template does not alter the position quantity', () =>
     templateData.calculateTemplate.call({ getViewModel: () => model, getView: () => ({}) });
     assert.equal(values.renderedTemplate, 'A: 8');
     assert.equal(row.get('anzahl'), 3);
+});
+
+test('combines the precision warning with server messages without blocking creation', () => {
+    const controller = loadDefinition('src/js/lazy/v2/controller/Panel.js');
+    const banner = {
+        setStyle: (name, value) => { banner.color = value; },
+        setHtml: value => { banner.html = value; },
+        show: () => { banner.visible = true; }
+    };
+    const result = { success: true, warnings: ['Serverwarnung'], errors: [], hasWarnings: true };
+    const context = {
+        canCreateReportResult: result,
+        hasPricePrecisionWarning: true,
+        getView: () => ({ getComponent: () => ({ getDockedComponent: () => banner }) })
+    };
+    controller.updateCanCreateReportBanner.call(context);
+    assert.equal(banner.color, '#ef6c00');
+    assert.match(banner.html, /Serverwarnung/);
+    assert.match(banner.html, /fünf Nachkommastellen/);
+    assert.deepEqual(result.warnings, ['Serverwarnung']);
+
+    context.hasPricePrecisionWarning = false;
+    result.warnings = [];
+    result.hasWarnings = false;
+    controller.updateCanCreateReportBanner.call(context);
+    assert.equal(banner.color, '#2e7d32');
+    assert.doesNotMatch(banner.html, /fünf Nachkommastellen/);
+
+    result.errors = ['Serverfehler'];
+    context.hasPricePrecisionWarning = true;
+    controller.updateCanCreateReportBanner.call(context);
+    assert.equal(banner.color, '#c62828');
+    assert.match(banner.html, /Serverfehler/);
+    assert.match(banner.html, /fünf Nachkommastellen/);
+});
+
+test('keeps the precision warning visible when the report check fails', async () => {
+    const controller = loadDefinition('src/js/lazy/v2/controller/Panel.js');
+    const banner = {
+        setStyle: (name, value) => { banner.color = value; },
+        setHtml: value => { banner.html = value; },
+        show: () => { banner.visible = true; }
+    };
+    const model = { get: () => '', set: (name, value) => { model[name] = value; } };
+    const context = {
+        ...controller,
+        hasPricePrecisionWarning: true,
+        getViewModel: () => model,
+        getView: () => ({ getComponent: () => ({ getDockedComponent: () => banner }) })
+    };
+
+    assert.equal(await controller.checkCanCreateReport.call(context), true);
+    assert.equal(model.canCreateReport, true);
+    assert.equal(banner.color, '#ef6c00');
+    assert.match(banner.html, /konnten nicht geprüft werden/);
+    assert.match(banner.html, /fünf Nachkommastellen/);
 });
 
 test('loads position templates and units before starting the positions store', async () => {

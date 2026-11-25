@@ -50,48 +50,57 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
     checkCanCreateReport: async function () {
         console.log('Panel.checkCanCreateReport');
         let me = this,
-            view = me.getView(),
-            model = me.getViewModel(),
-            banner = view.getComponent('previewOuterFrame').getDockedComponent('canCreateReportBanner');
+            model = me.getViewModel();
         try {
             let response = await fetch('./jobs/cancreatereport/' + model.get('reportType') + '/' + model.get('jobid'));
             let result = await response.json();
 
-            let warnings = Ext.isArray(result.warnings) ? result.warnings : [],
-                errors = Ext.isArray(result.errors) ? result.errors : [],
-                hasWarnings = (result.hasWarnings == true) || warnings.length > 0,
-                hasErrors = errors.length > 0,
-                success = result.success == true,
-                color = '#2e7d32',
-                icon = 'fa-solid fa-circle-check',
-                lines = [];
-
-            if (hasErrors) {
-                color = '#c62828';
-                icon = 'fa-solid fa-circle-exclamation';
-            } else if (hasWarnings) {
-                color = '#ef6c00';
-                icon = 'fa-solid fa-triangle-exclamation';
-            }
-
-            errors.forEach((msg) => lines.push(Ext.String.htmlEncode(msg)));
-            warnings.forEach((msg) => lines.push(Ext.String.htmlEncode(msg)));
-            if (lines.length === 0) {
-                lines.push(Ext.String.htmlEncode(result.msg || 'Der Beleg kann erstellt werden.'));
-            }
-
-            // success entscheidet, ob der Beleg erstellt werden darf – auch bei vorhandenen Fehlern
-            model.set('canCreateReport', success);
-            banner.setStyle('background-color', color);
-            banner.setHtml('<i class="' + icon + '"></i> ' + lines.join('<br>'));
-            banner.show();
-            return success;
+            me.canCreateReportResult = result;
+            model.set('canCreateReport', result.success == true);
+            me.updateCanCreateReportBanner();
+            return result.success == true;
         } catch (e) {
             console.error('Panel.checkCanCreateReport', e);
             model.set('canCreateReport', true);
-            banner.hide();
+            me.canCreateReportResult = {
+                success: true,
+                warnings: ['Die Voraussetzungen für die Belegerstellung konnten nicht geprüft werden.'],
+                errors: []
+            };
+            me.updateCanCreateReportBanner();
             return true;
         }
+    },
+
+    updateCanCreateReportBanner: function () {
+        let result = this.canCreateReportResult;
+        if (!result) return;
+
+        let banner = this.getView().getComponent('previewOuterFrame').getDockedComponent('canCreateReportBanner'),
+            warnings = Ext.isArray(result.warnings) ? result.warnings.slice() : [],
+            errors = Ext.isArray(result.errors) ? result.errors : [],
+            color = '#2e7d32',
+            icon = 'fa-solid fa-circle-check',
+            lines = [];
+
+        if (this.hasPricePrecisionWarning) {
+            warnings.push('Ein Einzelpreis kann mit fünf Nachkommastellen nicht exakt gespeichert werden. Beim Erstellen des Belegs geht Genauigkeit verloren.');
+        }
+        if (errors.length > 0) {
+            color = '#c62828';
+            icon = 'fa-solid fa-circle-exclamation';
+        } else if (result.hasWarnings == true || warnings.length > 0) {
+            color = '#ef6c00';
+            icon = 'fa-solid fa-triangle-exclamation';
+        }
+        errors.forEach((msg) => lines.push(Ext.String.htmlEncode(msg)));
+        warnings.forEach((msg) => lines.push(Ext.String.htmlEncode(msg)));
+        if (lines.length === 0) {
+            lines.push(Ext.String.htmlEncode(result.msg || 'Der Beleg kann erstellt werden.'));
+        }
+        banner.setStyle('background-color', color);
+        banner.setHtml('<i class="' + icon + '"></i> ' + lines.join('<br>'));
+        banner.show();
     },
 
     onChangeDocumentName: function (field, newValue, oldValue) {
@@ -306,6 +315,10 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
             let report = me.getReport();
             console.log('Rendering report:', report);
             if (report) {
+                me.hasPricePrecisionWarning = report.positions.some((position) =>
+                    me.hasSinglePricePrecisionLoss(position.singleprice)
+                );
+                me.updateCanCreateReportBanner();
                 //let oldScroll = me.getScrollPosition();
                 previewFrame.setData({ report: report });
                 //me.scrollPosition(oldScroll);

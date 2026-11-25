@@ -64,12 +64,43 @@ function report(records, forSaving) {
         tualo_job: { getRange: () => [record({ delivery_date: '2026-11-24' })] }
     };
     const model = { get: name => values[name], getStore: name => stores[name] };
-    return loadMixin('Report').getReport.call({
+    const reportMixin = loadMixin('Report');
+    return reportMixin.getReport.call({
+        ...reportMixin,
         getViewModel: () => model,
         getView: () => ({ getViewModel: () => model }),
         gruppenPreise() {}
     }, forSaving);
 }
+
+test('determines the minimum printed price precision and detects five-place loss', () => {
+    const mixin = loadMixin('Report');
+    const examples = [
+        [0.22, 20000, 4400, 2, false],
+        [0.22442, 20000, 4488.4, 5, false],
+        [4488.48 / 20000, 20000, 4488.48, 6, true],
+        [1 / 3, 3, 1, 3, true],
+        [0, 0, 0, 2, false],
+        [1e-16, 1, 0, 2, true]
+    ];
+    for (const [price, amount, net, precision, warning] of examples) {
+        assert.equal(mixin.getSinglePricePrintPrecision(price, amount, net), precision);
+        assert.equal(mixin.hasSinglePricePrecisionLoss(price), warning);
+    }
+    assert.throws(() => mixin.getSinglePricePrintPrecision(NaN, 1, 1), /Genauigkeit/);
+});
+
+test('exports and saves the grouped position print precision', () => {
+    const row = record({
+        use_in_offer: 1, gruppierung: 'group', gruppenmenge: 20000,
+        anzahl: 20000, gruppenpreis_netto: 4488.48, steuersatz: 0
+    });
+    for (const saving of [false, true]) {
+        const position = report([row], saving).positions[0];
+        assert.equal(position.singleprice_print_precision, 6);
+        assert.equal(position.net, 4488.48);
+    }
+});
 
 test('includes all selected calculation references for each report position', () => {
     const makeRow = (id, group, useInOffer = 1) => record({
