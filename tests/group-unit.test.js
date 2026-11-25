@@ -28,10 +28,12 @@ function record(data) {
     };
 }
 
-function group(records, aggregation, mixedGrouping = true) {
+function group(records, aggregation, mixedGrouping = true, selectedMenge) {
     const values = {
         selectedAggregation: aggregation,
-        selectedMenge: aggregation === 'one' ? 1 : 5,
+        selectedMenge: selectedMenge === undefined
+            ? (aggregation === 'one' ? 1 : aggregation === 'first' ? records[0].get('anzahl') : 5)
+            : selectedMenge,
         renderedTemplate: '',
         mixedGrouping
     };
@@ -202,13 +204,26 @@ test('ungrouping clears the unit override on all selected positions', () => {
     assert.deepEqual(rows.map(row => row.get('einheit')), [3, 4]);
 });
 
-function selectRows(rows, selection) {
+function selectRows(rows, selection, aggregation = 'sum', templates = []) {
     const operations = loadMixin('GridOperations');
-    const values = { selectedAggregation: 'sum', reportType: 'angebot' };
+    const values = { selectedAggregation: aggregation, reportType: 'angebot' };
+    const store = {
+        each: fn => rows.forEach(fn),
+        indexOf: record => rows.indexOf(record)
+    };
     const model = {
         get: name => values[name],
         set: (name, value) => { values[name] = value; },
-        getStore: () => ({ each: fn => rows.forEach(fn) })
+        getStore: name => name === 'templates'
+            ? {
+                findRecord: (field, value, start, anyMatch, caseSensitive, exactMatch) => {
+                    assert.equal(anyMatch, false);
+                    assert.equal(caseSensitive, true);
+                    assert.equal(exactMatch, true);
+                    return templates.find(template => template.get(field) === value) || null;
+                }
+            }
+            : store
     };
     const grid = { getSelectionModel: () => ({ getSelection: () => selection }) };
     const context = {
@@ -220,6 +235,25 @@ function selectRows(rows, selection) {
     operations.onSelectionchange.call(context, null, selection);
     return { values, context };
 }
+
+test('selects the exact template name for the selected position', () => {
+    const row = record({ kurztext: 'Artikel A', anzahl: 3, netto: 10 });
+    const templates = [
+        record({ id: 1, name: 'Artikel' }),
+        record({ id: 2, name: 'artikel a' }),
+        record({ id: 3, name: 'Artikel A' })
+    ];
+    const { values, context } = selectRows([row], [row], 'sum', templates);
+    assert.equal(values.selectedTemplate, 3);
+
+    values.selectedTemplate = 9;
+    row.set('kurztext', 'Unbekannt');
+    context.onSelectionchange(null, [row]);
+    assert.equal(values.selectedTemplate, 9);
+    row.set('kurztext', '');
+    context.onSelectionchange(null, [row]);
+    assert.equal(values.selectedTemplate, 9);
+});
 
 test('restores a saved group function and quantity after reload', () => {
     const rows = [1, 2].map(id => record({
@@ -249,7 +283,7 @@ test('restores the saved quantity when only part of a group is selected', () => 
 });
 
 test('restores each saved calculation mode', () => {
-    for (const aggregation of ['sum', 'min', 'max', 'tmax', 'one']) {
+    for (const aggregation of ['sum', 'min', 'max', 'tmax', 'one', 'first']) {
         const rows = [1, 2].map(id => record({
             id, use_in_offer: 1, anzahl: id + 2, netto: 10
         }));
@@ -257,8 +291,32 @@ test('restores each saved calculation mode', () => {
         const loaded = rows.map(row => record(JSON.parse(JSON.stringify(row.data))));
         const { values } = selectRows(loaded, loaded);
         assert.equal(values.selectedAggregation, aggregation);
-        assert.equal(values.selectedMenge, aggregation === 'one' ? 1 : 5);
+        assert.equal(values.selectedMenge, aggregation === 'one' ? 1 : aggregation === 'first' ? 3 : 5);
     }
+});
+
+test('first aggregation uses the first position quantity in grouped report output', () => {
+    const rows = [
+        record({
+            id: 1, position: 0, use_in_offer: 1, anzahl: 4, epreis: 10,
+            netto: 40, gruppenpreis_netto: 130, steuersatz: 0
+        }),
+        record({
+            id: 2, position: 1, use_in_offer: 1, anzahl: 9, epreis: 10,
+            netto: 90, gruppenpreis_netto: 130, steuersatz: 0
+        })
+    ];
+    const { values } = selectRows(rows, [rows[1], rows[0]], 'first');
+
+    assert.equal(values.selectedMenge, 4);
+
+    group(rows, 'first', true, values.selectedMenge);
+    assert.deepEqual(rows.map(row => row.get('gruppenmenge')), [4, 4]);
+    assert.deepEqual(rows.map(row => row.get('gruppenfunktion')), ['first', 'first']);
+
+    const position = report(rows, true).positions[0];
+    assert.equal(position.amount, 4);
+    assert.equal(position.anzahl, 4);
 });
 
 test('recognizes legacy package groups and leaves mixed selections unchanged', () => {

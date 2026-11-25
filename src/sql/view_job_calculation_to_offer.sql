@@ -1,6 +1,7 @@
 DELIMITER;
+CREATE OR REPLACE VIEW `view_job_calculation_to_report` AS 
 
-CREATE OR REPLACE VIEW `view_job_calculation_to_report` AS with t as (
+with t as (
     select
         'angebot' AS `reporttype`
     union
@@ -80,6 +81,8 @@ pos as (
         `p`.`gruppenpreis_netto` AS `gruppenpreis_netto`,
         `p`.`gruppenpreis_brutto` AS `gruppenpreis_brutto`,
         `p`.`gruppenmenge` AS `gruppenmenge`,
+        `p`.`gruppeneinheit` AS `gruppeneinheit`,
+        `p`.`gruppenfunktion` AS `gruppenfunktion`,
         `p`.`xzusatz` AS `xzusatz`,
         `p`.`xid` AS `xid`,
         `p`.`approved` AS `approved`,
@@ -95,12 +98,11 @@ pos as (
             `t`
             join `blg_pos_calculation` `p` on(
                 (
-                    `p`.`zid` is null
-                    or `p`.`zid` = 0
-                )
-                and (
-                    `p`.`oid` is null
-                    or `p`.`oid` = 0
+                    if (`t`.`reporttype` = 'rechnung', `p`.`zid` is null or `p`.`zid` = 0, 
+                        if (`t`.`reporttype` = 'angebot', `p`.`oid` is null or `p`.`oid` = 0, false)
+                    )
+               
+                    
                 )
             )
         )
@@ -112,6 +114,7 @@ a as (
         `h`.`approved` AS `approved`,
         `j`.`id` AS `jobid`,
         `g`.`langtext` AS `langtext`,
+        `g`.`kurztext` AS `kurztext`,
         `j`.`job_number` AS `job_number`,
         `h`.`document_name` AS `document_name`,
         `r`.`name` AS `reporting_type`,
@@ -129,18 +132,18 @@ a as (
             `p`.`use_real_amount` = 1
             and `p`.`reporttype` = 'rechnung',
             `p`.`epreis` * `p`.`ist_anzahl`,
-            `p`.`epreis` * `p`.`anzahl`
+            `p`.`epreis` * `p`.`ist_anzahl`
         ) AS `ist_netto`,
         `p`.`reporttype` AS `reporttype`,
         if(
             `p`.`use_real_amount` = 1
             and `p`.`reporttype` = 'rechnung',
-            `p`.`epreis` * `p`.`ist_anzahl` * (1 + `p`.`steuer` / 100),
-            `p`.`epreis` * `p`.`anzahl` * (1 + `p`.`steuer` / 100)
+            `p`.`epreis` * `p`.`ist_anzahl` * (1 + `p`.`steuersatz` / 100),
+            `p`.`epreis` * `p`.`ist_anzahl` * (1 + `p`.`steuersatz` / 100)
         ) AS `ist_brutto`,
         `p`.`epreis` AS `epreis`,
-        `p`.`steuer` AS `steuer`,
-        `p`.`brutto` AS `brutto`,
+        `p`.`netto` * `p`.`steuersatz` / 100 AS `steuer`,
+        `p`.`netto` * (1 + `p`.`steuersatz` / 100) AS `brutto`,
         `p`.`bemerkung` AS `bemerkung`,
         `p`.`pos` AS `pos`,
         `p`.`pos` AS `position`,
@@ -149,9 +152,18 @@ a as (
         `p`.`leistungsbeschreibung` AS `leistungsbeschreibung`,
         `p`.`pos_text` AS `pos_text`,
         `p`.`gruppenmenge` AS `gruppenmenge`,
+        `p`.`gruppeneinheit` AS `gruppeneinheit`,
+        `p`.`gruppenfunktion` AS `gruppenfunktion`,
         `p`.`angebot_title` AS `angebot_title`,
         `p`.`rechnung_title` AS `rechnung_title`,
-        `p`.`teilueberschrift` AS `teilueberschrift`
+        `p`.`teilueberschrift` AS `teilueberschrift`,
+        `p`.`gruppenpreis_netto` AS `gruppenpreis_netto`,
+        `p`.`gruppenpreis_brutto` AS `gruppenpreis_brutto`,
+        `h`.`zeitraum_von` AS `zeitraum_von`,
+        `h`.`zeitraum_bis` AS `zeitraum_bis`,
+        `p`.`einheit` AS `einheit`,
+        `p`.`einheit_symbol` AS `einheit_symbol`,
+        `p`.`einheit_faktor` AS `einheit_faktor`
     from
         (
             (
@@ -182,14 +194,24 @@ select
     `a`.`approved` AS `approved`,
     `a`.`jobid` AS `jobid`,
     `a`.`langtext` AS `langtext`,
+    `a`.`kurztext` AS `kurztext`,
     `a`.`job_number` AS `job_number`,
     `a`.`document_name` AS `calculation_name`,
-    if (`a`.`reporttype`='angebot', `a`.`angebot_title`, `a`.`rechnung_title`) AS `document_name`,
+    if(
+        `a`.`reporttype` = 'angebot',
+        `a`.`angebot_title`,
+        `a`.`rechnung_title`
+    ) AS `document_name`,
     `a`.`reporting_type` AS `reporting_type`,
     `a`.`warengruppe` AS `warengruppe`,
     `a`.`use_in_offer` AS `use_in_offer`,
     `a`.`beleg` AS `beleg`,
-    `a`.`gruppierung` AS `gruppierung`,
+    if(
+        `a`.`gruppierung` is null
+        or `a`.`gruppierung` = '',
+        cast(round(rand() * 10000, 0) as unsigned),
+        `a`.`gruppierung`
+    ) AS `gruppierung`,
     `a`.`artikel` AS `artikel`,
     `a`.`anzahl` AS `anzahl`,
     `a`.`ist_anzahl` AS `ist_anzahl`,
@@ -204,28 +226,67 @@ select
     `a`.`brutto` AS `brutto`,
     `a`.`bemerkung` AS `bemerkung`,
     `a`.`pos` AS `pos`,
-    `a`.`position` AS `position`,
+    `a`.`pos` AS `position`,
     `a`.`steuersatz` AS `steuersatz`,
     `a`.`id` AS `id`,
     `a`.`leistungsbeschreibung` AS `leistungsbeschreibung`,
     `a`.`pos_text` AS `pos_text`,
-    `a`.`gruppenmenge` AS `gruppenmenge`,
+    ifnull(`a`.`gruppenmenge`, 0) AS `gruppenmenge`,
+    `a`.`gruppeneinheit` AS `gruppeneinheit`,
+    `a`.`gruppenfunktion` AS `gruppenfunktion`,
     `a`.`angebot_title` AS `angebot_title`,
     `a`.`rechnung_title` AS `rechnung_title`,
     `a`.`teilueberschrift` AS `teilueberschrift`,
+    `a`.`einheit` AS `einheit`,
+    `a`.`einheit_symbol` AS `einheit_symbol`,
+    `a`.`einheit_faktor` AS `einheit_faktor`,
     if(
-        `a`.`gruppierung` is null,
-        `a`.`ist_netto`,
-        sum(`a`.`ist_netto`) over (partition by `a`.`beleg`, `a`.`gruppierung`)
+        `a`.`reporttype` = 'angebot',
+        if(
+            `a`.`gruppierung` is null,
+            `a`.`netto`,
+            sum(`a`.`netto`) over (
+                partition by `a`.`reporttype`,
+                `a`.`beleg`,
+                `a`.`gruppierung`
+            )
+        ),
+        if(
+            `a`.`gruppierung` is null,
+            `a`.`ist_netto`,
+            sum(`a`.`ist_netto`) over (
+                partition by `a`.`reporttype`,
+                `a`.`beleg`,
+                `a`.`gruppierung`
+            )
+        )
     ) AS `gruppenpreis_netto`,
     if(
-        `a`.`gruppierung` is null,
-        `a`.`ist_brutto`,
-        sum(`a`.`ist_brutto`) over (partition by `a`.`beleg`, `a`.`gruppierung`)
-    ) AS `gruppenpreis_brutto`
+        `a`.`reporttype` = 'angebot',
+        if(
+            `a`.`gruppierung` is null,
+            `a`.`brutto`,
+            sum(`a`.`brutto`) over (
+                partition by `a`.`reporttype`,
+                `a`.`beleg`,
+                `a`.`gruppierung`
+            )
+        ),
+        if(
+            `a`.`gruppierung` is null,
+            `a`.`ist_brutto`,
+            sum(`a`.`ist_brutto`) over (
+                partition by `a`.`reporttype`,
+                `a`.`beleg`,
+                `a`.`gruppierung`
+            )
+        )
+    ) AS `gruppenpreis_brutto`,
+    `a`.`zeitraum_von` AS `zeitraum_von`,
+    `a`.`zeitraum_bis` AS `zeitraum_bis`
 from
-    `a`
-    ;
+    `a`;
+    
 
 SET FOREIGN_KEY_CHECKS=0;
 INSERT INTO `ds` (`allowform`,`autosave`,`base_store_class`,`class_name`,`combined`,`default_pagesize`,`displayfield`,`existsreal`,`globalsearch`,`listselectionmodel`,`listviewbaseclass`,`modelbaseclass`,`phpexporter`,`phpexporterfilename`,`reorderfield`,`searchany`,`searchfield`,`showactionbtn`,`sortdirection`,`sortfield`,`syncable`,`table_name`,`title`,`use_history`,`use_insert_for_update`,`writetable`) VALUES ('1','0','Tualo.DataSets.data.Store','ProAd-Tualo-Ersatz','0','1000','jobid','1','0','cellmodel','Tualo.DataSets.ListView','Tualo.DataSets.model.Basic','XlsxWriter','view_job_calculation_to_report {DATE} {TIME}','position','0','jobid','1','ASC','position','0','view_job_calculation_to_report','Kalkulation zu Angebot','0','0','blg_pos_calculation') ON DUPLICATE KEY UPDATE `allowform`=values(`allowform`),`autosave`=values(`autosave`),`base_store_class`=values(`base_store_class`),`class_name`=values(`class_name`),`combined`=values(`combined`),`default_pagesize`=values(`default_pagesize`),`displayfield`=values(`displayfield`),`existsreal`=values(`existsreal`),`globalsearch`=values(`globalsearch`),`listselectionmodel`=values(`listselectionmodel`),`listviewbaseclass`=values(`listviewbaseclass`),`modelbaseclass`=values(`modelbaseclass`),`phpexporter`=values(`phpexporter`),`phpexporterfilename`=values(`phpexporterfilename`),`reorderfield`=values(`reorderfield`),`searchany`=values(`searchany`),`searchfield`=values(`searchfield`),`showactionbtn`=values(`showactionbtn`),`sortdirection`=values(`sortdirection`),`sortfield`=values(`sortfield`),`syncable`=values(`syncable`),`table_name`=values(`table_name`),`title`=values(`title`),`use_history`=values(`use_history`),`use_insert_for_update`=values(`use_insert_for_update`),`writetable`=values(`writetable`); 

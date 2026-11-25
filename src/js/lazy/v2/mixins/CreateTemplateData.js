@@ -13,7 +13,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.CreateTemplateData', {
 
             let tpl = new Ext.XTemplate(templateRecord.get('template'));
 
-            let object = record.data;
+            let object = { ...record.data };
             object.anzahl = model.get('selectedMenge');
 
             model.set('renderedTemplate', tpl.apply(object))

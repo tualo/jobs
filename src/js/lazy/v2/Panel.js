@@ -178,6 +178,7 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
                                     fieldLabel: 'Template',
                                     xtype: 'combobox_blg_config_position_templates_id',
                                     bind: {
+                                        store: '{templates}',
                                         value: '{selectedTemplate}'
                                     },
                                     listeners: {
@@ -201,7 +202,8 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
                                             { "id": "min", "name": "Minimum" },
                                             { "id": "max", "name": "Maximum" },
                                             { "id": "tmax", "name": "T.Max." },
-                                            { "id": "one", "name": "Paket" }
+                                            { "id": "one", "name": "Paket" },
+                                            { "id": "first", "name": "erste Position" }
                                         ]
                                     },
                                     queryMode: 'local',
@@ -218,6 +220,7 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
                                 {
                                     fieldLabel: 'Menge',
                                     xtype: 'numberfield',
+                                    editable: false,
                                     bind: {
                                         value: '{selectedMenge}'
                                     }

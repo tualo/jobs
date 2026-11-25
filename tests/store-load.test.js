@@ -126,6 +126,21 @@ test('activation uses the same description fallback as loading', () => {
     }
 });
 
+test('rendering a selected template does not alter the position quantity', () => {
+    const templateData = loadDefinition('src/js/lazy/v2/mixins/CreateTemplateData.js');
+    const row = record({ anzahl: 3, artikel: 'A' });
+    const values = { selectedTemplate: 'a', selectedRecord: row, selectedMenge: 8 };
+    const model = {
+        get: name => values[name],
+        set: (name, value) => { values[name] = value; },
+        getStore: () => ({ findRecord: () => record({ template: '{artikel}: {anzahl}' }) })
+    };
+
+    templateData.calculateTemplate.call({ getViewModel: () => model, getView: () => ({}) });
+    assert.equal(values.renderedTemplate, 'A: 8');
+    assert.equal(row.get('anzahl'), 3);
+});
+
 test('loads position templates and units before starting the positions store', async () => {
     const controller = loadDefinition('src/js/lazy/v2/controller/Panel.js');
     const stores = {};

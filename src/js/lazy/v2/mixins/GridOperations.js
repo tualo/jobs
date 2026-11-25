@@ -54,7 +54,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.GridOperations', {
             aggregation = getAggregation(first);
 
         if (Ext.isEmpty(group) || group == 0 || Ext.isEmpty(amount) ||
-            !['sum', 'min', 'max', 'tmax', 'one'].includes(aggregation)) {
+            !['sum', 'min', 'max', 'tmax', 'one', 'first'].includes(aggregation)) {
             return null;
         }
         if (!records.every((record) =>
@@ -66,6 +66,23 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.GridOperations', {
         }
         return { aggregation: aggregation, amount: amount };
     },
+    getFirstPositionRecord: function (records) {
+        if (records.length === 0) return null;
+
+        let store = this.getViewModel().getStore('data'),
+            firstRecord = records[0],
+            firstIndex = store.indexOf(firstRecord);
+
+        records.slice(1).forEach((record) => {
+            let index = store.indexOf(record);
+            if (index !== -1 && (firstIndex === -1 || index < firstIndex)) {
+                firstRecord = record;
+                firstIndex = index;
+            }
+        });
+
+        return firstRecord;
+    },
 
     onSelectionchange: function (view, records) {
         console.log('Panel.onSelectionchange');
@@ -75,6 +92,18 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.GridOperations', {
         model.set('selectedRows', records.length);
         if (records.length > 0) {
             model.set('selectedRecord', records[0]);
+            let kurztext = records[0].get('kurztext');
+            if (!Ext.isEmpty(kurztext)) {
+                let template = model.getStore('templates').findRecord('name', kurztext, 0, false, true, true);
+                if (template) {
+                    model.set('selectedTemplate', template.get('id'));
+                } else {
+                    template = model.getStore('templates').findRecord('name', 'default', 0, false, true, true);
+                    if (template) {
+                        model.set('selectedTemplate', template.get('id'));
+                    }
+                }
+            }
         }
         let groupSettings = this.getSelectedGroupSettings(records);
         if (groupSettings) {
@@ -161,6 +190,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.GridOperations', {
                 aggregation = model.get('selectedAggregation'),
                 grid = view.getComponent('westPanel').getComponent('calculationGrid'),
                 records = grid.getSelectionModel().getSelection(),
+                firstPositionRecord = this.getFirstPositionRecord(records),
                 total_amount = 0,
                 epreis = 0,
                 selectedSum = 0,
@@ -220,25 +250,27 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.GridOperations', {
             let groupSettings = this.getSelectedGroupSettings(records);
             model.set('selectedMenge',
                 groupSettings && groupSettings.aggregation === aggregation ? groupSettings.amount :
-                records.reduce((acc, current) => {
-                    console.log('Panel.updateSelectionData.records.reduce');
-                    console.log('aggregation', aggregation, acc, current);
-                    switch (aggregation) {
-                        case "zero":
-                            return 0;
-                        case "one":
-                            return 1;
-                        case "min":
-                            return Math.min(acc, current.get('anzahl'));
-                        case "max":
-                            return Math.max(acc, current.get('anzahl'));
-                        case "tmax":
-                            return Math.round(Math.max(acc, current.get('anzahl')) / 1000) * 1000;
-                        default:
-                            return acc + current.get('anzahl');
-                    }
+                    records.reduce((acc, current) => {
+                        console.log('Panel.updateSelectionData.records.reduce');
+                        console.log('aggregation', aggregation, acc, current);
+                        switch (aggregation) {
+                            case "zero":
+                                return 0;
+                            case "one":
+                                return 1;
+                            case "first":
+                                return current === firstPositionRecord ? current.get('anzahl') : acc;
+                            case "min":
+                                return Math.min(acc, current.get('anzahl'));
+                            case "max":
+                                return Math.max(acc, current.get('anzahl'));
+                            case "tmax":
+                                return Math.round(Math.max(acc, current.get('anzahl')) / 1000) * 1000;
+                            default:
+                                return acc + current.get('anzahl');
+                        }
 
-                }, initialValue)
+                    }, initialValue)
             );
 
             this.calculateTemplate();

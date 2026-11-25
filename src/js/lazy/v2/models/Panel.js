@@ -29,7 +29,8 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
         mixedGrouping: false,
         mixedHeadline: false,
         kostenstelle: 0,
-        modifiedRows: 0
+        modifiedRows: 0,
+        gridSelection: null
     },
     formulas: {
         name: function (get) {

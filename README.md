@@ -24,3 +24,17 @@ mit den Spalten `gruppeneinheit` und `gruppenfunktion` und ihren
 DS-Metadaten. Anschliessend muessen gegebenenfalls die generierten
 DS-Modelle neu geladen werden.
 
+## IDs für Kalkulationspositionen
+
+Nach Ausführung von [calculation_position_id.sql](src/sql/calculation_position_id.sql)
+verwendet DSX für neue Positionen ohne ID `getNewCalculationPositionID()`.
+Die IDs liegen zwischen 1.000.000.000 und 1.999.999.999 und sind als
+JavaScript-Zahlen exakt darstellbar. Die letzten drei Stellen sind eine
+pseudozufällige Permutation, nicht kryptografisch zufällig.
+
+Beim ersten Einrichten muss das Anlegen von Kalkulationspositionen pausieren;
+die Sequenz startet hinter dem Tausenderblock der höchsten vorhandenen ID
+in diesem Bereich. Sequenz und Seed müssen gemeinsam erhalten und gesichert
+werden. IDs außerhalb des Generators müssen weiterhin durch den Primärschlüssel
+geschützt sein. Nach Erschöpfung des Bereichs meldet MariaDB einen Fehler.
+
