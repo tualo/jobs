@@ -83,6 +83,15 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.StoreLoad', {
             : null;
     },
 
+    getPositionTemplateByRecord: function (record) {
+        let model = this.getViewModel(),
+            template = model.getStore('templates').findRecord('id', record.get('kurztext'), 0, false, true, true);
+
+        return template && !Ext.isEmpty(template.get('template'))
+            ? new Ext.XTemplate(template.get('template'))
+            : null;
+    },
+
     setDefaultPositionDescription: function (record, template) {
         if (!Ext.isEmpty(record.get('leistungsbeschreibung'))) return false;
 
