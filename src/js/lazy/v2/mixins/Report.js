@@ -309,7 +309,9 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
                 tax: entry.tax,
                 steuersatz: entry.tax,
                 zuschlag: 0,
-                pos_text: positions.length + 1
+                pos_text: positions.length + 1,
+                pos: 999999,
+                position: 999999
             };
             zuschlagRecord.taxvalue = Math.round(net * entry.tax) / 100;
             zuschlagRecord.gross = zuschlagRecord.net + zuschlagRecord.taxvalue;
