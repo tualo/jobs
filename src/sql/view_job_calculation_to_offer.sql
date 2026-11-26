@@ -1,4 +1,5 @@
 DELIMITER;
+
 CREATE OR REPLACE VIEW `view_job_calculation_to_report` AS 
 
 with t as (
@@ -163,6 +164,7 @@ a as (
         `h`.`zeitraum_bis` AS `zeitraum_bis`,
         `p`.`einheit` AS `einheit`,        
         `p`.`zuschlag` AS `zuschlag`,
+        `p`.`konto` AS `konto`,
 
         `p`.`einheit_symbol` AS `einheit_symbol`,
         `p`.`einheit_faktor` AS `einheit_faktor`
@@ -240,6 +242,9 @@ select
     `a`.`rechnung_title` AS `rechnung_title`,
     `a`.`teilueberschrift` AS `teilueberschrift`,
     `a`.`zuschlag` AS `zuschlag`,
+    `a`.`konto` AS `konto`,
+    `a`.`konto` AS `account`,
+    
     `a`.`einheit` AS `einheit`,
     `a`.`einheit_symbol` AS `einheit_symbol`,
     `a`.`einheit_faktor` AS `einheit_faktor`,

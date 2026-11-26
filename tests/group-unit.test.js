@@ -13,7 +13,10 @@ function loadMixin(name) {
             toast() {},
             util: { Format: { date: () => '2026-11-24' } }
         },
-        Tualo: { tualojs: { Format: { Renderer: { euroRenderer: value => String(value) } } } },
+        Tualo: { tualojs: { Format: { Renderer: {
+            euroRenderer: value => String(value),
+            fullPercentRenderer: value => String(value) + '%'
+        } } } },
         console: { log() {}, warn() {} },
         setTimeout: fn => fn()
     });
@@ -100,6 +103,39 @@ test('exports and saves the grouped position print precision', () => {
         assert.equal(position.singleprice_print_precision, 6);
         assert.equal(position.net, 4488.48);
     }
+});
+
+test('exports discounts and surcharges as separate package groups per tax rate', () => {
+    const rows = [
+        record({
+            id: 1, use_in_offer: 1, gruppierung: 'first', gruppenmenge: 2,
+            anzahl: 2, epreis: 50, gruppenpreis_netto: 100, steuersatz: 19, zuschlag: -20
+        }),
+        record({
+            id: 2, use_in_offer: 1, gruppierung: 'second', gruppenmenge: 2,
+            anzahl: 2, epreis: 100, gruppenpreis_netto: 200, steuersatz: 7, zuschlag: 10
+        })
+    ];
+
+    for (const saving of [false, true]) {
+        const positions = report(rows, saving).positions;
+        assert.equal(positions.length, 4);
+        assert.equal(new Set(positions.map(position => position.gruppierung)).size, 4);
+        for (const position of positions.slice(2)) {
+            assert.equal(position.gruppenmenge, 1);
+            assert.equal(position.gruppeneinheit, 7);
+            assert.equal(position.gruppenfunktion, 'one');
+            assert.equal(position.gruppenpreis_netto, position.net);
+            assert.equal(position.gruppenpreis_brutto, position.gross);
+            assert.equal(position.amount, 1);
+            assert.equal(position.unit, 7);
+            assert.equal(position.singleprice, position.net);
+            assert.equal(position.net, position.tax === 19 ? -20 : 20);
+            assert.equal(position.gross, position.tax === 19 ? -23.8 : 21.4);
+        }
+    }
+    assert.equal(rows[0].get('gruppenmenge'), 2);
+    assert.equal(rows[1].get('gruppenmenge'), 2);
 });
 
 test('includes all selected calculation references for each report position', () => {

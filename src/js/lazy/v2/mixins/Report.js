@@ -288,11 +288,17 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
                 use_in_offer: 1,
                 artikel: entry.firstRecord.artikel,
                 konto: entry.firstRecord.konto,
+                account: entry.firstRecord.account,
                 leistungsbeschreibung: label,
                 bemerkung: '',
                 zusatztext: '',
                 anzahl: 1,
                 amount: 1,
+                gruppierung: (new Date()).getTime() + positions.length,
+                gruppenmenge: 1,
+                gruppeneinheit: 7,
+                gruppenfunktion: 'one',
+                gruppenpreis_netto: net,
                 einheit: 7,
                 unit: 7,
                 einheit_symbol: unit.get('symbol'),
@@ -307,6 +313,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
             };
             zuschlagRecord.taxvalue = Math.round(net * entry.tax) / 100;
             zuschlagRecord.gross = zuschlagRecord.net + zuschlagRecord.taxvalue;
+            zuschlagRecord.gruppenpreis_brutto = zuschlagRecord.gross;
             zuschlagRecord.singleprice_print_precision = me.getSinglePricePrintPrecision(
                 zuschlagRecord.singleprice, zuschlagRecord.amount, zuschlagRecord.net
             );
