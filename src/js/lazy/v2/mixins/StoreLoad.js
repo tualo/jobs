@@ -86,7 +86,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.StoreLoad', {
     getPositionTemplateByRecord: function (record) {
         let model = this.getViewModel(),
             templateStore = model.getStore('templates'),
-            template = templateStore.findRecord('id', record.get('kurztext'), 0, false, true, true);
+            template = templateStore.findRecord('name', record.get('kurztext'), 0, false, true, true);
         console.log('Panel.getPositionTemplateByRecord', template, record);
         return template && !Ext.isEmpty(template.get('template'))
             ? new Ext.XTemplate(template.get('template'))
