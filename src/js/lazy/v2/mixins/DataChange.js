@@ -3,6 +3,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.DataChange', {
         if (operation === Ext.data.Model.EDIT && modifiedFieldNames &&
             modifiedFieldNames.includes('use_in_offer') && record.get('use_in_offer') == 1 &&
             Ext.isEmpty(record.get('leistungsbeschreibung'))) {
+            console.log('onDataUpdate', 'Setting default position description for record:', record);
             this.setDefaultPositionDescription(record, this.getPositionTemplate());
         }
     },
