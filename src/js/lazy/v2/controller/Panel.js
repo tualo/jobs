@@ -353,9 +353,32 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
 
         console.log('fetchInformation', 'Fetching information');
         await me.canSaveReport();
+
+        await me.loadStore(model.getStore('blg_config'));
+
+        if (!model.get('blgConfig')) {
+            Ext.Msg.alert('Error', 'Die Belegart konnte nicht geladen werden');
+            view.setDisabled(true);
+            return;
+        }
+        if (model.get('blgConfig').get('adress_bezug') != 'adressen') {
+            // Empfänger über den Beleg-Bezug erfragen, z. B. view_editor_relation_rechnung
+            let empfaenger = await me.promptEmpfaenger(model.get('blgConfig').get('tabellenzusatz'));
+            if (!empfaenger) {
+                view.setDisabled(true);
+                return;
+            }
+            console.log('Selected empfaenger:', empfaenger);
+            console.log('Empfaenger address:', empfaenger.get('address'));
+            model.set('empfaenger', empfaenger);
+            model.set('address', empfaenger.get('address'));
+        }
+
         await me.loadStore(model.getStore('tualo_job'));
 
-        await me.queryAddress();
+        if (model.get('blgConfig').get('adress_bezug') == 'adressen') {
+            await me.queryAddress();
+        }
         await me.queryReportTemplate();
         await Promise.all([
             /*
@@ -369,6 +392,7 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
             me.loadStore(model.getStore('briefanreden')),
             me.loadStore(model.getStore('tualo_job_offer_text')),
             me.loadStore(model.getStore('tualo_job_invoice_text')),
+            me.loadStore(model.getStore('tualo_job_report_text')),
             me.loadStore(model.getStore('tualo_job_text_templates')),
             Promise.all([
                 me.loadStore(model.getStore('templates')),
@@ -426,6 +450,67 @@ Ext.define('Tualo.jobs.lazy.v2.controller.Panel', {
             });
             return false;
         }
+    },
+    promptEmpfaenger: function (tabellenzusatz) {
+        return new Promise((resolve) => {
+            let resolved = false,
+                finish = (value) => {
+                    if (!resolved) {
+                        resolved = true;
+                        resolve(value);
+                    }
+                },
+                win = Ext.create('Ext.window.Window', {
+                    title: 'Empfänger wählen',
+                    modal: true,
+                    width: 480,
+                    layout: 'fit',
+                    items: [{
+                        xtype: 'panel',
+                        bodyPadding: 15,
+                        layout: 'anchor',
+                        items: [{
+                            xtype: 'component',
+                            anchor: '100%',
+                            style: 'margin-bottom: 10px;',
+                            html: 'Die Belegart hat keinen Adressbezug zu &quot;adressen&quot;. '
+                                + 'Bitte wählen Sie den Empfänger über den Beleg-Bezug aus.'
+                        }, {
+                            xtype: 'combobox_view_editor_relation_' + tabellenzusatz + '_id',
+                            itemId: 'empfaengerCombo',
+                            fieldLabel: 'Empfänger',
+                            anchor: '100%'
+                        }]
+                    }],
+                    buttons: ['->', {
+                        text: 'Abbrechen',
+                        handler: function () {
+                            win.close();
+                        }
+                    }, {
+                            text: 'Übernehmen',
+                            iconCls: 'fa fa-check',
+                            handler: function () {
+                                let combo = win.down('#empfaengerCombo'),
+                                    record = combo.getSelection();
+                                if (!record) {
+                                    combo.markInvalid('Bitte wählen Sie einen Empfänger aus.');
+                                    return;
+                                }
+                                console.log('Selected empfaenger:', record);
+                                console.log('Selected empfaenger address:', record.get('__address'));
+                                finish(record);
+                                win.close();
+                            }
+                        }],
+                    listeners: {
+                        close: function () {
+                            finish(null);
+                        }
+                    }
+                });
+            win.show();
+        });
     },
     queryAddress: async function () {
         let me = this,

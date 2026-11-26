@@ -8,7 +8,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.TemplateMenu', {
                 .getComponent('previewOuterFrame')
                 .getComponent('previewFrame'),
             iframeDocument = previewFrame.getStageDocument(),
-            texts = model.get('reportType') == 'angebot' ? model.getStore('tualo_job_offer_text') : model.getStore('tualo_job_invoice_text'),
+            texts = me.getTextStore(),
             texte = texts.getRange(),
             filtered = texte.filter(rec => record.get('placement') == rec.get('placement')),
             maxPosition = texte.reduce((max, rec) => record.get('placement') == rec.get('placement') ? Math.max(max, rec.get('pos') || 0) : max, 0);

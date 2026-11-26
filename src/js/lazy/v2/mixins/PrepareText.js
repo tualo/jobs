@@ -4,7 +4,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.PrepareText', {
         let me = this,
             view = me.getView(),
             model = me.getViewModel(),
-            store = model.get('reportType') == 'angebot' ? model.getStore('tualo_job_offer_text') : model.getStore('tualo_job_invoice_text'),
+            store = me.getTextStore(),
             job = model.get('job'),
             records = store.getRange(),
             i = 0,

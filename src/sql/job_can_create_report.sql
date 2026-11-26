@@ -8,6 +8,19 @@ begin
         set v_result = json_object('success', true, 'msg', 'Kann erstellt werden', 'hasWarnings', false, 'warnings', json_array(),'errors', json_array());
     end if;
 
+    if p_type = 'anfrage' then
+        set v_result = json_object('success', true, 'msg', 'Kann erstellt werden', 'hasWarnings', false, 'warnings', json_array(),'errors', json_array());
+    end if;
+
+
+    if p_type = 'lieferung' then
+        set v_result = json_object('success', true, 'msg', 'Kann erstellt werden', 'hasWarnings', false, 'warnings', json_array(),'errors', json_array());
+    end if;
+
+
+    if p_type = 'bestellung' then
+        set v_result = json_object('success', true, 'msg', 'Kann erstellt werden', 'hasWarnings', false, 'warnings', json_array(),'errors', json_array());
+    end if;
 
     if p_type = 'rechnung' then
         set v_result = json_object('success', true, 'msg', 'Kann erstellt werden', 'hasWarnings', false, 'warnings', json_array(),'errors', json_array());

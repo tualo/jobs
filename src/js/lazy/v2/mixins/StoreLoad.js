@@ -1,4 +1,39 @@
 Ext.define('Tualo.jobs.lazy.v2.mixins.StoreLoad', {
+
+    onBlgConfigStoreBeforeLoad: function (store, operation) {
+        console.log('Panel.onBlgConfigStoreBeforeLoad');
+        let model = this.getViewModel(),
+            view = model.getView(),
+            extraParams = store.getProxy().getExtraParams();
+
+        if (Ext.isEmpty(extraParams)) { extraParams = {}; };
+
+        extraParams.filter = Ext.JSON.encode([{
+            property: 'tabellenzusatz',
+            value: model.get('reportType'),
+            operator: 'eq'
+        }]);
+        store.getProxy().setExtraParams(extraParams);
+    },
+
+    onBlgConfigStoreLoad: function (store, records, successful, operation) {
+        let model = this.getViewModel();
+        console.log('Panel.onBlgConfigStoreLoad', store, records, successful, operation);
+        if (!successful) {
+            console.error('Failed to load BlgConfig store', operation);
+            Ext.Msg.alert('Error', 'Die Belegart konnte nicht geladen werden');
+            return;
+        }
+        if (records.length === 0) {
+            console.warn('BlgConfig store loaded but no records found');
+            Ext.Msg.alert('Warning', 'Die Belegart wurde geladen, aber es wurden keine Einträge gefunden');
+        }
+        model.set('blgConfig', records.length > 0 ? records[0] : null);
+
+
+
+    },
+
     onDocumentNamesStoreBeforeLoad: function (store, operation) {
         console.log('Panel.onDocumentNamesStoreBeforeLoad');
         let model = this.getViewModel(),

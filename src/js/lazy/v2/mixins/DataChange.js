@@ -11,7 +11,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.DataChange', {
         let me = this,
             view = me.getView(),
             model = me.getViewModel(),
-            textsStore = model.get('reportType') == 'angebot' ? model.getStore('tualo_job_offer_text') : model.getStore('tualo_job_invoice_text'),
+            textsStore = me.getTextStore(),
             dataStore = model.getStore('data'),
             frame = view.getComponent('previewOuterFrame').getComponent('previewFrame'),
             modifiedRows = textsStore.getModifiedRecords().length + dataStore.getModifiedRecords().length;
@@ -30,7 +30,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.DataChange', {
         let me = this,
             view = me.getView(),
             model = me.getViewModel(),
-            textsStore = model.get('reportType') == 'angebot' ? model.getStore('tualo_job_offer_text') : model.getStore('tualo_job_invoice_text'),
+            textsStore = me.getTextStore(),
             dataStore = model.getStore('data'),
             frame = view.getComponent('previewOuterFrame').getComponent('previewFrame'),
             modifiedRows = textsStore.getModifiedRecords().length + dataStore.getModifiedRecords().length;

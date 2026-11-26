@@ -334,7 +334,8 @@ Ext.define('Tualo.jobs.lazy.v2.Panel', {
                         {
                             bind: {
                                 disabled: '{disableSaveReport}',
-                                text: '{saveReportButtonText}'
+                                text: '{saveReportButtonText}',
+                                tooltip: '{saveReportButtonTooltip}'
                             },
                             handler: 'saveReport'
 

@@ -26,6 +26,8 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
         show_subtotals: 1,
         address: '',
         kundennummer: '',
+        empfaenger: null,
+        blgConfig: null,
         mixedGrouping: false,
         mixedHeadline: false,
         kostenstelle: 0,
@@ -36,12 +38,19 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
         name: function (get) {
             if (get('reportType') == 'angebot') return "Angebot";
             if (get('reportType') == 'rechnung') return "Rechnung*";
-            return '<unbekannt>';
+            let blgConfig = get('blgConfig');
+            return blgConfig && blgConfig.get('name') ? blgConfig.get('name') : '<unbekannt>';
         },
         title: function (get) {
             let txt = 'unbekannt';
             if (get('reportType') == 'angebot') txt = "Kalkulation zu Angebot";
-            if (get('reportType') == 'rechnung') txt = "Kalkulation zu Rechnung";
+            else if (get('reportType') == 'rechnung') txt = "Kalkulation zu Rechnung";
+            else {
+                let blgConfig = get('blgConfig');
+                if (blgConfig && blgConfig.get('name')) {
+                    txt = "Kalkulation zu " + blgConfig.get('name');
+                }
+            }
             if (!Ext.isEmpty(get('job'))) {
                 txt += " " + get('job').get('job_number');
             }
@@ -76,13 +85,45 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
             return get('selectedRows') == 0 ? 'Keine Zeilen ausgewählt' : ((get('mixedHeadline') ? 'Überschrift' : (get('selectedRows') > 1 ? 'Überschrift' : 'Überschrift')));
         },
         disableSave: function (get) {
+            // Das Speichern der Kalkulation ist nur für Angebot und Rechnung vorgesehen.
+            if (get('reportType') != 'angebot' && get('reportType') != 'rechnung') {
+                return true;
+            }
             return get('modifiedRows') == 0;
         },
         disableSaveReport: function (get) {
-            return (get('canSaveReport') === false) || (get('canCreateReport') === false) || get('modifiedRows') > 0;
+            if (get('canSaveReport') === false || get('canCreateReport') === false) {
+                return true;
+            }
+            // Ungespeicherte Änderungen blockieren nur Belegarten, bei denen Speichern möglich ist;
+            // bei den übrigen entstehen durch das automatische Text-Rendering immer Änderungen.
+            if (get('reportType') == 'angebot' || get('reportType') == 'rechnung') {
+                return get('modifiedRows') > 0;
+            }
+            return false;
         },
         saveReportButtonText: function (get) {
-            return get('reportType') == 'angebot' ? 'Angebot erstellen' : 'Rechnung erstellen';
+            if (get('reportType') == 'angebot') return 'Angebot erstellen';
+            if (get('reportType') == 'rechnung') return 'Rechnung erstellen';
+            let blgConfig = get('blgConfig');
+            return blgConfig && blgConfig.get('name')
+                ? blgConfig.get('name') + ' erstellen'
+                : 'Beleg erstellen';
+        },
+        saveReportButtonTooltip: function (get) {
+            if (get('canSaveReport') === false) {
+                return 'Ihnen fehlt das Speicherrecht für diese Belegart (Gruppe "job_save_' + get('reportType') + '").';
+            }
+            if (get('canCreateReport') === false) {
+                return 'Die Voraussetzungen für die Belegerstellung sind nicht erfüllt.';
+            }
+            if (
+                (get('reportType') == 'angebot' || get('reportType') == 'rechnung')
+                && get('modifiedRows') > 0
+            ) {
+                return 'Es gibt ungespeicherte Änderungen in der Kalkulation.';
+            }
+            return '';
         },
         document_names_displayField: function (get) {
             return get('reportType') + '_title';
@@ -159,6 +200,17 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
                 load: 'onTextStoreLoad',
             }
         },
+        tualo_job_report_text: {
+            type: 'tualo_job_report_text_store',
+            autoLoad: false,
+            autoSync: false,
+            pageSize: 100000,
+            listeners: {
+                beforeload: 'onTextStoreBeforeLoad',
+                datachanged: 'onTextDataChanged',
+                load: 'onTextStoreLoad',
+            }
+        },
         /*
         texts: {
             type: 'view_job_texts_store',
@@ -187,6 +239,16 @@ Ext.define('Tualo.jobs.lazy.v2.models.Panel', {
         },
         briefanreden: {
             type: 'briefanreden_store',
+            pageSize: 10000,
+            // ******
+            autoLoad: false
+        },
+        blg_config: {
+            type: 'blg_config_store',
+            listeners: {
+                beforeload: 'onBlgConfigStoreBeforeLoad',
+                load: 'onBlgConfigStoreLoad',
+            },
             pageSize: 10000,
             // ******
             autoLoad: false

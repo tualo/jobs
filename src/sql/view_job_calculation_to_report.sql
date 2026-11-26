@@ -10,6 +10,15 @@ CREATE OR REPLACE VIEW `view_job_calculation_to_report` AS with t as (
     union
     select
         'rechnung' AS `reporttype`
+    union
+    select
+        'anfrage' AS `reporttype`
+    union
+    select
+        'lieferung' AS `reporttype`
+    union
+    select
+        'bestellung' AS `reporttype`
 ),
 pos as (
     select

@@ -1,11 +1,23 @@
 Ext.define('Tualo.jobs.lazy.v2.mixins.Save', {
 
+    getTextStore: function () {
+        let model = this.getViewModel();
+        if (model.get('reportType') == 'angebot') {
+            return model.getStore('tualo_job_offer_text');
+        } else if (model.get('reportType') == 'rechnung') {
+            return model.getStore('tualo_job_invoice_text');
+        } else {
+            return model.getStore('tualo_job_report_text');
+        }
+    },
 
     saveReport: async function () {
         console.log('Panel.saveReport');
         let model = this.getViewModel(),
             view = this.getView(),
             reporttype = model.get('reportType');
+
+
 
         let res = await fetch('./report/' + reporttype + '/-1', {
             method: 'PUT',
@@ -70,10 +82,11 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Save', {
             grid = view.getComponent('westPanel').getComponent('calculationGrid'),
             previewFrame = me.getView().getComponent('previewOuterFrame').getComponent('previewFrame'),
             iframeDocument = previewFrame.getStageDocument(),
-            texts = model.get('reportType') == 'angebot' ? model.getStore('tualo_job_offer_text') : model.getStore('tualo_job_invoice_text'),
+            texts = me.getTextStore(),
             calcStore = grid.getStore(),
             updatedRecords = calcStore.getUpdatedRecords(),
             changedFields = new Set();
+
 
         // union of all changed field names across dirty records
         updatedRecords.forEach((rec) => {
