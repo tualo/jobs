@@ -166,6 +166,8 @@ a as (
         `h`.`zeitraum_von` AS `zeitraum_von`,
         `h`.`zeitraum_bis` AS `zeitraum_bis`,
         `p`.`einheit` AS `einheit`,
+        `p`.`konto` AS `konto`,
+        `p`.`zuschlag` AS `zuschlag`,
         `p`.`einheit_symbol` AS `einheit_symbol`,
         `p`.`einheit_faktor` AS `einheit_faktor`
     from
@@ -236,6 +238,8 @@ select
     `a`.`angebot_title` AS `angebot_title`,
     `a`.`rechnung_title` AS `rechnung_title`,
     `a`.`teilueberschrift` AS `teilueberschrift`,
+    `a`.`konto` AS `konto`,
+    `a`.`zuschlag` AS `zuschlag`,
         `a`.`einheit` AS `einheit`,
         `a`.`einheit_symbol` AS `einheit_symbol`,
         `a`.`einheit_faktor` AS `einheit_faktor`,
@@ -299,4 +303,8 @@ VALUES
     (16, '', 'gruppenfunktion', 'varchar(16)', 'varchar', 0, 0, 0, 1, '',
      'NEVER', 'YES', 0, 0, 0, 'select,insert,update,references', 0, 'blg_pos_calculation', 1),
     (16, '', 'gruppenfunktion', 'varchar(16)', 'varchar', 0, 0, 0, 1, '',
-     'NEVER', 'YES', 0, 0, 0, 'select,insert,update,references', 0, 'view_job_calculation_to_report', 1);
+     'NEVER', 'YES', 0, 0, 0, 'select,insert,update,references', 0, 'view_job_calculation_to_report', 1),
+    (0, '', 'zuschlag', 'decimal(15,4)', 'decimal', 0, 0, 0, 1, '',
+     'NEVER', 'YES', 0, 15, 4, 'select,insert,update,references', 0, 'view_job_calculation_to_report', 1),
+    (0, '', 'konto', 'int(11)', 'int', 0, 0, 0, 1, '',
+     'NEVER', 'NO', 0, 10, 0, 'select,insert,update,references', 0, 'view_job_calculation_to_report', 1);

@@ -246,7 +246,80 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
             positions.push(localRecord);
         });
 
+        // Zuschlag/Rabatt: je Steuersatz eine Pauschalposition am Belegende ergänzen.
+        // Die Spalte "zuschlag" enthält einen prozentualen Wert mit Vorzeichen (20 = 20%).
+        let zuschlagHash = {};
+        positions.forEach((localRecord) => {
+            let zuschlag = Number(localRecord.zuschlag);
+            if (!Number.isFinite(zuschlag) || zuschlag === 0) return;
+            let key = "" + localRecord.tax;
+            if (typeof zuschlagHash[key] === 'undefined') {
+                zuschlagHash[key] = {
+                    tax: localRecord.tax,
+                    value: 0,
+                    percents: [],
+                    firstRecord: localRecord
+                };
+            }
+            zuschlagHash[key].value += localRecord.net * zuschlag / 100;
+            if (zuschlagHash[key].percents.indexOf(zuschlag) === -1) {
+                zuschlagHash[key].percents.push(zuschlag);
+            }
+        });
 
+        for (let key in zuschlagHash) {
+            let entry = zuschlagHash[key],
+                net = Math.round(entry.value * 100) / 100;
+            if (net === 0) continue;
+
+            let unit = model.getStore('mengeneinheiten').findRecord('id', 7, 0, false, true, true);
+            if (!unit) {
+                let message = 'Mengeneinheit 7 (Pauschale) wurde nicht gefunden.';
+                Ext.toast({ html: message, title: 'Fehler', align: 't' });
+                throw new Error(message);
+            }
+
+            let label = net < 0 ? 'Rabatt' : 'Zuschlag';
+            if (entry.percents.length === 1) {
+                label += ' ' + Tualo.tualojs.Format.Renderer.fullPercentRenderer(Math.abs(entry.percents[0]));
+            }
+
+            let zuschlagRecord = {
+                use_in_offer: 1,
+                artikel: entry.firstRecord.artikel,
+                konto: entry.firstRecord.konto,
+                leistungsbeschreibung: label,
+                bemerkung: '',
+                zusatztext: '',
+                anzahl: 1,
+                amount: 1,
+                einheit: 7,
+                unit: 7,
+                einheit_symbol: unit.get('symbol'),
+                einheit_faktor: unit.get('faktor'),
+                singleprice: net,
+                epreis: net,
+                net: net,
+                tax: entry.tax,
+                steuersatz: entry.tax,
+                zuschlag: 0,
+                pos_text: positions.length + 1
+            };
+            zuschlagRecord.taxvalue = Math.round(net * entry.tax) / 100;
+            zuschlagRecord.gross = zuschlagRecord.net + zuschlagRecord.taxvalue;
+            zuschlagRecord.singleprice_print_precision = me.getSinglePricePrintPrecision(
+                zuschlagRecord.singleprice, zuschlagRecord.amount, zuschlagRecord.net
+            );
+
+            if (forSaving == true) {
+                zuschlagRecord.article = zuschlagRecord.artikel;
+                zuschlagRecord.vid = entry.firstRecord.vid;
+                zuschlagRecord.vzusatz = 'calculation';
+                zuschlagRecord.id = -1;
+            }
+
+            positions.push(zuschlagRecord);
+        }
 
         positions.forEach((localRecord) => {
             if (localRecord.use_in_offer == 0) return;

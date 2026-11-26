@@ -161,7 +161,9 @@ a as (
         `p`.`gruppenpreis_brutto` AS `gruppenpreis_brutto`,
         `h`.`zeitraum_von` AS `zeitraum_von`,
         `h`.`zeitraum_bis` AS `zeitraum_bis`,
-        `p`.`einheit` AS `einheit`,
+        `p`.`einheit` AS `einheit`,        
+        `p`.`zuschlag` AS `zuschlag`,
+
         `p`.`einheit_symbol` AS `einheit_symbol`,
         `p`.`einheit_faktor` AS `einheit_faktor`
     from
@@ -237,6 +239,7 @@ select
     `a`.`angebot_title` AS `angebot_title`,
     `a`.`rechnung_title` AS `rechnung_title`,
     `a`.`teilueberschrift` AS `teilueberschrift`,
+    `a`.`zuschlag` AS `zuschlag`,
     `a`.`einheit` AS `einheit`,
     `a`.`einheit_symbol` AS `einheit_symbol`,
     `a`.`einheit_faktor` AS `einheit_faktor`,
