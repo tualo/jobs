@@ -122,6 +122,8 @@ test('exports discounts and surcharges as separate package groups per tax rate',
         assert.equal(positions.length, 4);
         assert.equal(new Set(positions.map(position => position.gruppierung)).size, 4);
         for (const position of positions.slice(2)) {
+            assert.equal(position.pos, 999999);
+            assert.equal(position.position, 999999);
             assert.equal(position.gruppenmenge, 1);
             assert.equal(position.gruppeneinheit, 7);
             assert.equal(position.gruppenfunktion, 'one');
