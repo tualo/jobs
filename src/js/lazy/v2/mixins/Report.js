@@ -405,6 +405,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
                 */
             }
             report_taxes.push({
+                "_prio": 90000,
                 "cssattr": "totalnet",
                 "text": "Gesamt:",
                 "wert": Tualo.tualojs.Format.Renderer.euroRenderer(sum_net)
@@ -416,11 +417,13 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
                 sum_net += taxes_Hash[key].net;
 
                 let t = {
+                    "_prio": 10000 + taxes_Hash[key].rate,
                     "cssattr": "tax",
                     "text": "Steuer (" + Tualo.tualojs.Format.Renderer.fullPercentRenderer(taxes_Hash[key].rate) + "):",
                     "wert": Tualo.tualojs.Format.Renderer.euroRenderer(taxes_Hash[key].tax)
                 };
                 let o = {
+                    "_prio": 20000 + taxes_Hash[key].rate,
                     "cssattr": "totalnet",
                     "text": "Netto (" + Tualo.tualojs.Format.Renderer.fullPercentRenderer(taxes_Hash[key].rate) + "):",
                     "wert": Tualo.tualojs.Format.Renderer.euroRenderer(taxes_Hash[key].net)
@@ -430,6 +433,7 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
             }
 
             report_taxes.push({
+                "_prio": 30000,
                 "cssattr": "total",
                 "text": "Gesamt:",
                 "wert": Tualo.tualojs.Format.Renderer.euroRenderer(sum)
