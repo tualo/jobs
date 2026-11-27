@@ -451,8 +451,8 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
 
         reportTemplate.bookingdate = Ext.util.Format.date(new Date(), "Y-m-d");
         reportTemplate.date = Ext.util.Format.date(new Date(), "Y-m-d");
-        reportTemplate.service_period_stop = Ext.util.Format.date(jobRecord.get('delivery_date'), "Y-m-d");
-        reportTemplate.service_period_start = Ext.util.Format.date(jobRecord.get('delivery_date'), "Y-m-d");
+
+
         reportTemplate.document_name = model.get('document_name');
         reportTemplate.report_taxes = report_taxes;
         reportTemplate.texts = texts_array;
