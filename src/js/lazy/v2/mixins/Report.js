@@ -284,6 +284,11 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
                 label += ' ' + Tualo.tualojs.Format.Renderer.fullPercentRenderer(Math.abs(entry.percents[0]));
             }
 
+            // Laut ZUGFeRD (EN 16931, BR-27) darf der Einzelpreis nicht negativ sein:
+            // Rabatte werden mit negativer Menge und positivem Einzelpreis abgebildet.
+            let amount = net < 0 ? -1 : 1,
+                singleprice = Math.abs(net);
+
             let zuschlagRecord = {
                 use_in_offer: 1,
                 artikel: entry.firstRecord.artikel,
@@ -292,10 +297,10 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
                 leistungsbeschreibung: label,
                 bemerkung: '',
                 zusatztext: '',
-                anzahl: 1,
-                amount: 1,
+                anzahl: amount,
+                amount: amount,
                 gruppierung: (new Date()).getTime() + positions.length,
-                gruppenmenge: 1,
+                gruppenmenge: amount,
                 gruppeneinheit: 7,
                 gruppenfunktion: 'one',
                 gruppenpreis_netto: net,
@@ -303,8 +308,8 @@ Ext.define('Tualo.jobs.lazy.v2.mixins.Report', {
                 unit: 7,
                 einheit_symbol: unit.get('symbol'),
                 einheit_faktor: unit.get('faktor'),
-                singleprice: net,
-                epreis: net,
+                singleprice: singleprice,
+                epreis: singleprice,
                 net: net,
                 tax: entry.tax,
                 steuersatz: entry.tax,

@@ -42,6 +42,8 @@ pos as (
         `p`.`einheit_symbol` AS `einheit_symbol`,
         `p`.`einheit_faktor` AS `einheit_faktor`,
         `p`.`vdatum` AS `vdatum`,
+        `h`.`service_date` AS `vdatum`,
+        
         `p`.`handwerkeranteil` AS `handwerkeranteil`,
         `p`.`ekpreis` AS `ekpreis`,
         `p`.`ekpreis_summe` AS `ekpreis_summe`,
@@ -108,6 +110,10 @@ pos as (
     from
         (
             `t`
+            
+            join `blg_hdr_calculation` `h` 
+                on `h`.`id` = `p`.`beleg`
+            
             join `blg_pos_calculation` `p` on(
                 (
                     `p`.`zid` is null
