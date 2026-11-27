@@ -8,6 +8,16 @@ with t as (
     union
     select
         'rechnung' AS `reporttype`
+    union
+    select
+        'anfrage' AS `reporttype`
+    union
+    select
+        'lieferung' AS `reporttype`
+    union
+    select
+        'bestellung' AS `reporttype`
+
 ),
 pos as (
     select
@@ -100,7 +110,15 @@ pos as (
             join `blg_pos_calculation` `p` on(
                 (
                     if (`t`.`reporttype` = 'rechnung', `p`.`zid` is null or `p`.`zid` = 0, 
-                        if (`t`.`reporttype` = 'angebot', `p`.`oid` is null or `p`.`oid` = 0, false)
+                        if (`t`.`reporttype` = 'angebot', `p`.`oid` is null or `p`.`oid` = 0, 
+                        if (`t`.`reporttype` = 'lieferung', true, 
+                        if (`t`.`reporttype` = 'anfrage', true, 
+                        if (`t`.`reporttype` = 'bestellung', true, 
+                        false
+                        )
+                        )
+                        )
+                        )
                     )
                
                     
